@@ -102,8 +102,8 @@ class Sb3VecEnvWrapper(gym.Wrapper, VecEnv):
     Operations - MDP
     """
 
-    def reset(self) -> VecEnvObs:  # noqa: D102
-        obs_dict = self.env.reset()
+    def reset(self) -> VecEnvObs:  # noqa: D102 # learn/1
+        obs_dict = self.env.reset() 
         # convert data types to numpy depending on backend
         return self._process_obs(obs_dict)
 
@@ -163,22 +163,33 @@ class Sb3VecEnvWrapper(gym.Wrapper, VecEnv):
     Helper functions.
     """
 
-    def _process_obs(self, obs_dict) -> np.ndarray:
+    def _process_obs(self, obs_dict) -> np.ndarray: # learn/2
         """Convert observations into NumPy data type."""
+
+        '''
+        obs_dics
+        {'policy': tensor([[ 0.0915, -0.2714, -0.4762, -0.5840],
+        [ 0.5541,  0.3517, -0.2878, -0.5938],
+        [ 0.7348, -0.1189, -0.4602,  0.7255],
+        [-0.6713, -0.1547,  0.1630,  0.6098]])}
+        '''
         # Sb3 doesn't support asymmetric observation spaces, so we only use "policy"
-        obs = obs_dict["policy"]
+
+
+        obs = obs_dict["policy"] 
+
         # Note: IsaacEnv uses torch backend (by default).
-        if self.env.sim.backend == "torch":
+        if self.env.sim.backend == "torch": # here
             if isinstance(obs, dict):
                 for key, value in obs.items():
                     obs[key] = value.detach().cpu().numpy()
-            else:
+            else: # and here
                 obs = obs.detach().cpu().numpy()
         elif self.env.sim.backend == "numpy":
             pass
         else:
             raise NotImplementedError(f"Unsupported backend for simulation: {self.env.sim.backend}")
-        return obs
+        return obs # array 1 X 4
 
     def _process_extras(self, obs, dones, extras, reset_ids) -> List[Dict[str, Any]]:
         """Convert miscellaneous information into dictionary for each sub-environment."""

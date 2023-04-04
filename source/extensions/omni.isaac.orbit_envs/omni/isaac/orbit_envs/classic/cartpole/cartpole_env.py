@@ -33,7 +33,7 @@ class CartpoleEnv(IsaacEnv):
             headless (bool, optional): Whether to enable rendering or not. Defaults to False.
         """
         # copy configuration
-        self.cfg_dict = cfg.copy()
+        self.cfg_dict = cfg.copy() # {'env': {'num_envs': 4, 'env_spacing': 4.0, 'episode_length': 500, 'control_frequency_inv': 2, 'reset_dist': 3.0, 'max_effort': 400.0}, 'scene': {'cartpole': {...}}, 'sim': {'dt': 0.0083, 'substeps': 1, 'gravity': [...], 'enable_scene_query_support': False, 'use_gpu_pipeline': False, 'use_flatcache': True, 'device': 'cpu', 'physx': {...}}}
         # configuration for the environment
         isaac_cfg = IsaacEnvCfg(
             env=EnvCfg(num_envs=self.cfg_dict["env"]["num_envs"], env_spacing=self.cfg_dict["env"]["env_spacing"])

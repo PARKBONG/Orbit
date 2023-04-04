@@ -194,7 +194,7 @@ class IsaacEnv(gym.Env):
         rep.set_global_seed(seed)
         return torch_utils.set_seed(seed)
 
-    def reset(self) -> VecEnvObs:
+    def reset(self) -> VecEnvObs: # called sb3.py/reset
         """Flags all environments for reset.
 
         Note:

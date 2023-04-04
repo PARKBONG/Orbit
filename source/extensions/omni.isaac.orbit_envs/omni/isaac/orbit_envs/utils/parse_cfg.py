@@ -29,7 +29,7 @@ def load_default_env_cfg(task_name: str) -> Union[dict, Any]:
         Union[dict, Any]: The parsed configuration object.
     """
     # retrieve the configuration file to load
-    cfg_entry_point: str = gym.spec(task_name)._kwargs.pop("cfg_entry_point")
+    cfg_entry_point: str = gym.spec(task_name)._kwargs.pop("cfg_entry_point") # 'omni.isaac.orbit_envs.classic.humanoid:humanoid_cfg.yaml'
 
     # parse the default config file
     if cfg_entry_point.endswith(".yaml"):
@@ -38,13 +38,13 @@ def load_default_env_cfg(task_name: str) -> Union[dict, Any]:
             config_file = cfg_entry_point
         else:
             # resolve path to the module location
-            mod_name, file_name = cfg_entry_point.split(":")
+            mod_name, file_name = cfg_entry_point.split(":") # 'omni.isaac.orbit_envs.classic.humanoid, humanoid_cfg.yaml
             mod_path = os.path.dirname(importlib.import_module(mod_name).__file__)
             # obtain the configuration file path
             config_file = os.path.join(mod_path, file_name)
         # load the configuration
         print(f"[INFO]: Parsing default environment configuration from: {config_file}")
-        with open(config_file) as f:
+        with open(config_file) as f: # config_file <- '/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/classic/humanoid/humanoid_cfg.yaml'
             cfg = yaml.full_load(f)
     else:
         if callable(cfg_entry_point):
@@ -61,7 +61,8 @@ def load_default_env_cfg(task_name: str) -> Union[dict, Any]:
         print(f"[INFO]: Parsing default environment configuration from: {inspect.getfile(cfg_cls)}")
         cfg = cfg_cls()
 
-    return cfg
+    return cfg 
+#  cfg <- {'env': {'num_envs': 1024, 'env_spacing': 5, 'episode_length': 1000, 'control_frequency_inv': 2, 'power_scale': 1.0, 'angular_velocity_scale': 0.25, 'dof_velocity_scale': 0.1, 'contact_force_scale': 0.01, 'heading_weight': 0.5, ...}, 'scene': {'humanoid': {...}}, 'sim': {'dt': 0.0083, 'substeps': 1, 'gravity': [...], 'enable_scene_query_support': False, 'use_gpu_pipeline': True, 'use_flatcache': True, 'device': 'cuda:0', 'physx': {...}}}
 
 
 def parse_env_cfg(task_name: str, use_gpu: bool = True, num_envs: int = None, **kwargs) -> Union[dict, Any]:
@@ -76,12 +77,12 @@ def parse_env_cfg(task_name: str, use_gpu: bool = True, num_envs: int = None, **
         Union[dict, Any]: The parsed configuration object.
     """
     # create a dictionary to update from
-    args_cfg = {"sim": {"physx": dict()}, "env": dict()}
+    args_cfg = {"sim": {"physx": dict()}, "env": dict()} # {'sim': {'physx': {}}, 'env': {}}
     # resolve pipeline to use (based on input)
     if not use_gpu:
         args_cfg["sim"]["use_gpu_pipeline"] = False
         args_cfg["sim"]["physx"]["use_gpu"] = False
-        args_cfg["sim"]["device"] = "cpu"
+        args_cfg["sim"]["device"] = "cpu" # {'sim': {'physx': {...}, 'use_gpu_pipeline': False, 'device': 'cpu'}, 'env': {}}
     else:
         args_cfg["sim"]["use_gpu_pipeline"] = True
         args_cfg["sim"]["physx"]["use_gpu"] = True
@@ -96,7 +97,7 @@ def parse_env_cfg(task_name: str, use_gpu: bool = True, num_envs: int = None, **
     # number of environments
     if num_envs is not None:
         args_cfg["env"]["num_envs"] = num_envs
-        print(f"[Config]: Overriding number of environments to: {num_envs}")
+        print(f"[Config]: Overriding number of environments to: {num_envs}") # {'sim': {'physx': {...}, 'use_gpu_pipeline': False, 'device': 'cpu'}, 'env': {'num_envs': 1}}
 
     # load the configuration
     cfg = load_default_env_cfg(task_name)
