@@ -11,6 +11,7 @@
             // "args" : ["--task","Isaac-Cartpole-v0","--num_envs","4","--headless","--cpu"],
             // "args" : ["--task","Isaac-Humanoid-v0","--num_envs","1", "--cpu"],
             "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],
+            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2048", "--cpu"],
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {

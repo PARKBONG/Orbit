@@ -50,7 +50,7 @@ def main():
         actions = torch.zeros((env.num_envs, env.action_space.shape[0]), device=env.device)
         # apply actions
         _, _, _, _ = env.step(actions)
-        print("sdf")
+        
         # check if simulator is stopped
         if env.unwrapped.sim.is_stopped():
             break

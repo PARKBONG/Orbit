@@ -3,20 +3,21 @@
 n_timesteps: !!float 16384000
 policy: 'MlpPolicy'
 n_steps: 64
+# n_steps: 128
 # mini batch size: num_envs * nsteps / nminibatches 2048×512÷2048
-batch_size: 192
+batch_size: 2048
 gae_lambda: 0.95
 gamma: 0.99
 n_epochs: 8
-ent_coef: 0.00
+ent_coef: 0.00238306
 vf_coef: 0.0001
-learning_rate: !!float 3e-4
+# learning_rate: !!float 3e-4
+learning_rate: !!float 1.5e-4
 clip_range: 0.2
 policy_kwargs: "dict(
                   activation_fn=nn.ELU,
-                  net_arch=[32, 32, dict(pi=[256, 128, 64], vf=[256, 128, 64])]
+                  net_arch=[64, 128, dict(pi=[256, 128, 64], vf=[256, 128, 64])]
                 )"
-
 
 target_kl: 0.01
 max_grad_norm: 1.0
@@ -24,7 +25,7 @@ seed: 42 # bong
 
 
 # # Uses VecNormalize class to normalize obs
-# normalize_input: True
+normalize_input: True
 # # Uses VecNormalize class to normalize rew
-# normalize_value: True
-# clip_obs: 5
+normalize_value: True
+clip_obs: 5

@@ -21,13 +21,14 @@ from omni.isaac.orbit.utils.mdp import ObservationManager, RewardManager
 
 from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 
-from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
+from .lift_cfg import LiftEnvCfg, RandomizationCfg
 
 
 class LiftEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator."""
 
     def __init__(self, cfg: LiftEnvCfg = None, headless: bool = False):
+
         # copy configuration
         self.cfg = cfg
         # parse the configuration for controller configuration
@@ -184,6 +185,7 @@ class LiftEnv(IsaacEnv):
         # -- add information to extra if task completed
         object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
         self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)
+        # print(self.extras["is_success"]) #printbong
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
@@ -263,8 +265,10 @@ class LiftEnv(IsaacEnv):
         """Visualize the environment in debug mode."""
         # apply to instance manager
         # -- goal
+        # print(self.object_des_pose_w[:, 0:3]) # printbong
         self._goal_markers.set_world_poses(self.object_des_pose_w[:, 0:3], self.object_des_pose_w[:, 3:7])
         # -- end-effector
+        # print(self.robot.data.ee_state_w[:, 0:3]) #printbong
         self._ee_markers.set_world_poses(self.robot.data.ee_state_w[:, 0:3], self.robot.data.ee_state_w[:, 3:7])
         # -- task-space commands
         if self.cfg.control.control_type == "inverse_kinematics":
@@ -382,6 +386,7 @@ class LiftObservationManager(ObservationManager):
 
     def tool_positions(self, env: LiftEnv):
         """Current end-effector position of the arm."""
+        # print(env.robot.data.ee_state_w[:, :3]) #printbong
         return env.robot.data.ee_state_w[:, :3] - env.envs_positions
 
     def tool_orientations(self, env: LiftEnv):
@@ -443,6 +448,8 @@ class LiftRewardManager(RewardManager):
 
     def reaching_object_position_l2(self, env: LiftEnv):
         """Penalize end-effector tracking position error using L2-kernel."""
+        # print(env.robot.data.ee_state_w[:, 0:3]) #printbong
+        # print(env.object.data.root_pos_w) #printbong
         return torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
 
     def reaching_object_position_exp(self, env: LiftEnv, sigma: float):
@@ -452,6 +459,7 @@ class LiftRewardManager(RewardManager):
 
     def reaching_object_position_tanh(self, env: LiftEnv, sigma: float):
         """Penalize tool sites tracking position error using tanh-kernel."""
+        # print(env.robot.data.ee_state_w[:, 0:3]) #printbong
         # distance of end-effector to the object: (num_envs,)
         ee_distance = torch.norm(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w, dim=1)
         # distance of the tool sites to the object: (num_envs, num_tool_sites)
@@ -480,6 +488,10 @@ class LiftRewardManager(RewardManager):
         """Penalize large values in action commands for the tool."""
         return -torch.square(env.actions[:, -1])
 
+    def tracking_object_position_l2(self, env: LiftEnv):
+        """Penalize tracking object position error using exp-kernel."""
+        return torch.sum(torch.square(env.object_des_pose_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
+
     def tracking_object_position_exp(self, env: LiftEnv, sigma: float, threshold: float):
         """Penalize tracking object position error using exp-kernel."""
         # distance of the end-effector to the object: (num_envs,)
@@ -496,4 +508,9 @@ class LiftRewardManager(RewardManager):
 
     def lifting_object_success(self, env: LiftEnv, threshold: float):
         """Sparse reward if object is lifted successfully."""
+        # print(env.object.data.root_pos_w[:, 2]) # printbong
         return torch.where(env.object.data.root_pos_w[:, 2] > threshold, 1.0, 0.0)
+
+    def lifting_object_desired_success(self, env: LiftEnv):
+        """Sparse reward if object is lifted successfully."""
+        return torch.where(env.object.data.root_pos_w[:, 2] > env.object_des_pose_w[:, 2], 1.0, 0.0)
