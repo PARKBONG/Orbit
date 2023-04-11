@@ -7,6 +7,7 @@ import gym.spaces
 import math
 import torch
 from typing import List
+import numpy as np
 
 import omni.isaac.core.utils.prims as prim_utils
 
@@ -43,7 +44,7 @@ class LiftEnv(IsaacEnv):
         # parse the configuration for information
         self._process_cfg()
         # initialize views for the cloned scenes
-        self._initialize_views()
+        self._initialize_views()  # here, action space set
 
         # prepare the observation manager
         self._observation_manager = LiftObservationManager(class_to_dict(self.cfg.observations), self, self.device)
@@ -59,7 +60,18 @@ class LiftEnv(IsaacEnv):
         num_obs = self._observation_manager.group_obs_dim["policy"][0]
         self.observation_space = gym.spaces.Box(low=-math.inf, high=math.inf, shape=(num_obs,))
         # compute the action space
-        self.action_space = gym.spaces.Box(low=-1.0, high=1.0, shape=(self.num_actions,))
+        # self.action_space = gym.spaces.Box(low=-5.0, high=5.0, shape=(self.num_actions,)) # original, clipping
+
+        # for 6-DoF
+        # self.action_space = gym.spaces.Box(low=np.array([-0.215, -0.6, -0.4, -torch.pi/2, -torch.pi/2, -torch.pi/2]),
+        #                                    high=np.array([0.3, 0.7, 0.4, torch.pi/2, torch.pi/2, torch.pi/2]),
+        #                                    shape=(self.num_actions,))  # bong, clipping
+
+        # for 3-DoF
+        self.action_space = gym.spaces.Box(low=np.array([-0.215, -0.6, -0.4]),
+                                           high=np.array([0.3, 0.6, 0.4]),
+                                           shape=(self.num_actions,))  # bong, clipping
+        # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]
         print("[INFO]: Completed setting up the environment...")
 
         # Take an initial step to initialize the scene.
@@ -69,6 +81,15 @@ class LiftEnv(IsaacEnv):
         self.object.update_buffers(self.dt)
         self.robot.update_buffers(self.dt)
 
+        # bong
+        self.ee_to_obj_l2 = torch.tensor([0 for _ in range(self.num_envs)], dtype=torch.float32)
+        self.catch_threshold = 0.0025
+        # bong, vis
+        # self._markers1.set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
+        # for i in range(6):
+        #     self._markers_list[i].set_world_poses(self.envs_positions - torch.tensor([], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
+        #     self._markers_list[i].set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
+        #     self._markers_list[i + 1].set_world_poses(self.envs_positions - torch.tensor([self.action_space.low[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
     """
     Implementation specifics.
     """
@@ -107,6 +128,14 @@ class LiftEnv(IsaacEnv):
                     usd_path=self.cfg.frame_marker.usd_path,
                     scale=self.cfg.frame_marker.scale,
                 )
+
+            # self._markers_list = [StaticMarker(
+            #     "/Visuals/bong_" + str(i),
+            #     self.num_envs,
+            #     usd_path=self.cfg.frame_marker.usd_path,
+            #     scale=self.cfg.frame_marker.scale,
+            # ) for i in range(6)]
+                
         # return list of global prims
         return ["/World/defaultGroundPlane"]
 
@@ -137,6 +166,9 @@ class LiftEnv(IsaacEnv):
         if self.cfg.control.control_type == "inverse_kinematics":
             self._ik_controller.reset_idx(env_ids)
 
+        # bong
+        self.ee_to_obj_l2[env_ids] = 0
+
     def _step_impl(self, actions: torch.Tensor):
         # pre-step: set actions into buffer
         self.actions = actions.clone().to(device=self.device)
@@ -157,9 +189,15 @@ class LiftEnv(IsaacEnv):
             # we assume last command is tool action so don't change that
             self.robot_actions[:, -1] = self.actions[:, -1]
         elif self.cfg.control.control_type == "default":
-            self.robot_actions[:] = self.actions
+            # self.robot_actions[:] = self.actions     # original
+            self.robot_actions[:, :-1] = self.actions  # bong
+            # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]   # good: [-0.215, 0.07, 0, 0, 0, 0]
+            # self.robot_actions[:, :-1] = torch.tensor([[0, 0, -0.4, 0, 0, 0], [0, 0, 0, 0, 0, 0]], dtype=torch.float32)  # bong
+            self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=50)  # open = 0.785398
+            # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
+            # print()
             # set actions into buffers
             self.robot.apply_action(self.robot_actions)
             # simulate
@@ -183,12 +221,16 @@ class LiftEnv(IsaacEnv):
         # Note: this is used by algorithms like PPO where time-outs are handled differently
         self.extras["time_outs"] = self.episode_length_buf >= self.max_episode_length
         # -- add information to extra if task completed
-        object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
-        self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)
+
+        # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # original
+        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
+        # self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)  # original
+        self.extras["is_success"] = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)  # bong
         # print(self.extras["is_success"]) #printbong
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
+        # close gripper_func
 
     def _get_observations(self) -> VecEnvObs:
         # compute observations
@@ -247,7 +289,8 @@ class LiftEnv(IsaacEnv):
             )
             self.num_actions = self._ik_controller.num_actions + 1
         elif self.cfg.control.control_type == "default":
-            self.num_actions = self.robot.num_actions
+            # self.num_actions = self.robot.num_actions   # original
+            self.num_actions = self.robot.num_actions - 1  # bong
 
         # history
         self.actions = torch.zeros((self.num_envs, self.num_actions), device=self.device)
@@ -282,18 +325,20 @@ class LiftEnv(IsaacEnv):
     Helper functions - MDP.
     """
 
-    def _check_termination(self) -> None:
+    def _check_termination(self) -> None:  # change
         # access buffers from simulator
-        object_pos = self.object.data.root_pos_w - self.envs_positions
+        object_pos = self.object.data.root_pos_w - self.envs_positions  # original
         # extract values from buffer
         self.reset_buf[:] = 0
         # compute resets
         # -- when task is successful
-        if self.cfg.terminations.is_success:
-            object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
-            self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
+        if self.cfg.terminations.is_success:  # original
+            # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
+            object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
+            self.reset_buf = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)
         # -- object fell off the table (table at height: 0.0 m)
         if self.cfg.terminations.object_falling:
+            # print(object_pos[:, 2])
             self.reset_buf = torch.where(object_pos[:, 2] < -0.05, 1, self.reset_buf)
         # -- episode length
         if self.cfg.terminations.episode_timeout:
@@ -355,6 +400,15 @@ class LiftEnv(IsaacEnv):
             )
         # transform command from local env to world
         self.object_des_pose_w[env_ids, 0:3] += self.envs_positions[env_ids]
+
+    def bong_is_ee_close_to_object(self, stacks=20):
+        # change need if there is false -> reset
+        bool_tensor = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)
+        self.ee_to_obj_l2[~bool_tensor] = 0
+        self.ee_to_obj_l2 += bool_tensor
+        print(self.ee_to_obj_l2)
+        # print(self.ee_to_obj_l2, -1 * (self.ee_to_obj_l2 > stacks)) # printbong
+        return (self.ee_to_obj_l2 >= stacks)
 
 
 class LiftObservationManager(ObservationManager):
@@ -448,9 +502,9 @@ class LiftRewardManager(RewardManager):
 
     def reaching_object_position_l2(self, env: LiftEnv):
         """Penalize end-effector tracking position error using L2-kernel."""
-        # print(env.robot.data.ee_state_w[:, 0:3]) #printbong
-        # print(env.object.data.root_pos_w) #printbong
-        return torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
+        # print("ee", env.robot.data.ee_state_w[:, 0:3])  # printbong
+        # print("obj", env.object.data.root_pos_w)  # printbong
+        return -torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
 
     def reaching_object_position_exp(self, env: LiftEnv, sigma: float):
         """Penalize end-effector tracking position error using exp-kernel."""
@@ -514,3 +568,8 @@ class LiftRewardManager(RewardManager):
     def lifting_object_desired_success(self, env: LiftEnv):
         """Sparse reward if object is lifted successfully."""
         return torch.where(env.object.data.root_pos_w[:, 2] > env.object_des_pose_w[:, 2], 1.0, 0.0)
+
+    def bong_catch_object(self, env: LiftEnv):  # what is the diff between sparse and con?
+        """Sparse reward if object is lifted successfully."""
+        # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
+        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025)

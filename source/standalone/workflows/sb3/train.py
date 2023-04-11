@@ -54,6 +54,8 @@ from omni.isaac.orbit_envs.utils.wrappers.sb3 import Sb3VecEnvWrapper
 
 from config import parse_sb3_cfg
 
+# from omni.isaac.orbit_envs.bong.lift.callbacks import GripperCloseCallback
+
 
 def main():
     """Train with stable-baselines agent."""
@@ -102,8 +104,11 @@ def main():
 
     # callbacks for agent
     checkpoint_callback = CheckpointCallback(save_freq=100, save_path=log_dir, name_prefix="model", verbose=2)
+    # gripperclose_callback = GripperCloseCallback(threshold=0.1)
     # train the agent
+    # agent.learn(total_timesteps=n_timesteps)  # sb3.py/reset
     agent.learn(total_timesteps=n_timesteps, callback=checkpoint_callback)  # sb3.py/reset
+    # agent.learn(total_timesteps=n_timesteps, callback=gripperclose_callback)  # sb3.py/reset
     # save the final model
     agent.save(os.path.join(log_dir, "model"))
 

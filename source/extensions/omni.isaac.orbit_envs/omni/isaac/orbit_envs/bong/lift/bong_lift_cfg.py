@@ -40,7 +40,7 @@ class ManipulationObjectCfg(RigidObjectCfg):
 
     meta_info = RigidObjectCfg.MetaInfoCfg(
         usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
-        scale=(0.8, 0.8, 0.8),
+        scale=(1, 1, 1),
     )
     init_state = RigidObjectCfg.InitialStateCfg(
         pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
@@ -175,6 +175,7 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
+    bong_catch_object = {"weight": 1}
 
 
 @configclass
@@ -194,7 +195,7 @@ class ControlCfg:
     # action space
     control_type = "default"  # "default", "inverse_kinematics"
     # decimation: Number of control action updates @ sim dt per policy dt
-    decimation = 2
+    decimation = 1
 
     # configuration loaded when control_type == "inverse_kinematics"
     inverse_kinematics: DifferentialInverseKinematicsCfg = DifferentialInverseKinematicsCfg(
