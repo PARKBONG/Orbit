@@ -406,7 +406,7 @@ class LiftEnv(IsaacEnv):
         bool_tensor = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)
         self.ee_to_obj_l2[~bool_tensor] = 0
         self.ee_to_obj_l2 += bool_tensor
-        print(self.ee_to_obj_l2)
+        # print(self.ee_to_obj_l2)  # printbong
         # print(self.ee_to_obj_l2, -1 * (self.ee_to_obj_l2 > stacks)) # printbong
         return (self.ee_to_obj_l2 >= stacks)
 
@@ -504,7 +504,7 @@ class LiftRewardManager(RewardManager):
         """Penalize end-effector tracking position error using L2-kernel."""
         # print("ee", env.robot.data.ee_state_w[:, 0:3])  # printbong
         # print("obj", env.object.data.root_pos_w)  # printbong
-        return -torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
+        return 0.5 - torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
 
     def reaching_object_position_exp(self, env: LiftEnv, sigma: float):
         """Penalize end-effector tracking position error using exp-kernel."""
