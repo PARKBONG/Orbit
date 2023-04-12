@@ -235,7 +235,7 @@ class LiftEnv(IsaacEnv):
         # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # original
         object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         # self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)  # original
-        self.extras["is_success"] = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)  # bong
+        self.extras["is_catch"] = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)  # bong
         self.extras["fail_to_catch"] = torch.where((self.robot_actions[:, -1] != 0) & ~object_position_error_bool, 1, self.reset_buf)  # bong
         # print(self.extras["is_success"]) #printbong
         # -- update USD visualization
@@ -345,10 +345,15 @@ class LiftEnv(IsaacEnv):
         self.reset_buf[:] = 0
         # compute resets
         # -- when task is successful
-        if self.cfg.terminations.is_success:  # original
+        if self.cfg.terminations.is_catch:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
             object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
             self.reset_buf = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)
+
+        if self.cfg.terminations.is_obj_desired:  # original
+            object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
+            self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
+
         # -- object fell off the table (table at height: 0.0 m)
         if self.cfg.terminations.object_falling:
             # print(object_pos[:, 2])
@@ -509,9 +514,14 @@ class LiftObservationManager(ObservationManager):
         """Last tool actions transformed to a boolean command."""
         return torch.sign(env.actions[:, -1]).unsqueeze(1)
 
-
+    def bong_obj_to_desire(self, env: LiftEnv):
+        return env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3]
+    
 class LiftRewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""
+
+    def __init__(self, cfg, env, num_envs: int, dt: float, device: str):
+        super().__init__(cfg, env, num_envs, dt, device)
 
     def reaching_object_position_l2(self, env: LiftEnv):
         """Penalize end-effector tracking position error using L2-kernel."""
@@ -594,7 +604,17 @@ class LiftRewardManager(RewardManager):
         return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002)  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):  # what is the diff between sparse and con?
-        """Sparse reward if object is lifted successfully."""
+        """Sparse reward if object is lifted failed."""
         # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
         return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) >= 0.002)  # descremental, bong
-    
+
+    def bong_after_catch(self, env: LiftEnv):
+
+        new = (env.robot_actions[:, -1] != 0)
+        old = (env.previous_actions[:, -1] != 0)
+        pen = -1 * ((old ^ new) * (torch.sum(torch.square(env.object_des_pose_w[:, 0:3] - env.object.data.root_pos_w), dim=1)))
+        return pen
+
+    def bong_obj_finish(self, env: LiftEnv):
+        object_position_error = torch.norm(env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3], dim=1)
+        return torch.where(object_position_error < 0.002, 1, 0)
