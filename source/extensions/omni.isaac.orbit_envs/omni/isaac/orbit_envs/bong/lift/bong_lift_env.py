@@ -85,7 +85,7 @@ class LiftEnv(IsaacEnv):
         # bong
         self.ee_to_obj_l2 = torch.tensor([0 for _ in range(self.num_envs)], dtype=torch.float32)
         # self.catch_threshold = 0.0025
-        self.catch_threshold = 0.0035
+        self.catch_threshold = 0.002
         # bong, vis
         # self._markers1.set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
         # for i in range(6):
@@ -236,6 +236,7 @@ class LiftEnv(IsaacEnv):
         object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         # self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)  # original
         self.extras["is_success"] = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)  # bong
+        # self.extras["fail_to_catch"] = torch.where((self.robot_actions[:, -1] != 0) & ~object_position_error_bool, 1, self.reset_buf)  # bong
         # print(self.extras["is_success"]) #printbong
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
@@ -584,5 +585,9 @@ class LiftRewardManager(RewardManager):
     def bong_catch_object(self, env: LiftEnv):  # what is the diff between sparse and con?
         """Sparse reward if object is lifted successfully."""
         # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
-        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0035)  # descremental, bong
+        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002)  # descremental, bong
 
+    def bong_catch_failure(self, env: LiftEnv):  # what is the diff between sparse and con?
+        """Sparse reward if object is lifted successfully."""
+        # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
+        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) >= 0.002)  # descremental, bong

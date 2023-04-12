@@ -176,6 +176,7 @@ class RewardsCfg:
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
     bong_catch_object = {"weight": 100}
+    # bong_fail_to_catch = {"weight": 50}
 
 
 @configclass
@@ -186,6 +187,7 @@ class TerminationsCfg:
     object_falling = True  # reset when object falls off the table
     # is_success = False  # reset when object is lifted
     is_success = True  # reset when object is lifted
+    fail_to_catch = True  # reset when object is lifted
 
 
 @configclass
