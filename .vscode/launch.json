@@ -8,16 +8,17 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            // "args" : ["--task","Isaac-Cartpole-v0","--num_envs","4","--headless","--cpu"],
-            // "args" : ["--task","Isaac-Humanoid-v0","--num_envs","1", "--cpu"],
-            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train
-            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_07-12-28/model_16384000_steps.zip","--cpu"], // play
-            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_11-56-02/model_16384000_steps.zip","--cpu"], // play
-            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_12-44-11/model_137420800_steps.zip","--cpu"], // play
-            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_17-06-59/model_57958400_steps.zip","--cpu"], // play
-            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_18-20-37/model_16384000_steps.zip","--cpu"], // play good
-            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","32", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_18-41-29/model_16384000_steps.zip","--cpu"], // play good, little high
-            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","32", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_19-48-02/model_16384000_steps.zip","--cpu"], // play good, little high
+            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train
+            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu", "--checkpoint", // play
+
+                    //  "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_07-12-28/model_16384000_steps.zip"], // play
+                    // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_11-56-02/model_16384000_steps.zip"], // play
+                    // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_12-44-11/model_137420800_steps.zip"], // play
+                    // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_17-06-59/model_57958400_steps.zip"], // play
+                    // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_18-20-37/model_16384000_steps.zip"], // play good
+                    // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_18-41-29/model_16384000_steps.zip"], // play good, little high
+                    // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_19-48-02/model_16384000_steps.zip"], // play good, little high
+                    // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_19-48-02/model_16384000_steps.zip"], // new_inv, reward weight changed
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
