@@ -236,7 +236,7 @@ class LiftEnv(IsaacEnv):
         object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         # self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)  # original
         self.extras["is_success"] = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)  # bong
-        # self.extras["fail_to_catch"] = torch.where((self.robot_actions[:, -1] != 0) & ~object_position_error_bool, 1, self.reset_buf)  # bong
+        self.extras["fail_to_catch"] = torch.where((self.robot_actions[:, -1] != 0) & ~object_position_error_bool, 1, self.reset_buf)  # bong
         # print(self.extras["is_success"]) #printbong
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
@@ -518,6 +518,12 @@ class LiftRewardManager(RewardManager):
         # print("ee", env.robot.data.ee_state_w[:, 0:3])  # printbong
         # print("obj", env.object.data.root_pos_w)  # printbong
         return - torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
+
+    def reaching_object_height(self, env: LiftEnv):
+        """Penalize end-effector tracking position error using L2-kernel."""
+        # print("ee", env.robot.data.ee_state_w[:, 0:3])  # printbong
+        # print("obj", env.object.data.root_pos_w)  # printbong
+        return - torch.sum(torch.square(env.robot.data.ee_state_w[:, 0] - env.object.data.root_pos_w[:, 0]), dim=1)
 
     def reaching_object_position_exp(self, env: LiftEnv, sigma: float):
         """Penalize end-effector tracking position error using exp-kernel."""

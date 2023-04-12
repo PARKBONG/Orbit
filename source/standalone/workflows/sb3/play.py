@@ -79,17 +79,18 @@ def main():
     while simulation_app.is_running():
         # agent stepping
         actions, model_info = agent.predict(obs, deterministic=True)
+        # actions[:, 0] *= 1.1
         # env stepping
         obs, reward, done, env_info = env.step(actions)
-
-        print(reward)
+        # print(env.robot)
+        # print(reward)
         # print(env.)
         # check if simulator is stopped
         if env.unwrapped.sim.is_stopped():
             break
 
-        if done[0]:
-            print("=" * 10)
+        # if done[0]:
+        #     print("=" * 10)
 
     # close the simulator
     env.close()
