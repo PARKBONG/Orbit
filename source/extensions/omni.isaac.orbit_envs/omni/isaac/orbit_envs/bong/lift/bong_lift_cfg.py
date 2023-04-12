@@ -147,7 +147,6 @@ class ObservationsCfg:
         # -- previous action
         # arm_actions = {"scale": 1.0}
         # tool_actions = {"scale": 1.0}
-        bong_obj_to_desire = {"scale": 1.0}
 
     # global observation settings
     return_dict_obs_in_group = False
@@ -161,7 +160,7 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     # -- robot-centric
-    reaching_object_position_l2 = {"weight": 50}  # Penalty
+    reaching_object_position_l2 = {"weight": 50}
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
@@ -177,10 +176,8 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 200}  # Reward
-    bong_catch_failure = {"weight": 50}  # penalty + Reset
-    bong_after_catch = {"weight": 50}  # penalty
-    bong_obj_finish = {"weight": 200}  # reward + Reset
+    bong_catch_object = {"weight": 200}
+    bong_catch_failure = {"weight": 50}
 
 
 @configclass
@@ -190,9 +187,8 @@ class TerminationsCfg:
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
     # is_success = False  # reset when object is lifted
-    is_catch = False  # reset when object is lifted
+    is_success = True  # reset when object is lifted
     fail_to_catch = True  # reset when object is lifted
-    is_obj_desired = True
 
 
 @configclass
@@ -216,6 +212,7 @@ class ControlCfg:
 ##
 # Environment configuration
 ##
+
 
 @configclass
 class LiftEnvCfg(IsaacEnvCfg):
