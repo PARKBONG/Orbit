@@ -523,7 +523,7 @@ class LiftRewardManager(RewardManager):
         """Penalize end-effector tracking position error using L2-kernel."""
         # print("ee", env.robot.data.ee_state_w[:, 0:3])  # printbong
         # print("obj", env.object.data.root_pos_w)  # printbong
-        return - torch.sum(torch.square(env.robot.data.ee_state_w[:, 0] - env.object.data.root_pos_w[:, 0]), dim=1)
+        return - 3 * torch.square(env.robot.data.ee_state_w[:, 0] - env.object.data.root_pos_w[:, 0])
 
     def reaching_object_position_exp(self, env: LiftEnv, sigma: float):
         """Penalize end-effector tracking position error using exp-kernel."""

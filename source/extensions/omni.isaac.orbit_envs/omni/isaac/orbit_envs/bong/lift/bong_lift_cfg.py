@@ -176,8 +176,8 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 100}
-    bong_fail_to_catch = {"weight": 25}
+    bong_catch_object = {"weight": 200}
+    bong_catch_failure = {"weight": 25}
 
 
 @configclass
