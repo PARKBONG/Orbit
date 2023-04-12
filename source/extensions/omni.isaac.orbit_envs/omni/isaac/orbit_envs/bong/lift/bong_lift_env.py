@@ -69,6 +69,7 @@ class LiftEnv(IsaacEnv):
 
         # for 3-DoF
         self.action_space = gym.spaces.Box(low=np.array([-0.215, -0.6, -0.4]),
+        # self.action_space = gym.spaces.Box(low=np.array([-0.25, -0.6, -0.4]),
                                            high=np.array([0.3, 0.6, 0.4]),
                                            shape=(self.num_actions,))  # bong, clipping
         # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]
@@ -83,7 +84,8 @@ class LiftEnv(IsaacEnv):
 
         # bong
         self.ee_to_obj_l2 = torch.tensor([0 for _ in range(self.num_envs)], dtype=torch.float32)
-        self.catch_threshold = 0.0025
+        # self.catch_threshold = 0.0025
+        self.catch_threshold = 0.0035
         # bong, vis
         # self._markers1.set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
         # for i in range(6):
@@ -128,6 +130,14 @@ class LiftEnv(IsaacEnv):
                     usd_path=self.cfg.frame_marker.usd_path,
                     scale=self.cfg.frame_marker.scale,
                 )
+
+            # create marker for object
+            self._object_markers = StaticMarker(
+                "/Visuals/object",
+                self.num_envs,
+                usd_path=self.cfg.frame_marker.usd_path,
+                scale=self.cfg.frame_marker.scale,
+            )
 
             # self._markers_list = [StaticMarker(
             #     "/Visuals/bong_" + str(i),
@@ -313,6 +323,8 @@ class LiftEnv(IsaacEnv):
         # -- end-effector
         # print(self.robot.data.ee_state_w[:, 0:3]) #printbong
         self._ee_markers.set_world_poses(self.robot.data.ee_state_w[:, 0:3], self.robot.data.ee_state_w[:, 3:7])
+
+        self._object_markers.set_world_poses(self.object.data.root_pos_w, self.object.data.root_quat_w)
         # -- task-space commands
         if self.cfg.control.control_type == "inverse_kinematics":
             # convert to world frame
@@ -401,7 +413,7 @@ class LiftEnv(IsaacEnv):
         # transform command from local env to world
         self.object_des_pose_w[env_ids, 0:3] += self.envs_positions[env_ids]
 
-    def bong_is_ee_close_to_object(self, stacks=20):
+    def bong_is_ee_close_to_object(self, stacks=10):
         # change need if there is false -> reset
         bool_tensor = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)
         self.ee_to_obj_l2[~bool_tensor] = 0
@@ -572,4 +584,4 @@ class LiftRewardManager(RewardManager):
     def bong_catch_object(self, env: LiftEnv):  # what is the diff between sparse and con?
         """Sparse reward if object is lifted successfully."""
         # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
-        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025)
+        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0035)

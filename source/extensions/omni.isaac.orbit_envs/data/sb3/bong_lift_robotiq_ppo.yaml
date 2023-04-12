@@ -1,6 +1,6 @@
 # Reference: https://github.com/DLR-RM/rl-baselines3-zoo/blob/master/hyperparams/ppo.yml#L32
 # epoch * n_steps * nenvs: 500×512*8*8
-n_timesteps: !!float 16384000
+n_timesteps: !!float 163840000
 policy: 'MlpPolicy'
 n_steps: 64
 # n_steps: 128
@@ -12,7 +12,7 @@ n_epochs: 8
 ent_coef: 0.00238306
 vf_coef: 0.0001
 # learning_rate: !!float 3e-4
-learning_rate: !!float 1.5e-4
+learning_rate: !!float 5e-5
 clip_range: 0.2
 policy_kwargs: "dict(
                   activation_fn=nn.ELU,
@@ -28,4 +28,4 @@ seed: 42 # bong
 normalize_input: True
 # # Uses VecNormalize class to normalize rew
 normalize_value: True
-clip_obs: 5
+# clip_obs: 5

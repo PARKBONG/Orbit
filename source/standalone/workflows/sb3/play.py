@@ -75,11 +75,15 @@ def main():
     # reset environment
     obs = env.reset()
     # simulate environment
+
     while simulation_app.is_running():
         # agent stepping
-        actions, _ = agent.predict(obs, deterministic=True)
+        actions, model_info = agent.predict(obs, deterministic=True)
         # env stepping
-        obs, _, _, _ = env.step(actions)
+        obs, reward, done, env_info = env.step(actions)
+
+        print(reward)
+        # print(env.)
         # check if simulator is stopped
         if env.unwrapped.sim.is_stopped():
             break
