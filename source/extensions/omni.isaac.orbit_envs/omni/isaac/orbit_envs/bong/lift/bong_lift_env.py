@@ -413,10 +413,10 @@ class LiftEnv(IsaacEnv):
         # transform command from local env to world
         self.object_des_pose_w[env_ids, 0:3] += self.envs_positions[env_ids]
 
-    def bong_is_ee_close_to_object(self, stacks=10):
+    def bong_is_ee_close_to_object(self, stacks=2):
         # change need if there is false -> reset
         bool_tensor = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)
-        self.ee_to_obj_l2[~bool_tensor] = 0
+        self.ee_to_obj_l2[~bool_tensor & (self.ee_to_obj_l2 < stacks)] = 0
         self.ee_to_obj_l2 += bool_tensor
         # print(self.ee_to_obj_l2)  # printbong
         # print(self.ee_to_obj_l2, -1 * (self.ee_to_obj_l2 > stacks)) # printbong
@@ -516,7 +516,7 @@ class LiftRewardManager(RewardManager):
         """Penalize end-effector tracking position error using L2-kernel."""
         # print("ee", env.robot.data.ee_state_w[:, 0:3])  # printbong
         # print("obj", env.object.data.root_pos_w)  # printbong
-        return 0.5 - torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
+        return - torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
 
     def reaching_object_position_exp(self, env: LiftEnv, sigma: float):
         """Penalize end-effector tracking position error using exp-kernel."""
@@ -584,4 +584,5 @@ class LiftRewardManager(RewardManager):
     def bong_catch_object(self, env: LiftEnv):  # what is the diff between sparse and con?
         """Sparse reward if object is lifted successfully."""
         # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
-        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0035)
+        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0035)  # descremental, bong
+

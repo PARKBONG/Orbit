@@ -12,7 +12,10 @@
             // "args" : ["--task","Isaac-Humanoid-v0","--num_envs","1", "--cpu"],
             // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train
             // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_07-12-28/model_16384000_steps.zip","--cpu"], // play
-            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_11-56-02/model_16384000_steps.zip","--cpu"], // play
+            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_11-56-02/model_16384000_steps.zip","--cpu"], // play
+            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_12-44-11/model_137420800_steps.zip","--cpu"], // play
+            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_17-06-59/model_57958400_steps.zip","--cpu"], // play
+            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--checkpoint","./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_18-20-37/model_16384000_steps.zip","--cpu"], // play
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {

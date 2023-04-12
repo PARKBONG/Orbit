@@ -160,7 +160,7 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     # -- robot-centric
-    reaching_object_position_l2 = {"weight": 5}
+    reaching_object_position_l2 = {"weight": 100}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
     # penalizing_arm_dof_velocity_l2 = {"weight": 1e-5}
@@ -175,7 +175,7 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 1}
+    bong_catch_object = {"weight": 100}
 
 
 @configclass
@@ -184,8 +184,8 @@ class TerminationsCfg:
 
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
-    is_success = False  # reset when object is lifted
-    # is_success = True  # reset when object is lifted
+    # is_success = False  # reset when object is lifted
+    is_success = True  # reset when object is lifted
 
 
 @configclass

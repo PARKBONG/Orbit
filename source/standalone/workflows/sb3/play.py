@@ -88,6 +88,9 @@ def main():
         if env.unwrapped.sim.is_stopped():
             break
 
+        if done[0]:
+            print("=" * 10)
+
     # close the simulator
     env.close()
     simulation_app.close()
