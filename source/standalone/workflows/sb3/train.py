@@ -14,6 +14,8 @@ import os
 
 from omni.isaac.kit import SimulationApp
 
+from omni.isaac.orbit_envs.bong.lift.alert import bong_alert
+
 # add argparse arguments
 parser = argparse.ArgumentParser("Welcome to Orbit: Omniverse Robotics Environments!")
 parser.add_argument("--headless", action="store_true", default=False, help="Force display off at all times.")
@@ -115,6 +117,8 @@ def main():
     # close the simulator
     env.close()
     simulation_app.close()
+
+    bong_alert()
 
 
 if __name__ == "__main__":
