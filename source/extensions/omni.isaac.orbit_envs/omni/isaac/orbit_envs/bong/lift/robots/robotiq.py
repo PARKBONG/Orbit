@@ -65,8 +65,8 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
     rigid_props=SingleArmManipulatorCfg.RigidBodyPropertiesCfg(
         # solver_position_iteration_count=16,  # bong
         # solver_velocity_iteration_count=1,  # bong
-        max_angular_velocity=0.1,  # bong
-        max_linear_velocity=0.1,  # bong
+        max_angular_velocity=0.5,  # bong
+        max_linear_velocity=0.5,  # bong
         disable_gravity=False,
         max_depenetration_velocity=5.0,
     ),
