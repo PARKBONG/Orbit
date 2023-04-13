@@ -108,8 +108,8 @@ def main():
     checkpoint_callback = CheckpointCallback(save_freq=100, save_path=log_dir, name_prefix="model", verbose=2)
     # gripperclose_callback = GripperCloseCallback(threshold=0.1)
     # train the agent
-    # agent.learn(total_timesteps=n_timesteps)  # sb3.py/reset
-    agent.learn(total_timesteps=n_timesteps, callback=checkpoint_callback)  # sb3.py/reset
+    agent.learn(total_timesteps=n_timesteps)  # sb3.py/reset
+    # agent.learn(total_timesteps=n_timesteps, callback=checkpoint_callback)  # sb3.py/reset
     # agent.learn(total_timesteps=n_timesteps, callback=gripperclose_callback)  # sb3.py/reset
     # save the final model
     agent.save(os.path.join(log_dir, "model"))

@@ -182,8 +182,9 @@ class RewardsCfg:
     bong_catch_failure = {"weight": 50}  # penalty + Reset
 
     # -----------------------------------------
-    bong_after_catch = {"weight": 50}  # penalty
-    bong_obj_finish = {"weight": 200}  # reward + Reset
+    # bong_after_catch = {"weight": 50}  # penalty
+    # bong_obj_finish = {"weight": 200}  # reward + Reset
+    bong_robot_out_of_box = {"weight": 50}
 
 
 @configclass
@@ -193,10 +194,11 @@ class TerminationsCfg:
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
     # is_success = False  # reset when object is lifted
-    is_catch = False  # reset when object is lifted
+    is_catch = True  # reset when object is lifted
     # -------------------------------------------
     fail_to_catch = True  # reset when object is lifted
     is_obj_desired = True
+    robot_out_of_box = True
 
 
 @configclass
