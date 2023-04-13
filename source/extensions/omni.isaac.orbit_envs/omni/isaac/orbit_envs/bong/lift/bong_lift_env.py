@@ -639,8 +639,8 @@ class LiftRewardManager(RewardManager):
 
     def bong_robot_out_of_box(self, env: LiftEnv):
         robot_pos = env.robot.data.ee_state_w[:, 0:3] - env.envs_positions
-        print(torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0))
+        # print(torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0))
         return torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0)
 
     def bong_object_falling(self, env: LiftEnv):
-        return torch.where(env.object.data.root_pos_w - env.envs_positions < -0.05, -1, 0)
+        return torch.where((env.object.data.root_pos_w - env.envs_positions)[:, 2] < -0.05, -1, 0)
