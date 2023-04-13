@@ -620,20 +620,11 @@ class LiftRewardManager(RewardManager):
         """Sparse reward if object is lifted successfully."""
         return torch.where(env.object.data.root_pos_w[:, 2] > env.object_des_pose_w[:, 2], 1.0, 0.0)
 
-    def bong_catch_object(self, env: LiftEnv):  # what is the diff between sparse and con?
-        """Sparse reward if object is lifted successfully."""
-        # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
+    def bong_catch_object(self, env: LiftEnv): 
         return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 1.5 * 0.002)  # descremental, bong
 
-    def bong_catch_failure(self, env: LiftEnv):  # what is the diff between sparse and con?
-        # if self.cfg.terminations.fail_to_catch:
-        #     object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
-        #     self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & ~object_position_error_bool_large), 1, self.reset_buf)
-        """Sparse reward if object is lifted failed."""
-        # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
-        # return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) >= 0.002)  # descremental, bong
-        object_position_error_bool_large = (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 1.5 * 0.002)  # bong
-        return -1 * ((env.robot_actions[:, -1] != 0) & ~object_position_error_bool_large)
+    def bong_catch_failure(self, env: LiftEnv):  
+        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 1.5 * 0.002)
 
     def bong_after_catch(self, env: LiftEnv):
 
@@ -648,4 +639,5 @@ class LiftRewardManager(RewardManager):
 
     def bong_robot_out_of_box(self, env: LiftEnv):
         robot_pos = env.robot.data.ee_state_w[:, 0:3] - env.envs_positions
+        print(torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0))
         return torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0)

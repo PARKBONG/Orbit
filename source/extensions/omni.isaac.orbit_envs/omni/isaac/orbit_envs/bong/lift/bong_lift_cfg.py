@@ -179,7 +179,7 @@ class RewardsCfg:
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
     bong_catch_object = {"weight": 300}  # Reward
-    bong_catch_failure = {"weight": 50}  # penalty + Reset
+    # bong_catch_failure = {"weight": 50}  # penalty + Reset
 
     # -----------------------------------------
     # bong_after_catch = {"weight": 50}  # penalty
