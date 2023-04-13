@@ -131,7 +131,6 @@ class Sb3VecEnvWrapper(gym.Wrapper, VecEnv):
         # reset info for terminated environments
         self._ep_rew_buf[reset_ids] = 0
         self._ep_len_buf[reset_ids] = 0
-
         return obs, rew, dones, infos
 
     """

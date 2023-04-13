@@ -144,7 +144,7 @@ class GripperActuatorGroup(ActuatorGroup):
         else:
             # compute new command
             dof_pos_targets = torch.where(command >= 0, self._open_dof_pos, self._close_dof_pos)
-            dof_pos_targets = dof_pos_targets * self._mimic_multiplier
+            # dof_pos_targets = dof_pos_targets * self._mimic_multiplier # bong, modified, mimic
             # store new command
             self._previous_dof_targets[:] = dof_pos_targets
             # return command
