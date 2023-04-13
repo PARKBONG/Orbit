@@ -16,6 +16,7 @@ from omni.isaac.orbit.controllers.differential_inverse_kinematics import Differe
 from omni.isaac.orbit.markers import StaticMarker
 from omni.isaac.orbit.objects import RigidObject
 from omni.isaac.orbit.robots.single_arm import SingleArmManipulator
+# from omni.isaac.orbit.bong.bong_single_arm import Bong_SingleArmManipulator
 from omni.isaac.orbit.utils.dict import class_to_dict
 from omni.isaac.orbit.utils.math import quat_inv, quat_mul, random_orientation, sample_uniform, scale_transform
 from omni.isaac.orbit.utils.mdp import ObservationManager, RewardManager
@@ -233,16 +234,14 @@ class LiftEnv(IsaacEnv):
         # -- add information to extra if task completed
 
         # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # original
-        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
+        # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
+        # object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
         # self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)  # original
-        self.extras["is_catch"] = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)  # bong
-        self.extras["fail_to_catch"] = torch.where((self.robot_actions[:, -1] != 0) & ~object_position_error_bool, 1, self.reset_buf)  # bong
-        # print(self.extras["is_success"]) #printbong
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
         # close gripper_func
-
+        
     def _get_observations(self) -> VecEnvObs:
         # compute observations
         return self._observation_manager.compute()
@@ -263,6 +262,9 @@ class LiftEnv(IsaacEnv):
             # set the end-effector offsets
             self.cfg.control.inverse_kinematics.position_offset = self.cfg.robot.ee_info.pos_offset
             self.cfg.control.inverse_kinematics.rotation_offset = self.cfg.robot.ee_info.rot_offset
+        
+        # elif self.cfg.control.control_type == "default":
+        #     self.cfg.robot.rigid_props.disable_gravity = True
         else:
             print("Using default joint controller...")
 
@@ -350,6 +352,10 @@ class LiftEnv(IsaacEnv):
             object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
             self.reset_buf = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)
 
+        if self.cfg.terminations.fail_to_catch:
+            object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
+            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & ~object_position_error_bool_large), 1, self.reset_buf)
+
         if self.cfg.terminations.is_obj_desired:  # original
             object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
             self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
@@ -432,6 +438,10 @@ class LiftEnv(IsaacEnv):
 class LiftObservationManager(ObservationManager):
     """Reward manager for single-arm reaching environment."""
 
+    def arm_dof_pos_3D(self, env: LiftEnv):
+        """DOF positions for the arm."""
+        return env.robot.data.arm_dof_pos[:, :3]
+    
     def arm_dof_pos(self, env: LiftEnv):
         """DOF positions for the arm."""
         return env.robot.data.arm_dof_pos
@@ -516,7 +526,8 @@ class LiftObservationManager(ObservationManager):
 
     def bong_obj_to_desire(self, env: LiftEnv):
         return env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3]
-    
+
+
 class LiftRewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""
 
@@ -604,9 +615,14 @@ class LiftRewardManager(RewardManager):
         return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002)  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):  # what is the diff between sparse and con?
+        # if self.cfg.terminations.fail_to_catch:
+        #     object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
+        #     self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & ~object_position_error_bool_large), 1, self.reset_buf)
         """Sparse reward if object is lifted failed."""
         # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
-        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) >= 0.002)  # descremental, bong
+        # return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) >= 0.002)  # descremental, bong
+        object_position_error_bool_large = (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 1.5 * 0.002)  # bong
+        return -1 * ((env.robot_actions[:, -1] != 0) & ~object_position_error_bool_large)
 
     def bong_after_catch(self, env: LiftEnv):
 

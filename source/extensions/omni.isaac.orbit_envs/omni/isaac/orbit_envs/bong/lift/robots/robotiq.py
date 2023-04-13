@@ -26,9 +26,9 @@ _ROBOTIQ_WRIST_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022
 # _ROBOTIQ_WRIST_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/bong/robotiq_wrist_resized_direction_mass.usd"
 
 VELOCITY_LIMIT = 100
-TORQUE_LIMIT = 20
-STIFFNESS = 20
-DAMPING = 0.1 * STIFFNESS
+TORQUE_LIMIT = 100
+STIFFNESS = 400
+DAMPING = 0.05 * STIFFNESS
 
 ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
     meta_info=SingleArmManipulatorCfg.MetaInfoCfg(
@@ -39,6 +39,7 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
     ),
     init_state=SingleArmManipulatorCfg.InitialStateCfg(   # revjoint
         pos=[0.2, 0, 0.3],
+        # pos=[0, 0, 0],
         # rot=[0.707, 0, 0.707, 0],
         rot=[0.5, 0.5, 0.5, 0.5],  # {action:global} = {x, z}, {y, x}, {z, y}
         dof_pos={
@@ -62,8 +63,12 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
         body_name="base", pos_offset=(0.0, 0.0, 0.15), rot_offset=(1.0, 0.0, 0.0, 0.0)  # xform / head
     ),
     rigid_props=SingleArmManipulatorCfg.RigidBodyPropertiesCfg(
+        # solver_position_iteration_count=16,  # bong
+        # solver_velocity_iteration_count=1,  # bong
+        max_angular_velocity=0.1,  # bong
+        max_linear_velocity=0.1,  # bong
+        disable_gravity=False,
         max_depenetration_velocity=5.0,
-        # max_depenetration_velocity=0.0000000000001,
     ),
     collision_props=SingleArmManipulatorCfg.CollisionPropertiesCfg(
         contact_offset=0.005,
@@ -99,12 +104,13 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
         # ),
         "robotiq_hand": GripperActuatorGroupCfg(
             dof_names=["bot_joint_0_p", "top_joint_0_p", "bot_joint_1_p", "top_joint_1_p", "bot_joint_2_p", "top_joint_2_p"],
-            model_cfg=ImplicitActuatorCfg(velocity_limit=VELOCITY_LIMIT, torque_limit=100),
-            control_cfg=ActuatorControlCfg(command_types=["p_abs"], stiffness={".*": 400}, damping={".*": 20}),
+            model_cfg=ImplicitActuatorCfg(velocity_limit=VELOCITY_LIMIT, torque_limit=20),
+            control_cfg=ActuatorControlCfg(command_types=["p_abs"], stiffness={".*": STIFFNESS}, damping={".*": DAMPING}),
             mimic_multiplier={"bot_joint_0_p": 1, "top_joint_0_p": -1, "bot_joint_1_p": 1, "top_joint_1_p": -1, "bot_joint_2_p": -1, "top_joint_2_p": 1},
             # speed=1,
             open_dof_pos=0,
-            close_dof_pos=0.785398,
+            close_dof_pos=0.3,
+            # close_dof_pos=0.785398,
         )
     },
 )

@@ -26,12 +26,12 @@ class TableCfg:
     usd_path = f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
 
 
-@configclass
-class PointCfg:
-    """Properties for the point."""
+# @configclass
+# class PointCfg:
+#     """Properties for the point."""
 
-    # note: we use instanceable asset since it consumes less memory
-    usd_path = f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
+#     # note: we use instanceable asset since it consumes less memory
+#     usd_path = f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
 
 
 @configclass
@@ -130,7 +130,8 @@ class ObservationsCfg:
         enable_corruption: bool = False
         # observation terms
         # -- joint state
-        arm_dof_pos = {"scale": 1.0}
+        # arm_dof_pos = {"scale": 1.0}
+        arm_dof_pos_3D = {"scale": 1.0}
         # arm_dof_pos_scaled = {"scale": 1.0}
         # arm_dof_vel = {"scale": 0.5, "noise": {"name": "uniform", "min": -0.01, "max": 0.01}}
         # tool_dof_pos_scaled = {"scale": 1.0}
@@ -146,7 +147,7 @@ class ObservationsCfg:
         # object_desired_positions = {"scale": 1.0}
         # -- previous action
         # arm_actions = {"scale": 1.0}
-        # tool_actions = {"scale": 1.0}
+        tool_actions = {"scale": 1.0}
         bong_obj_to_desire = {"scale": 1.0}
 
     # global observation settings
@@ -179,6 +180,8 @@ class RewardsCfg:
     # lifting_object_desired_success = {"weight" : 2}
     bong_catch_object = {"weight": 200}  # Reward
     bong_catch_failure = {"weight": 50}  # penalty + Reset
+
+    # -----------------------------------------
     bong_after_catch = {"weight": 50}  # penalty
     bong_obj_finish = {"weight": 200}  # reward + Reset
 
@@ -191,6 +194,7 @@ class TerminationsCfg:
     object_falling = True  # reset when object falls off the table
     # is_success = False  # reset when object is lifted
     is_catch = False  # reset when object is lifted
+    # -------------------------------------------
     fail_to_catch = True  # reset when object is lifted
     is_obj_desired = True
 
