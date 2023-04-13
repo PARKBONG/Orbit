@@ -178,14 +178,14 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 300}  # Reward
+    bong_catch_object = {"weight": 200}  # Reward
     # bong_catch_failure = {"weight": 50}  # penalty + Reset
 
     # -----------------------------------------
     # bong_after_catch = {"weight": 50}  # penalty
     # bong_obj_finish = {"weight": 200}  # reward + Reset
-    bong_robot_out_of_box = {"weight": 50}
-
+    bong_robot_out_of_box = {"weight": 25}
+    bong_object_failing = {"weight": 25}
 
 @configclass
 class TerminationsCfg:
@@ -196,8 +196,8 @@ class TerminationsCfg:
     # is_success = False  # reset when object is lifted
     is_catch = True  # reset when object is lifted
     # -------------------------------------------
-    fail_to_catch = True  # reset when object is lifted
-    is_obj_desired = True
+    fail_to_catch = False  # reset when object is lifted
+    is_obj_desired = False
     robot_out_of_box = True
 
 
