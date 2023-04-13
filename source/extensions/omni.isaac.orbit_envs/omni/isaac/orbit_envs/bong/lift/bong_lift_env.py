@@ -351,7 +351,7 @@ class LiftEnv(IsaacEnv):
         # access buffers from simulator
         object_pos = self.object.data.root_pos_w - self.envs_positions  # original
         robot_pos = self.robot.data.ee_state_w[:, 0:3] - self.envs_positions  # bong
-        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  #
+        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  #
         # extract values from buffer
         self.reset_buf[:] = 0
         # compute resets
@@ -621,10 +621,10 @@ class LiftRewardManager(RewardManager):
         return torch.where(env.object.data.root_pos_w[:, 2] > env.object_des_pose_w[:, 2], 1.0, 0.0)
 
     def bong_catch_object(self, env: LiftEnv): 
-        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 1.5 * 0.002)  # descremental, bong
+        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002)  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):  
-        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 1.5 * 0.002)
+        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002)
 
     def bong_after_catch(self, env: LiftEnv):
 
