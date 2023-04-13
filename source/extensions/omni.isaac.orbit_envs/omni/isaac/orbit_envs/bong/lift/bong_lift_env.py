@@ -350,19 +350,18 @@ class LiftEnv(IsaacEnv):
     def _check_termination(self) -> None:  # change
         # access buffers from simulator
         object_pos = self.object.data.root_pos_w - self.envs_positions  # original
-        robot_pos = self.robot.data.ee_state_w[:, 0:3] - self.envs_positions
+        robot_pos = self.robot.data.ee_state_w[:, 0:3] - self.envs_positions  # bong
+        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  #
         # extract values from buffer
         self.reset_buf[:] = 0
         # compute resets
         # -- when task is successful
         if self.cfg.terminations.is_catch:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
-            object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
-            self.reset_buf = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)
+            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, self.reset_buf)
 
         if self.cfg.terminations.fail_to_catch:
-            object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
-            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & ~object_position_error_bool_large), 1, self.reset_buf)
+            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & ~object_position_error_bool), 1, self.reset_buf)
 
         if self.cfg.terminations.is_obj_desired:  # original
             object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
@@ -453,7 +452,7 @@ class LiftObservationManager(ObservationManager):
     def arm_dof_pos_3D(self, env: LiftEnv):
         """DOF positions for the arm."""
         return env.robot.data.arm_dof_pos[:, :3]
-    
+
     def arm_dof_pos(self, env: LiftEnv):
         """DOF positions for the arm."""
         return env.robot.data.arm_dof_pos
@@ -624,7 +623,7 @@ class LiftRewardManager(RewardManager):
     def bong_catch_object(self, env: LiftEnv):  # what is the diff between sparse and con?
         """Sparse reward if object is lifted successfully."""
         # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
-        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002)  # descremental, bong
+        return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 1.5 * 0.002)  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):  # what is the diff between sparse and con?
         # if self.cfg.terminations.fail_to_catch:
