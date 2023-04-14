@@ -23,7 +23,7 @@ from omni.isaac.orbit.utils.mdp import ObservationManager, RewardManager
 
 from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 
-from .lift_cfg import LiftEnvCfg, RandomizationCfg
+from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
 
 
 class LiftEnv(IsaacEnv):

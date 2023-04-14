@@ -14,7 +14,7 @@ import os
 
 from omni.isaac.kit import SimulationApp
 
-from omni.isaac.orbit_envs.bong.slack_notification import bong_alert
+# from omni.isaac.orbit_envs.bong.slack_notification import bong_alert
 
 # add argparse arguments
 parser = argparse.ArgumentParser("Welcome to Orbit: Omniverse Robotics Environments!")
@@ -118,7 +118,7 @@ def main():
     env.close()
     simulation_app.close()
 
-    bong_alert()
+    # bong_alert()
 
 
 if __name__ == "__main__":
