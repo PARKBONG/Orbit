@@ -1,7 +1,8 @@
 import requests
+import subprocess
 
 
-def alert(env=0):
+def slack_notification(env=0):
     token = "xoxb-5094106865095-5094120833959-i0TtABG8MR35g23NOwQYU80p"
     channel = "notification"
 
@@ -15,5 +16,12 @@ def alert(env=0):
                   data={"channel": channel, "text": text})
 
 
+def git_hash():
+    cmd = "git rev-parse HEAD"
+    result = subprocess.run(cmd, shell=True, capture_output=True)
+    hash = str(result.stdout.decode('utf-8').strip())
+    return hash
+
+
 if __name__ == "__main__":
-    alert()
+    slack_notification()
