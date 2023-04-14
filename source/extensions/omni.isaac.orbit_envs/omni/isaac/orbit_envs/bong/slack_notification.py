@@ -2,7 +2,7 @@ import requests
 
 
 def alert(env=0):
-    token = "xoxb-5094106865095-5094120833959-GVRkWaaOScg2aGw1TpouDR1m"
+    token = "xoxb-5094106865095-5094120833959-i0TtABG8MR35g23NOwQYU80p"
     channel = "notification"
 
     if env :
