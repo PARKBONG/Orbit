@@ -64,6 +64,7 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
     rigid_props=SingleArmManipulatorCfg.RigidBodyPropertiesCfg(
         max_depenetration_velocity=5.0,
         # max_depenetration_velocity=0.0000000000001,
+        disable_gravity=True
     ),
     collision_props=SingleArmManipulatorCfg.CollisionPropertiesCfg(
         contact_offset=0.005,
@@ -104,7 +105,8 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
             mimic_multiplier={"bot_joint_0_p": 1, "top_joint_0_p": -1, "bot_joint_1_p": 1, "top_joint_1_p": -1, "bot_joint_2_p": -1, "top_joint_2_p": 1},
             # speed=1,
             open_dof_pos=0,
-            close_dof_pos=0.785398,
+            # close_dof_pos=0.785398,
+            close_dof_pos=0.35,
         )
     },
 )
