@@ -14,6 +14,8 @@ import os
 
 from omni.isaac.kit import SimulationApp
 
+from omni.isaac.orbit_envs.bong.utils import git_hash
+
 # add argparse arguments
 parser = argparse.ArgumentParser("Welcome to Orbit: Omniverse Robotics Environments!")
 parser.add_argument("--headless", action="store_true", default=False, help="Force display off at all times.")
@@ -66,6 +68,7 @@ def main():
 
     # directory for logging into
     log_dir = os.path.join("logs", "sb3", args_cli.task, datetime.now().strftime("%b%d_%H-%M-%S"))
+    log_dir = log_dir + "_" + git_hash()
     # dump the configuration into log-directory
     dump_yaml(os.path.join(log_dir, "params", "env.yaml"), env_cfg)
     dump_yaml(os.path.join(log_dir, "params", "agent.yaml"), agent_cfg)
