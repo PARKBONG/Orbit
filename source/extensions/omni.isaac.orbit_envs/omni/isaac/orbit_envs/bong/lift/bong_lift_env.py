@@ -436,6 +436,10 @@ class LiftObservationManager(ObservationManager):
         """DOF positions for the arm."""
         return env.robot.data.arm_dof_pos
 
+    def arm_dof_pos_3D(self, env: LiftEnv):
+        """DOF positions for the arm."""
+        return env.robot.data.arm_dof_pos[:, 3]
+
     def arm_dof_pos_scaled(self, env: LiftEnv):
         """DOF positions for the arm normalized to its max and min ranges."""
         return scale_transform(

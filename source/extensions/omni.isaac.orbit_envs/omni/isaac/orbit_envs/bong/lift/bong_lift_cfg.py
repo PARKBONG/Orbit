@@ -103,7 +103,7 @@ class RandomizationCfg:
         """Randomization of object desired pose."""
 
         # category
-        position_cat: str = "default"  # randomize position: "default", "uniform"
+        position_cat: str = "uniform"  # randomize position: "default", "uniform"
         orientation_cat: str = "default"  # randomize position: "default", "uniform"
         # randomize position
         position_default = [0.5, 0.0, 0.5]  # position default (x,y,z)
@@ -130,7 +130,8 @@ class ObservationsCfg:
         enable_corruption: bool = False
         # observation terms
         # -- joint state
-        arm_dof_pos = {"scale": 1.0}
+        # arm_dof_pos = {"scale": 1.0}
+        arm_dof_pos_3D = {"scale": 1.0}
         # arm_dof_pos_scaled = {"scale": 1.0}
         # arm_dof_vel = {"scale": 0.5, "noise": {"name": "uniform", "min": -0.01, "max": 0.01}}
         # tool_dof_pos_scaled = {"scale": 1.0}
@@ -146,8 +147,8 @@ class ObservationsCfg:
         # object_desired_positions = {"scale": 1.0}
         # -- previous action
         # arm_actions = {"scale": 1.0}
-        # tool_actions = {"scale": 1.0}
-        bong_obj_to_desire = {"scale": 1.0}
+        tool_actions = {"scale": 1.0}
+        # bong_obj_to_desire = {"scale": 1.0}
 
     # global observation settings
     return_dict_obs_in_group = False
@@ -189,8 +190,8 @@ class TerminationsCfg:
     object_falling = True  # reset when object falls off the table
     # is_success = False  # reset when object is lifted
     is_catch = True  # reset when object is lifted
-    fail_to_catch = False  # reset when object is lifted
-    is_obj_desired = False
+    # fail_to_catch = False  # reset when object is lifted
+    # is_obj_desired = False
 
 
 @configclass
