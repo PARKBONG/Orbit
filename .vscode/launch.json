@@ -8,9 +8,9 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],
-            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu", "--checkpoint",
-            // "logs/sb3/Bong-Lift-Robotiq-v0/Apr14_23-24-16/model_16384000_steps.zip"],
+            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],
+            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu", "--checkpoint",
+            "logs/sb3/Bong-Lift-Robotiq-v0/Apr15_03-06-34_980552c4c0adad648c0b086f497d7dc647cc445b/model_15564800_steps.zip"],
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
