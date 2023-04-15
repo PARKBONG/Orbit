@@ -25,5 +25,5 @@ seed: 42 # bong
 # # Uses VecNormalize class to normalize obs
 normalize_input: False
 # # Uses VecNormalize class to normalize rew
-normalize_value: False
+normalize_value: True
 # clip_obs: 5
