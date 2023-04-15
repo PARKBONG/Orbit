@@ -606,7 +606,7 @@ class LiftRewardManager(RewardManager):
     def bong_catch_object(self, env: LiftEnv):  # what is the diff between sparse and con?
         """Sparse reward if object is lifted successfully."""
         # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
-        print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002))
+        # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002))
         return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002)  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):  # what is the diff between sparse and con?
