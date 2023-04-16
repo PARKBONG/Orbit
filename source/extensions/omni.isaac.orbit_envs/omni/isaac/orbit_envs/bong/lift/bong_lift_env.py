@@ -452,6 +452,9 @@ class LiftObservationManager(ObservationManager):
         """DOF velocity of the arm."""
         return env.robot.data.arm_dof_vel
 
+    def tool_vel(self, env: LiftEnv):
+        return env.robot.data.tool_dof_vel
+        
     def tool_dof_pos_scaled(self, env: LiftEnv):
         """DOF positions of the tool normalized to its max and min ranges."""
         return scale_transform(
