@@ -187,6 +187,7 @@ class RewardsCfg:
     bong_robot_out_of_box = {"weight": 25}
     bong_object_falling = {"weight": 25}
     
+    
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""

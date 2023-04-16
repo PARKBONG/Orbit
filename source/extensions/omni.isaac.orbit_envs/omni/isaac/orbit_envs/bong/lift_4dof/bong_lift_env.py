@@ -178,6 +178,7 @@ class LiftEnv(IsaacEnv):
         # -- MDP reset
         self.reset_buf[env_ids] = 0
         self.episode_length_buf[env_ids] = 0
+        self.dummy_buf[env_ids] = 0
         # controller reset
         if self.cfg.control.control_type == "inverse_kinematics":
             self._ik_controller.reset_idx(env_ids)
@@ -231,14 +232,16 @@ class LiftEnv(IsaacEnv):
         # -- compute MDP signals
         # reward
         self.reward_buf = self._reward_manager.compute()
+        self.reward_buf = self.reward_buf * (self.dummy_buf == 0)
         # terminations
         self._check_termination()
         # -- store history
         self.previous_actions = self.actions.clone()
-
+        self.dummy_buf = self.episode_length_buf >= 100
         # -- add information to extra if timeout occurred due to episode length
         # Note: this is used by algorithms like PPO where time-outs are handled differently
         self.extras["time_outs"] = self.episode_length_buf >= self.max_episode_length
+        self.extras["dummy_steps"] = self.episode_length_buf >= torch.randint(low=3, high=100, size=(2,))
         # -- add information to extra if task completed
 
         # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # original
@@ -249,6 +252,10 @@ class LiftEnv(IsaacEnv):
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
         # close gripper_func
+
+    def _dummy_actions(self, actions, dummy_env_ids):
+        actions[dummy_env_ids, 1] = actions[dummy_env_ids, 1] + 0.1
+        return actions
 
     def _get_observations(self) -> VecEnvObs:
         # compute observations
