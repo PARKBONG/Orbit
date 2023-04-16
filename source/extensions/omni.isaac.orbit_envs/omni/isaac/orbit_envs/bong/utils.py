@@ -25,3 +25,6 @@ def git_hash():
 
 if __name__ == "__main__":
     slack_notification()
+
+if __name__ == "__main__":
+    slack_notification()

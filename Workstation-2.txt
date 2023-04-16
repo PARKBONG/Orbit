@@ -1,0 +1,14 @@
+
+
+[CHANGE] POS_RELATIVE + catch only
+Apr14_05-10-29
+it falls obj.
+===================================
+no_catch_object_penalty + action_space_limit
+Apr14_07-01-59
+to large threshold=1.5*0.002 -> terminated
+==============
+reward_first, termination lager
+(it has catch reward!)
+Apr14_08-19-05
+

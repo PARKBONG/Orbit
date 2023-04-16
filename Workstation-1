@@ -1,0 +1,29 @@
+with randomizaiton,
+lockOn =20
+
+=============
+to desired position
+Apr13_03-38-25/model_16384000_steps.zip
+Wrong Reward!
+=============
+Reward changed.
+Bong-Lift-Robotiq-v0/Apr13_05-16-23
+BAD
+=============
+after reward on : catch 
+strong!
+Apr13_06-48-47
+*IMPORTANT* tool actions!
+catnnot grasp!
+=============
+catch_change + reward
+Apr14_05-55-22/model_14336000_steps.zip
+throw obj
+=============
+with obj falling penalty
+Apr14_07-18-38
+to large threshold=1.5*0.002 -> terminated
+==============
+reward_first, termination lager
+(it has NO catch reward!)
+Apr14_08-17-52
