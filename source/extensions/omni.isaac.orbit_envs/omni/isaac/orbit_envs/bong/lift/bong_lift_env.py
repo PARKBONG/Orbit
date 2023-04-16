@@ -233,11 +233,9 @@ class LiftEnv(IsaacEnv):
         # -- add information to extra if task completed
 
         # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # original
-        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
-        # self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)  # original
-        self.extras["is_catch"] = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)  # bong
-        self.extras["fail_to_catch"] = torch.where((self.robot_actions[:, -1] != 0) & ~object_position_error_bool, 1, self.reset_buf)  # bong
-        # print(self.extras["is_success"]) #printbong
+        # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
+        # object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
+        self.extras["is_success"] = torch.where(self.object.data.root_pos_w[:, 2] > 0.3, 1, 0)  # original
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
@@ -345,14 +343,21 @@ class LiftEnv(IsaacEnv):
         self.reset_buf[:] = 0
         # compute resets
         # -- when task is successful
+
+        if self.cfg.terminations.is_success:  # original
+            # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
+            self.reset_buf = torch.where(self.object.data.root_pos_w[:, 2] > 0.3, 1, self.reset_buf)
+        
         if self.cfg.terminations.is_catch:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
-            object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
-            self.reset_buf = torch.where((self.robot_actions[:, -1] != 0) & object_position_error_bool, 1, self.reset_buf)
+            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, self.reset_buf)
 
-        if self.cfg.terminations.is_obj_desired:  # original
-            object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
-            self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
+        if self.cfg.terminations.fail_to_catch:
+            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & ~object_position_error_bool), 1, self.reset_buf)
+
+        # if self.cfg.terminations.is_obj_desired:  # original
+        #     object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
+        #     self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
 
         # -- object fell off the table (table at height: 0.0 m)
         if self.cfg.terminations.object_falling:
@@ -624,3 +629,14 @@ class LiftRewardManager(RewardManager):
     def bong_obj_finish(self, env: LiftEnv):
         object_position_error = torch.norm(env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3], dim=1)
         return torch.where(object_position_error < 0.002, 1, 0)
+
+    def bong_robot_out_of_box(self, env: LiftEnv):
+        robot_pos = env.robot.data.ee_state_w[:, 0:3] - env.envs_positions
+        # print(torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0))
+        return torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0)
+
+    def bong_object_falling(self, env: LiftEnv):
+        return torch.where((env.object.data.root_pos_w - env.envs_positions)[:, 2] < -0.05, -1, 0)
+
+    def bong_is_success(self, env: LiftEnv):
+        return torch.where(env.object.data.root_pos_w[:, 2] > 0.3, 1, 0)
