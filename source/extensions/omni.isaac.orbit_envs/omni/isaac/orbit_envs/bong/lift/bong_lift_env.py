@@ -178,6 +178,7 @@ class LiftEnv(IsaacEnv):
         # -- MDP reset
         self.reset_buf[env_ids] = 0
         self.episode_length_buf[env_ids] = 0
+        self.dummy_buf[env_ids] = 0
         # controller reset
         if self.cfg.control.control_type == "inverse_kinematics":
             self._ik_controller.reset_idx(env_ids)
@@ -230,24 +231,31 @@ class LiftEnv(IsaacEnv):
         # -- compute MDP signals
         # reward
         self.reward_buf = self._reward_manager.compute()
+        self.reward_buf = self.reward_buf * (self.dummy_buf == 0)
         # terminations
         self._check_termination()
         # -- store history
         self.previous_actions = self.actions.clone()
-
+        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
+        self.dummy_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)
         # -- add information to extra if timeout occurred due to episode length
         # Note: this is used by algorithms like PPO where time-outs are handled differently
         self.extras["time_outs"] = self.episode_length_buf >= self.max_episode_length
+        self.extras["dummy_steps"] = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)
         # -- add information to extra if task completed
 
         # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # original
         # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         # object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
-        # self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)  # original
+        self.extras["is_success"] = torch.where(self.object.data.root_pos_w[:, 2] > 0.3, 1, self.reset_buf)  # original
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
         # close gripper_func
+
+    def _dummy_actions(self, actions, dummy_env_ids):
+        actions[dummy_env_ids, 0] = actions[dummy_env_ids, 0] + 0.1
+        return actions
 
     def _get_observations(self) -> VecEnvObs:
         # compute observations
