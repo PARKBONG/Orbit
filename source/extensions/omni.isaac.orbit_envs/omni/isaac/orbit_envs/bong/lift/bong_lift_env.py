@@ -247,7 +247,7 @@ class LiftEnv(IsaacEnv):
         # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # original
         # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         # object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
-        self.extras["is_success"] = torch.where(self.object.data.root_pos_w[:, 2] > 0.3, 1, self.reset_buf)  # original
+        self.extras["is_success"] = torch.where(self.object.data.root_pos_w[:, 2] > 0.3, 1, 0)  # original
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
@@ -364,6 +364,11 @@ class LiftEnv(IsaacEnv):
         self.reset_buf[:] = 0
         # compute resets
         # -- when task is successful
+
+        if self.cfg.terminations.is_success:  # original
+            # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
+            self.reset_buf = torch.where(self.object.data.root_pos_w[:, 2] > 0.3, 1, self.reset_buf)
+        
         if self.cfg.terminations.is_catch:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
             self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, self.reset_buf)
@@ -371,9 +376,9 @@ class LiftEnv(IsaacEnv):
         if self.cfg.terminations.fail_to_catch:
             self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & ~object_position_error_bool), 1, self.reset_buf)
 
-        if self.cfg.terminations.is_obj_desired:  # original
-            object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
-            self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
+        # if self.cfg.terminations.is_obj_desired:  # original
+        #     object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
+        #     self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
 
         if self.cfg.terminations.robot_out_of_box:  # bong
             self.reset_buf = torch.where(torch.any(robot_pos < self.action_bound[0, :], dim=1), 1, self.reset_buf)  # bigger than min
@@ -652,3 +657,6 @@ class LiftRewardManager(RewardManager):
 
     def bong_object_falling(self, env: LiftEnv):
         return torch.where((env.object.data.root_pos_w - env.envs_positions)[:, 2] < -0.05, -1, 0)
+
+    def bong_is_success(self, env: LiftEnv):
+        return torch.where(env.object.data.root_pos_w[:, 2] > 0.3, 1, 0)
