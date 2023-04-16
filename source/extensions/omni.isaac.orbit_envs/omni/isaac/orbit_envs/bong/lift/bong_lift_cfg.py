@@ -134,6 +134,8 @@ class ObservationsCfg:
         arm_dof_pos_3D = {"scale": 1.0}
         # arm_dof_pos_scaled = {"scale": 1.0}
         # arm_dof_vel = {"scale": 0.5, "noise": {"name": "uniform", "min": -0.01, "max": 0.01}}
+        arm_dof_vel_3D = {"scale": 1.0}
+        # tool_vel = {"scale": 1.0}
         # tool_dof_pos_scaled = {"scale": 1.0}
         # -- end effector state
         # tool_positions = {"scale": 1.0}
@@ -166,8 +168,8 @@ class RewardsCfg:
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
-    # penalizing_arm_dof_velocity_l2 = {"weight": 1e-5}
-    # penalizing_tool_dof_velocity_l2 = {"weight": 1e-5}
+    penalizing_arm_dof_velocity_l2 = {"weight": 1e-5}
+    # penalizing_tool_dof_velocity_l2 = {"weight": 1}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
     # -- action-centric
     # penalizing_arm_action_rate_l2 = {"weight": 0.5}
@@ -178,10 +180,12 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
+    bong_catch_object = {"weight": 300}
     # bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
-    bong_is_success = {"weight": 400}
-    bong_robot_out_of_box = {"weight": 10}
+    # bong_is_success = {"weight": 400}
+    # bong_robot_out_of_box = {"weight": 10}
+
 
 @configclass
 class TerminationsCfg:
@@ -189,11 +193,10 @@ class TerminationsCfg:
 
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
-    is_success = True  # reset when object is lifted
-    is_catch = False  # reset when object is lifted
+    # is_success = False  # reset when object is lifted
+    is_catch = True  # reset when object is lifted
     fail_to_catch = False  # reset when object is lifted
-    robot_out_of_box = True
-    # is_obj_desired = False
+    is_obj_desired = False
 
 
 @configclass
