@@ -168,7 +168,7 @@ class RewardsCfg:
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
-    penalizing_arm_dof_velocity_l2 = {"weight": 1}
+    penalizing_arm_dof_velocity_l2 = {"weight": 10}
     # penalizing_tool_dof_velocity_l2 = {"weight": 1}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
     # -- action-centric
@@ -180,7 +180,7 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 300}
+    bong_catch_object = {"weight": 500}
     # bong_catch_failure = {"weight": 50}
     bong_robot_out_of_box = {"weight": 10}
 
