@@ -195,9 +195,9 @@ class TerminationsCfg:
     object_falling = True  # reset when object falls off the table
     is_success = True  # reset when object is lifted
     is_catch = False  # reset when object is lifted
-    fail_to_catch = False  # reset when object is lifted
+    fail_to_catch = True  # reset when object is lifted
     is_obj_desired = False
-    
+
 
 @configclass
 class ControlCfg:
