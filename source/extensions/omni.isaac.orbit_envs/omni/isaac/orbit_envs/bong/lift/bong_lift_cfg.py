@@ -182,7 +182,7 @@ class RewardsCfg:
     # lifting_object_desired_success = {"weight" : 2}
     bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
-
+    bong_robot_out_of_box = {"weight": 10}
 
 @configclass
 class TerminationsCfg:
@@ -194,7 +194,7 @@ class TerminationsCfg:
     is_catch = True  # reset when object is lifted
     fail_to_catch = False  # reset when object is lifted
     is_obj_desired = False
-
+    robot_out_of_box = True
 
 @configclass
 class ControlCfg:
