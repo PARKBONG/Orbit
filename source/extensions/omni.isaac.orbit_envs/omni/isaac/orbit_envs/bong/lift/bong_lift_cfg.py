@@ -149,7 +149,7 @@ class ObservationsCfg:
         # object_desired_positions = {"scale": 1.0}
         # -- previous action
         # arm_actions = {"scale": 1.0}
-        tool_actions = {"scale": 1.0}
+        tool_actions = {"scale": 10.0}
         # bong_obj_to_desire = {"scale": 1.0}
 
     # global observation settings
@@ -168,7 +168,7 @@ class RewardsCfg:
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
-    penalizing_arm_dof_velocity_l2 = {"weight": 1e-5}
+    penalizing_arm_dof_velocity_l2 = {"weight": 1}
     # penalizing_tool_dof_velocity_l2 = {"weight": 1}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
     # -- action-centric
