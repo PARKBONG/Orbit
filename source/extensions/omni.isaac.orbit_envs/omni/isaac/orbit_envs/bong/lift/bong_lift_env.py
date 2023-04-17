@@ -17,7 +17,7 @@ from omni.isaac.orbit.markers import StaticMarker
 from omni.isaac.orbit.objects import RigidObject
 from omni.isaac.orbit.robots.single_arm import SingleArmManipulator
 from omni.isaac.orbit.utils.dict import class_to_dict
-from omni.isaac.orbit.utils.math import quat_inv, quat_mul, random_orientation, sample_uniform, scale_transform
+from omni.isaac.orbit.utils.math import quat_inv, quat_mul, random_orientation, sample_uniform, scale_transform, euler_xyz_from_quat
 from omni.isaac.orbit.utils.mdp import ObservationManager, RewardManager
 
 from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
@@ -67,10 +67,10 @@ class LiftEnv(IsaacEnv):
         #                                    high=np.array([0.3, 0.7, 0.4, torch.pi/2, torch.pi/2, torch.pi/2]),
         #                                    shape=(self.num_actions,))  # bong, clipping
 
-        # for 3-DoF
-        self.action_space = gym.spaces.Box(low=np.array([-0.215, -0.6, -0.4]),
+        # for 4-DoF
+        self.action_space = gym.spaces.Box(low=np.array([-0.215, -0.6, -0.4, -2 * math.pi]),
         # self.action_space = gym.spaces.Box(low=np.array([-0.25, -0.6, -0.4]),
-                                           high=np.array([0.3, 0.6, 0.4]),
+                                           high=np.array([0.3, 0.6, 0.4, 2 * math.pi]),
                                            shape=(self.num_actions,))  # bong, clipping
         # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]
         print("[INFO]: Completed setting up the environment...")
@@ -440,6 +440,10 @@ class LiftObservationManager(ObservationManager):
         """DOF positions for the arm."""
         return env.robot.data.arm_dof_pos[:, :3]
 
+    def arm_dof_pos_4D(self, env: LiftEnv):
+        """DOF positions for the arm."""
+        return env.robot.data.arm_dof_pos[:, :4]
+
     def arm_dof_pos_scaled(self, env: LiftEnv):
         """DOF positions for the arm normalized to its max and min ranges."""
         return scale_transform(
@@ -455,6 +459,10 @@ class LiftObservationManager(ObservationManager):
     def arm_dof_vel_3D(self, env: LiftEnv):
         """DOF velocity of the arm."""
         return env.robot.data.arm_dof_vel[:, :3]
+
+    def arm_dof_vel_4D(self, env: LiftEnv):
+        """DOF velocity of the arm."""
+        return env.robot.data.arm_dof_vel[:, :4]
 
     def tool_dof_pos_scaled(self, env: LiftEnv):
         """DOF positions of the tool normalized to its max and min ranges."""
@@ -490,6 +498,15 @@ class LiftObservationManager(ObservationManager):
     def object_relative_tool_positions(self, env: LiftEnv):
         """Current object position w.r.t. end-effector frame."""
         return env.object.data.root_pos_w - env.robot.data.ee_state_w[:, :3]
+        # from omni.isaac.orbit.utils.math import euler_xyz_from_quat
+
+    # def object_relative_tool_orientations(self, env: LiftEnv):  # original
+    #     """Current object orientation w.r.t. end-effector frame."""
+    #     # compute the relative orientation
+    #     quat_ee = quat_mul(quat_inv(env.robot.data.ee_state_w[:, 3:7]), env.object.data.root_quat_w)
+    #     # make the first element positive
+    #     quat_ee[quat_ee[:, 0] < 0] *= -1
+    #     return quat_ee
 
     def object_relative_tool_orientations(self, env: LiftEnv):
         """Current object orientation w.r.t. end-effector frame."""
@@ -497,6 +514,7 @@ class LiftObservationManager(ObservationManager):
         quat_ee = quat_mul(quat_inv(env.robot.data.ee_state_w[:, 3:7]), env.object.data.root_quat_w)
         # make the first element positive
         quat_ee[quat_ee[:, 0] < 0] *= -1
+        print(euler_xyz_from_quat(quat_ee))
         return quat_ee
 
     def object_desired_positions(self, env: LiftEnv):
