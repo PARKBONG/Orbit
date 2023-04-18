@@ -529,6 +529,9 @@ class LiftObservationManager(ObservationManager):
     def bong_obj_to_desire(self, env: LiftEnv):
         return env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3]
 
+    def bong_obj_height(self, env: LiftEnv):
+        return env.object.data.root_pos_w[:, 2]
+
 
 class LiftRewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""
@@ -648,4 +651,5 @@ class LiftRewardManager(RewardManager):
     def bong_object_height(self, env: LiftEnv):    
         # print(env.object.data.root_pos_w[:, 2])
         # print(env.object.data.root_pos_w )
-        return env.object.data.root_pos_w[:, 2] - 0.1
+        # print(env.object.data.root_pos_w[:, 2])
+        return (10**5) * (env.object.data.root_pos_w[:, 2] - 0.0270)

@@ -143,7 +143,7 @@ class ObservationsCfg:
         # -- object state
         # object_positions = {"scale": 1.0}
         # object_orientations = {"scale": 1.0}
-        object_relative_tool_positions = {"scale": 1.0}
+        object_relative_tool_positions = {"scale": 10.0}
         # object_relative_tool_orientations = {"scale": 1.0}
         # -- object desired state
         # object_desired_positions = {"scale": 1.0}
@@ -151,7 +151,8 @@ class ObservationsCfg:
         # arm_actions = {"scale": 1.0}
         tool_actions = {"scale": 10.0}
         # bong_obj_to_desire = {"scale": 1.0}
-
+        bong_obj_height = {"scale": 1.0}
+        
     # global observation settings
     return_dict_obs_in_group = False
     """Whether to return observations as dictionary or flattened vector within groups."""
@@ -185,7 +186,7 @@ class RewardsCfg:
     # bong_catch_failure = {"weight": 50}
     bong_is_success = {"weight": 300}
     # bong_robot_out_of_box = {"weight": 10}
-    bong_object_height = {"weight": 100}
+    bong_object_height = {"weight": 1}
 
 
 @configclass
