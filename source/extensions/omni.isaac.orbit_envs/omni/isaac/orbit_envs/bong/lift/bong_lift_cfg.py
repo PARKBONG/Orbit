@@ -152,7 +152,7 @@ class ObservationsCfg:
         tool_actions = {"scale": 10.0}
         # bong_obj_to_desire = {"scale": 1.0}
         bong_obj_height = {"scale": 1.0}
-        
+
     # global observation settings
     return_dict_obs_in_group = False
     """Whether to return observations as dictionary or flattened vector within groups."""

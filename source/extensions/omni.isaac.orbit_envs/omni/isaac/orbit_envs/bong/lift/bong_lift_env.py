@@ -529,7 +529,7 @@ class LiftObservationManager(ObservationManager):
     def bong_obj_to_desire(self, env: LiftEnv):
         return env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3]
 
-    def bong_obj_height(self, env: LiftEnv):
+    def bong_object_height(self, env: LiftEnv):
         return env.object.data.root_pos_w[:, 2]
 
 
