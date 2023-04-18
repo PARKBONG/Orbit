@@ -10,6 +10,7 @@
 
 import argparse
 import numpy as np
+import time 
 
 from omni.isaac.kit import SimulationApp
 
@@ -83,6 +84,7 @@ def main():
         # env stepping
         obs, reward, done, env_info = env.step(actions)
         print(reward)
+        time.sleep(0.1)
         # print(env.robot)
         # print(reward)
         # print(env.)

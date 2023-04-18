@@ -26,8 +26,8 @@ _ROBOTIQ_WRIST_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022
 # _ROBOTIQ_WRIST_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/bong/robotiq_wrist_resized_direction_mass.usd"
 
 VELOCITY_LIMIT = 100
-TORQUE_LIMIT = 100
-STIFFNESS = 100
+TORQUE_LIMIT = 20
+STIFFNESS = 20
 DAMPING = 0.1 * STIFFNESS
 
 ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
