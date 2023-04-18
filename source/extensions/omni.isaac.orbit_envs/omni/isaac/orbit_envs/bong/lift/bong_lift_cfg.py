@@ -175,7 +175,7 @@ class RewardsCfg:
     # penalizing_arm_action_rate_l2 = {"weight": 0.5}
     # penalizing_tool_action_l2 = {"weight": 1e-2}
     # -- object-centric
-    tracking_object_position_l2 = {"weight": 100}
+    # tracking_object_position_l2 = {"weight": 100}
     # tracking_object_position_exp = {"weight": 5.0, "sigma": 0.25, "threshold": 0.08}
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
@@ -186,6 +186,7 @@ class RewardsCfg:
     bong_is_success = {"weight": 300}  # sparse
     # bong_is_success = {"weight": 300} # dense
     # bong_robot_out_of_box = {"weight": 10}
+    bong_object_height = {"weight": 100}
 
 
 @configclass

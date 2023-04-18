@@ -647,4 +647,6 @@ class LiftRewardManager(RewardManager):
         # print(env.object.data.root_pos_w[:, 2])
         return torch.where(env.object.data.root_pos_w[:, 2] > 0.1, 1, 0)
 
-    
+    def bong_object_height(self, env: LiftEnv):    
+        # print(env.object.data.root_pos_w[:, 2])
+        return env.object.data.root_pos_w[:, 2]
