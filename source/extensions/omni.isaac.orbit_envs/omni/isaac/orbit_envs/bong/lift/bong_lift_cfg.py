@@ -186,7 +186,7 @@ class RewardsCfg:
     bong_is_success = {"weight": 300}  # sparse
     # bong_is_success = {"weight": 300} # dense
     # bong_robot_out_of_box = {"weight": 10}
-    bong_object_height = {"weight": 100}
+    bong_object_height = {"weight": 0.1}
 
 
 @configclass
