@@ -28,7 +28,7 @@ _ROBOTIQ_WRIST_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022
 VELOCITY_LIMIT = 100
 TORQUE_LIMIT = 50
 STIFFNESS = 50
-DAMPING = 0.05 * STIFFNESS
+DAMPING = 7
 
 ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
     meta_info=SingleArmManipulatorCfg.MetaInfoCfg(
