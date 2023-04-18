@@ -644,6 +644,7 @@ class LiftRewardManager(RewardManager):
         return torch.where((env.object.data.root_pos_w - env.envs_positions)[:, 2] < -0.05, -1, 0)
 
     def bong_is_success(self, env: LiftEnv):
+        print(env.object.data.root_pos_w[:, 2])
         return torch.where(env.object.data.root_pos_w[:, 2] > 0.1, 1, 0)
 
     

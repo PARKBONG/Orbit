@@ -183,7 +183,7 @@ class RewardsCfg:
     bong_catch_object = {"weight": 300}
     # bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
-    bong_is_success = {"weight": 300} # sparse
+    bong_is_success = {"weight": 300}  # sparse
     # bong_is_success = {"weight": 300} # dense
     # bong_robot_out_of_box = {"weight": 10}
 
