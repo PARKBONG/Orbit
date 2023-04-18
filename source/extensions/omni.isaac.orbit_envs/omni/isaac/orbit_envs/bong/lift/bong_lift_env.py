@@ -68,8 +68,7 @@ class LiftEnv(IsaacEnv):
         #                                    shape=(self.num_actions,))  # bong, clipping
 
         # for 3-DoF
-        self.action_space = gym.spaces.Box(low=np.array([-0.215, -0.6, -0.4]),
-        # self.action_space = gym.spaces.Box(low=np.array([-0.25, -0.6, -0.4]),
+        self.action_space = gym.spaces.Box(low=np.array([-0.29, -0.6, -0.4]),
                                            high=np.array([0.3, 0.6, 0.4]),
                                            shape=(self.num_actions,))  # bong, clipping
         # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]
@@ -208,8 +207,7 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
-            # print()
-            # set actions into buffers
+
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
@@ -649,4 +647,5 @@ class LiftRewardManager(RewardManager):
 
     def bong_object_height(self, env: LiftEnv):    
         # print(env.object.data.root_pos_w[:, 2])
+        # print(env.object.data.root_pos_w )
         return env.object.data.root_pos_w[:, 2] - 0.1
