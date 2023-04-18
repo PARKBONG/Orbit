@@ -649,4 +649,4 @@ class LiftRewardManager(RewardManager):
 
     def bong_object_height(self, env: LiftEnv):    
         # print(env.object.data.root_pos_w[:, 2])
-        return env.object.data.root_pos_w[:, 2]
+        return env.object.data.root_pos_w[:, 2] - 0.1
