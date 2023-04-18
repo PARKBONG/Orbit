@@ -86,7 +86,7 @@ class LiftEnv(IsaacEnv):
         self.ee_to_obj_l2 = torch.tensor([0 for _ in range(self.num_envs)], dtype=torch.float32)
         # self.catch_threshold = 0.0025
         self.catch_threshold = 0.002
-        self.action_bound = torch.tensor([[-0.29, -0.4, 0], [1, 0.4, 0.6]])
+        self.action_bound = torch.tensor([[-0.29, -0.6, -0.4], [0.3, 0.6, 0.4]])
 
         # bong, vis
         # self._markers1.set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
@@ -204,6 +204,11 @@ class LiftEnv(IsaacEnv):
         elif self.cfg.control.control_type == "default":
             # self.robot_actions[:] = self.actions     # original
             self.robot_actions[:, :-1] += self.actions  # bong
+            self.robot_actions[:, :-1] = torch.clamp(self.robot_actions[:, :-1], self.action_bound[0], self.action_bound[1])
+            # print(self.robot_actions)
+            # action clipping
+            # self.robot_actions[:, :-1]
+            # self.action_bound = torch.tensor([[-0.29, -0.4, 0], [1, 0.4, 0.6]])
             # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]   # good: [-0.215, 0.07, 0, 0, 0, 0]
             # self.robot_actions[:, :-1] = torch.tensor([[0, 0, -0.4, 0, 0, 0], [0, 0, 0, 0, 0, 0]], dtype=torch.float32)  # bong
             self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=20)  # open = 0.785398
@@ -212,6 +217,7 @@ class LiftEnv(IsaacEnv):
         for _ in range(self.cfg.control.decimation):
             # print()
             # set actions into buffers
+            # self.robot_actions[0, :-1] = self.action_bound[1]
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
@@ -366,9 +372,9 @@ class LiftEnv(IsaacEnv):
         if self.cfg.terminations.episode_timeout:
             self.reset_buf = torch.where(self.episode_length_buf >= self.max_episode_length, 1, self.reset_buf)
 
-        if self.cfg.terminations.robot_out_of_box:  # bong
-            self.reset_buf = torch.where(torch.any(robot_pos < self.action_bound[0, :], dim=1), 1, self.reset_buf)  # bigger than min
-            self.reset_buf = torch.where(torch.any(robot_pos > self.action_bound[1, :], dim=1), 1, self.reset_buf)  # smaller than min
+        # if self.cfg.terminations.robot_out_of_box:  # bong
+        #     self.reset_buf = torch.where(torch.any(robot_pos < self.action_bound[0, :], dim=1), 1, self.reset_buf)  # bigger than min
+        #     self.reset_buf = torch.where(torch.any(robot_pos > self.action_bound[1, :], dim=1), 1, self.reset_buf)  # smaller than min
 
     def _randomize_object_initial_pose(self, env_ids: torch.Tensor, cfg: RandomizationCfg.ObjectInitialPoseCfg):
         """Randomize the initial pose of the object."""
@@ -636,6 +642,6 @@ class LiftRewardManager(RewardManager):
         object_position_error = torch.norm(env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3], dim=1)
         return torch.where(object_position_error < 0.002, 1, 0)
 
-    def bong_robot_out_of_box(self, env: LiftEnv):
-        robot_pos = env.robot.data.ee_state_w[:, 0:3] - env.envs_positions
-        return -1 * torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), 1, 0)
+    # def bong_robot_out_of_box(self, env: LiftEnv):
+    #     robot_pos = env.robot.data.ee_state_w[:, 0:3] - env.envs_positions
+    #     return -1 * torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), 1, 0)

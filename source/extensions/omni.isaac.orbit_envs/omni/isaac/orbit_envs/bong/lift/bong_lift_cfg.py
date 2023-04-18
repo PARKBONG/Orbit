@@ -164,7 +164,7 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     # -- robot-centric
-    reaching_object_position_l2 = {"weight": 500}
+    reaching_object_position_l2 = {"weight": 100}
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
@@ -182,7 +182,7 @@ class RewardsCfg:
     # lifting_object_desired_success = {"weight" : 2}
     bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
-    bong_robot_out_of_box = {"weight": 100}
+    # bong_robot_out_of_box = {"weight": 100}
 
 @configclass
 class TerminationsCfg:
@@ -194,7 +194,7 @@ class TerminationsCfg:
     is_catch = True  # reset when object is lifted
     fail_to_catch = False  # reset when object is lifted
     is_obj_desired = False
-    robot_out_of_box = True
+    robot_out_of_box = False
 
 @configclass
 class ControlCfg:
