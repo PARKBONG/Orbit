@@ -83,7 +83,7 @@ def main():
         # actions[:, 0] *= 1.1
         # env stepping
         obs, reward, done, env_info = env.step(actions)
-        print(actions)
+        # print(actions)
         # time.sleep(0.1)
         # print(env.robot)
         # print(reward)
