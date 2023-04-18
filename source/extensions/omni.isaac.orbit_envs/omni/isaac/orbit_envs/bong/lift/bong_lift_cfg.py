@@ -51,7 +51,7 @@ class ManipulationObjectCfg(RigidObjectCfg):
         max_angular_velocity=1000.0,
         max_linear_velocity=1000.0,
         max_depenetration_velocity=5.0,
-        disable_gravity=True,
+        disable_gravity=False,
     )
     physics_material = RigidObjectCfg.PhysicsMaterialCfg(
         static_friction=0.5, dynamic_friction=0.5, restitution=0.0, prim_path="/World/Materials/cubeMaterial", density=0.001
