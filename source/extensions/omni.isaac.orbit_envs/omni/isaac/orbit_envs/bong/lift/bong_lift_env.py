@@ -652,4 +652,4 @@ class LiftRewardManager(RewardManager):
         # print(env.object.data.root_pos_w[:, 2])
         # print(env.object.data.root_pos_w )
         # print(env.object.data.root_pos_w[:, 2])
-        return (10**5) * (env.object.data.root_pos_w[:, 2] - 0.0270)
+        return (env.object.data.root_pos_w[:, 2] - 0.0270)

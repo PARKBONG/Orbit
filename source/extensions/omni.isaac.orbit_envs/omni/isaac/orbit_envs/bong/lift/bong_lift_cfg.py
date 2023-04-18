@@ -151,7 +151,7 @@ class ObservationsCfg:
         # arm_actions = {"scale": 1.0}
         tool_actions = {"scale": 10.0}
         # bong_obj_to_desire = {"scale": 1.0}
-        bong_obj_height = {"scale": 1.0}
+        bong_obj_height = {"scale": 100.0}
 
     # global observation settings
     return_dict_obs_in_group = False
