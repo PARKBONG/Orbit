@@ -11,7 +11,7 @@
             // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],
             "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu", "--checkpoint",
             // "logs/sb3/Bong-Lift-Robotiq-v0/Apr18_11-06-35_eb5b4626fd6364e9cf5bc694613e9c7035d20306/model_14848000_steps.zip"], // very fast, work. 
-            "logs/sb3/Bong-Lift-Robotiq-v0/Apr18_11-52-16_e1d5a835d1919e3ac9502c3af97c68ebbb12a00d/model_16384000_steps.zip"], // very fast, work. 
+            "logs/sb3/Bong-Lift-Robotiq-v0/Apr18_12-13-10_1152707ba17f9adb18847669ec8c129819816824/model_10342400_steps.zip"], // very fast, work. 
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
