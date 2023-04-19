@@ -503,6 +503,7 @@ class LiftObservationManager(ObservationManager):
 
     def object_relative_tool_positions(self, env: LiftEnv):
         """Current object position w.r.t. end-effector frame."""
+        print(env.object.data.root_pos_w - env.robot.data.ee_state_w[:, :3])
         return env.object.data.root_pos_w - env.robot.data.ee_state_w[:, :3]
 
     def object_relative_tool_orientations(self, env: LiftEnv):
