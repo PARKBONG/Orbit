@@ -20,7 +20,7 @@ policy_kwargs: "dict(
 
 target_kl: 0.02 # next, try 0.08
 max_grad_norm: 1.0
-seed: 42 # bong
+seed: 7 # bong
 
 # # Uses VecNormalize class to normalize obs
 normalize_input: False

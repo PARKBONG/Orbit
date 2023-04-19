@@ -10,7 +10,7 @@
             "request": "launch",
             // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],
             "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu", "--checkpoint",
-            "logs/sb3/Bong-Lift-Robotiq-v0/Apr19_21-43-08_9896f59b131ba406bc698522ca7ef7fc0c6f0296/model_1638400_steps.zip"],
+            "logs/sb3/Bong-Lift-Robotiq-v0/Apr19_21-46-52_4a1f7cf87b9a093fe7e482e4092231a44ed1460f/model_1638400_steps.zip"],
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
