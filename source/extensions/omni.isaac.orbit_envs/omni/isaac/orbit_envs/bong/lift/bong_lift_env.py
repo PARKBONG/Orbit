@@ -533,7 +533,7 @@ class LiftObservationManager(ObservationManager):
         return env.object.data.root_pos_w[:, 2:3]
 
     def bong_is_catch(self, env: LiftEnv):
-        return torch.where(-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002, 1, 0)
+        return torch.where((-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002), 1, 0).unsqueeze(0)
     
 class LiftRewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""
