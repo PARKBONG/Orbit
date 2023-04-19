@@ -343,6 +343,7 @@ class LiftEnv(IsaacEnv):
         # compute resets
         # -- when task is successful
         object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
+        object_position_error_bool_fail = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) > 1.1 * self.catch_threshold)  # bong
         if self.cfg.terminations.is_success:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
             self.reset_buf = torch.where(self.object.data.root_pos_w[:, 2] > 0.2, 1, self.reset_buf)
@@ -352,7 +353,7 @@ class LiftEnv(IsaacEnv):
             self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, self.reset_buf)
 
         if self.cfg.terminations.fail_to_catch:
-            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & ~object_position_error_bool), 1, self.reset_buf)
+            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & ~object_position_error_bool_fail), 1, self.reset_buf)
 
         # if self.cfg.terminations.is_obj_desired:  # original
         #     object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
