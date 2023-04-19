@@ -141,7 +141,7 @@ class ObservationsCfg:
         # tool_positions = {"scale": 1.0}
         # tool_orientations = {"scale": 1.0}
         # -- object state
-        # object_positions = {"scale": 1.0}
+        object_positions = {"scale": 1.0}
         # object_orientations = {"scale": 1.0}
         object_relative_tool_positions = {"scale": 1.0}
         # object_relative_tool_orientations = {"scale": 1.0}
@@ -188,7 +188,7 @@ class RewardsCfg:
     # bong_is_success = {"weight": 100}
     # bong_robot_out_of_box = {"weight": 10}
     # bong_object_height = {"weight": 1000}
-
+    bong_object_falling = {"weight" : 50}
 
 @configclass
 class TerminationsCfg:
