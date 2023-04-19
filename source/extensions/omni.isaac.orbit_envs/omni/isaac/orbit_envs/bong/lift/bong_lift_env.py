@@ -234,7 +234,7 @@ class LiftEnv(IsaacEnv):
         # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # original
         # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         # object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
-        self.extras["is_success"] = torch.where(self.object.data.root_pos_w[:, 2] > 0.3, 1, 0)  # original
+        self.extras["is_success"] = torch.where(self.object.data.root_pos_w[:, 2] > 0.2, 1, 0)  # original
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
@@ -345,7 +345,7 @@ class LiftEnv(IsaacEnv):
         object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         if self.cfg.terminations.is_success:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
-            self.reset_buf = torch.where(self.object.data.root_pos_w[:, 2] > 0.3, 1, self.reset_buf)
+            self.reset_buf = torch.where(self.object.data.root_pos_w[:, 2] > 0.2, 1, self.reset_buf)
         
         if self.cfg.terminations.is_catch:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
@@ -649,7 +649,8 @@ class LiftRewardManager(RewardManager):
 
     def bong_is_success(self, env: LiftEnv):
         # print(env.object.data.root_pos_w[:, 2])
-        return torch.where(env.object.data.root_pos_w[:, 2] > 0.1, 1, 0)
+        print(env.object.data.root_pos_w[:, 2])
+        return torch.where(env.object.data.root_pos_w[:, 2] > 0.2, 1, 0)
 
     def bong_object_height(self, env: LiftEnv):    
         # print(env.object.data.root_pos_w[:, 2])
