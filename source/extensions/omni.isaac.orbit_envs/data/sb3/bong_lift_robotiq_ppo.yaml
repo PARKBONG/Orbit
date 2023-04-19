@@ -6,9 +6,9 @@ n_steps: 64
 # mini batch size: num_envs * nsteps / nminibatches 2048×512÷2048
 batch_size: 65536
 gae_lambda: 0.95
-gamma: 0.995
+gamma: 0.99
 n_epochs: 12
-ent_coef: 0.01
+ent_coef: 0.02
 vf_coef: 0.0001
 learning_rate: !!float 3e-4
 clip_range: 0.2
