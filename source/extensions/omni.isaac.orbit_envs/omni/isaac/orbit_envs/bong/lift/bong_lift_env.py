@@ -217,7 +217,8 @@ class LiftEnv(IsaacEnv):
         for _ in range(self.cfg.control.decimation):
             # print()
             # set actions into buffers
-            # self.robot_actions[0, :-1] = self.action_bound[1]
+            # self.robot_actions[0, :-1] = self.action_bound[0]
+            self.robot_actions[0, :-1] = torch.tensor([-0.29, 0, 0])
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
@@ -509,7 +510,7 @@ class LiftObservationManager(ObservationManager):
 
     def object_relative_tool_positions(self, env: LiftEnv):
         """Current object position w.r.t. end-effector frame."""
-        print(env.object.data.root_pos_w - env.robot.data.ee_state_w[:, :3])
+        # print(env.object.data.root_pos_w - env.robot.data.ee_state_w[:, :3])
         return env.object.data.root_pos_w - env.robot.data.ee_state_w[:, :3]
 
     def object_relative_tool_orientations(self, env: LiftEnv):
@@ -563,6 +564,7 @@ class LiftRewardManager(RewardManager):
         """Penalize end-effector tracking position error using L2-kernel."""
         # print("ee", env.robot.data.ee_state_w[:, 0:3])  # printbong
         # print("obj", env.object.data.root_pos_w)  # printbong
+        # print(- torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1))
         return - torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
 
     def reaching_object_height(self, env: LiftEnv):
@@ -593,6 +595,7 @@ class LiftRewardManager(RewardManager):
 
     def penalizing_arm_dof_velocity_l2(self, env: LiftEnv):
         """Penalize large movements of the robot arm."""
+        # print(-torch.sum(torch.square(env.robot.data.arm_dof_vel), dim=1))
         return -torch.sum(torch.square(env.robot.data.arm_dof_vel), dim=1)
 
     def penalizing_tool_dof_velocity_l2(self, env: LiftEnv):
@@ -637,6 +640,7 @@ class LiftRewardManager(RewardManager):
     def bong_catch_object(self, env: LiftEnv):  # what is the diff between sparse and con?
         """Sparse reward if object is lifted successfully."""
         # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0025))
+        # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002))
         # print(1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002))
         return 1 * (-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002)  # descremental, bong
 
