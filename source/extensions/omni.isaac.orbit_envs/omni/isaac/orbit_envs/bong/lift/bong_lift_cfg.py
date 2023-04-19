@@ -200,7 +200,7 @@ class TerminationsCfg:
     is_catch = False  # reset when object is lifted
     fail_to_catch = True  # reset when object is lifted
     is_obj_desired = False
-
+    robot_out_of_box = True
 
 @configclass
 class ControlCfg:

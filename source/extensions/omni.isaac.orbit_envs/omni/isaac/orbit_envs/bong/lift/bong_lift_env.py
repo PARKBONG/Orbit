@@ -68,8 +68,9 @@ class LiftEnv(IsaacEnv):
         #                                    shape=(self.num_actions,))  # bong, clipping
 
         # for 3-DoF
-        self.action_space = gym.spaces.Box(low=np.array([-0.29, -0.6, -0.4]),
-                                           high=np.array([0.3, 0.6, 0.4]),
+        self.action_space = gym.spaces.Box(low=np.array([-0.01, -0.01, -0.01]),
+        # self.action_space = gym.spaces.Box(low=np.array([-0.25, -0.6, -0.4]),
+                                           high=np.array([0.01, 0.01, 0.01]),
                                            shape=(self.num_actions,))  # bong, clipping
         # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]
         print("[INFO]: Completed setting up the environment...")
@@ -86,6 +87,7 @@ class LiftEnv(IsaacEnv):
         # self.catch_threshold = 0.0025
         self.catch_threshold = 0.002
         self.action_bound = torch.tensor([[-0.22, -0.4, 0], [1, 0.4, 0.6]])
+
         # bong, vis
         # self._markers1.set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
         # for i in range(6):
@@ -178,6 +180,7 @@ class LiftEnv(IsaacEnv):
 
         # bong
         self.ee_to_obj_l2[env_ids] = 0
+        self.robot_actions.zero_()
 
     def _step_impl(self, actions: torch.Tensor):
         # pre-step: set actions into buffer
@@ -200,7 +203,7 @@ class LiftEnv(IsaacEnv):
             self.robot_actions[:, -1] = self.actions[:, -1]
         elif self.cfg.control.control_type == "default":
             # self.robot_actions[:] = self.actions     # original
-            self.robot_actions[:, :-1] = self.actions  # bong
+            self.robot_actions[:, :-1] += self.actions  # bong
             # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]   # good: [-0.215, 0.07, 0, 0, 0, 0]
             # self.robot_actions[:, :-1] = torch.tensor([[0, 0, -0.4, 0, 0, 0], [0, 0, 0, 0, 0, 0]], dtype=torch.float32)  # bong
             self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=40)  # open = 0.785398
@@ -338,6 +341,7 @@ class LiftEnv(IsaacEnv):
     def _check_termination(self) -> None:  # change
         # access buffers from simulator
         object_pos = self.object.data.root_pos_w - self.envs_positions  # original
+        robot_pos = self.robot.data.ee_state_w[:, 0:3] - self.envs_positions  # bong
         # extract values from buffer
         self.reset_buf[:] = 0
         # compute resets
@@ -366,6 +370,10 @@ class LiftEnv(IsaacEnv):
         # -- episode length
         if self.cfg.terminations.episode_timeout:
             self.reset_buf = torch.where(self.episode_length_buf >= self.max_episode_length, 1, self.reset_buf)
+
+        if self.cfg.terminations.robot_out_of_box:  # bong
+            self.reset_buf = torch.where(torch.any(robot_pos < self.action_bound[0, :], dim=1), 1, self.reset_buf)  # bigger than min
+            self.reset_buf = torch.where(torch.any(robot_pos > self.action_bound[1, :], dim=1), 1, self.reset_buf)  # smaller than min
 
     def _randomize_object_initial_pose(self, env_ids: torch.Tensor, cfg: RandomizationCfg.ObjectInitialPoseCfg):
         """Randomize the initial pose of the object."""
