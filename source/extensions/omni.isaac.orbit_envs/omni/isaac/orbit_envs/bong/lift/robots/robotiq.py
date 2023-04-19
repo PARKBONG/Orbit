@@ -101,6 +101,7 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
         #         dof_pos_offset={"rev_x": 0, "rev_y": 0, "rev_z": 0.0},
         #     ),
         # ),
+
         "robotiq_hand": GripperActuatorGroupCfg(
             dof_names=["bot_joint_0_p", "top_joint_0_p", "bot_joint_1_p", "top_joint_1_p", "bot_joint_2_p", "top_joint_2_p"],
             model_cfg=ImplicitActuatorCfg(velocity_limit=VELOCITY_LIMIT, torque_limit=1000),
