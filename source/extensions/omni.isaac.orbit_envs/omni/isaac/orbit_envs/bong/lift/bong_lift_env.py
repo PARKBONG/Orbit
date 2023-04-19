@@ -218,7 +218,7 @@ class LiftEnv(IsaacEnv):
             # print()
             # set actions into buffers
             # self.robot_actions[0, :-1] = self.action_bound[0]
-            self.robot_actions[0, :-1] = torch.tensor([-0.29, 0, 0])
+            # self.robot_actions[0, :-1] = torch.tensor([-0.29, 0, 0])
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
