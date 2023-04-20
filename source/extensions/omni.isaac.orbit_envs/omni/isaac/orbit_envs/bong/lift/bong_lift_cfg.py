@@ -152,7 +152,7 @@ class ObservationsCfg:
         tool_actions = {"scale": 1.0}
         bong_is_catch = {"scale": 1.0}
         # bong_obj_to_desire = {"scale": 1.0}
-        bong_obj_height = {"scale": 1.0}
+        # bong_obj_height = {"scale": 1.0}
 
     # global observation settings
     return_dict_obs_in_group = False
@@ -182,10 +182,10 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 50}
+    bong_catch_object = {"weight": 300}
     # bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
-    bong_is_success = {"weight": 100}
+    # bong_is_success = {"weight": 100}
     # bong_robot_out_of_box = {"weight": 10}
     # bong_object_height = {"weight": 1000}
 
