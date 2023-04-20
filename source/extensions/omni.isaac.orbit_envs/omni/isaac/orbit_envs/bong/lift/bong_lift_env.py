@@ -93,6 +93,7 @@ class LiftEnv(IsaacEnv):
         #     self._markers_list[i].set_world_poses(self.envs_positions - torch.tensor([], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
         #     self._markers_list[i].set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
         #     self._markers_list[i + 1].set_world_poses(self.envs_positions - torch.tensor([self.action_space.low[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
+
     """
     Implementation specifics.
     """
@@ -180,7 +181,7 @@ class LiftEnv(IsaacEnv):
 
         # bong
         self.ee_to_obj_l2[env_ids] = 0
-        self.robot_actions.zero_()
+        # self.robot_actions[env_ids] = 0
 
     def _step_impl(self, actions: torch.Tensor):
         # pre-step: set actions into buffer
@@ -203,8 +204,8 @@ class LiftEnv(IsaacEnv):
             self.robot_actions[:, -1] = self.actions[:, -1]
         elif self.cfg.control.control_type == "default":
             # self.robot_actions[:] = self.actions     # original
-            # self.robot_actions[:, :-1] = self.actions  # bong
-            self.robot_actions[:, :-1] += self.actions  # bong
+            self.robot_actions[:, :-1] = self.actions  # bong
+            # self.robot_actions[:, :-1] += self.actions  # bong
             # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]   # good: [-0.215, 0.07, 0, 0, 0, 0]
             # self.robot_actions[:, :-1] = torch.tensor([[0, 0, -0.4, 0, 0, 0], [0, 0, 0, 0, 0, 0]], dtype=torch.float32)  # bong
             self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=40)  # open = 0.785398
@@ -248,7 +249,9 @@ class LiftEnv(IsaacEnv):
         # close gripper_func
 
     def _dummy_actions(self, actions, dummy_env_ids):
-        actions[dummy_env_ids, 0] = actions[dummy_env_ids, 0] + 0.1
+        # actions[dummy_env_ids, 0] = actions[dummy_env_ids, 0] + 0.1
+        # actions[dummy_env_ids, :3] = torch.tensor([[0, 0, 0]])
+        actions[dummy_env_ids, :3] = self.previous_actions[dummy_env_ids, :3] + torch.tensor([[0.01, 0, 0]]).repeat(len(dummy_env_ids), 1)
         return actions
 
     def _get_observations(self) -> VecEnvObs:
@@ -352,7 +355,7 @@ class LiftEnv(IsaacEnv):
     def _check_termination(self) -> None:  # change
         # access buffers from simulator
         object_pos = self.object.data.root_pos_w - self.envs_positions  # original
-        robot_pos = self.robot.data.ee_state_w[:, 0:3] - self.envs_positions  # bong
+        # robot_pos = self.robot.data.ee_state_w[:, 0:3] - self.envs_positions  # bong
         object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  #
         # extract values from buffer
         self.reset_buf[:] = 0
@@ -375,9 +378,9 @@ class LiftEnv(IsaacEnv):
         #     object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
         #     self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
 
-        if self.cfg.terminations.robot_out_of_box:  # bong
-            self.reset_buf = torch.where(torch.any(robot_pos < self.action_bound[0, :], dim=1), 1, self.reset_buf)  # bigger than min
-            self.reset_buf = torch.where(torch.any(robot_pos > self.action_bound[1, :], dim=1), 1, self.reset_buf)  # smaller than min
+        # if self.cfg.terminations.robot_out_of_box:  # bong
+        #     self.reset_buf = torch.where(torch.any(robot_pos < self.action_bound[0, :], dim=1), 1, self.reset_buf)  # bigger than min
+        #     self.reset_buf = torch.where(torch.any(robot_pos > self.action_bound[1, :], dim=1), 1, self.reset_buf)  # smaller than min
             # print(object_pos)
         # -- object fell off the table (table at height: 0.0 m)
         if self.cfg.terminations.object_falling:
@@ -655,10 +658,10 @@ class LiftRewardManager(RewardManager):
         object_position_error = torch.norm(env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3], dim=1)
         return torch.where(object_position_error < 0.002, 1, 0)
 
-    def bong_robot_out_of_box(self, env: LiftEnv):
-        robot_pos = env.robot.data.ee_state_w[:, 0:3] - env.envs_positions
-        # print(torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0))
-        return torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0)
+    # def bong_robot_out_of_box(self, env: LiftEnv):
+    #     robot_pos = env.robot.data.ee_state_w[:, 0:3] - env.envs_positions
+    #     # print(torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0))
+    #     return torch.where(torch.any(robot_pos < env.action_bound[0, :], dim=1) | torch.any(robot_pos > env.action_bound[1, :], dim=1), -1, 0)
 
     def bong_object_falling(self, env: LiftEnv):
         return torch.where((env.object.data.root_pos_w - env.envs_positions)[:, 2] < -0.05, -1, 0)

@@ -110,7 +110,7 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
             mimic_multiplier={"bot_joint_0_p": 1, "top_joint_0_p": -1, "bot_joint_1_p": 1, "top_joint_1_p": -1, "bot_joint_2_p": -1, "top_joint_2_p": 1},
             # speed=1,
             open_dof_pos=0,
-            close_dof_pos=0.3,
+            # close_dof_pos=0.3,
             # close_dof_pos=0.785398,
             close_dof_pos=0.4,
         )
