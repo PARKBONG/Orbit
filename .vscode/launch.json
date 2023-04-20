@@ -8,7 +8,8 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train Bong-Lift-Robotiq-4d
+            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train 
+            "args" : ["--task","Bong-Lift-Robotiq-soft-v0","--num_envs","2", "--cpu"],  // Bong-Lift-Robotiq-soft-v0
             // "args" : ["--task","Bong-Lift-Robotiq-4dof-v0","--num_envs","2", "--cpu"],  // 4dof
             // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu", "--checkpoint", // play
                     //  "logs/sb3/Bong-Lift-Robotiq-v0/Apr20_12-50-49_a9ec3b0aa9c349ca263dd9559aef52e28df3e3bb/model_5017600_steps.zip"], // play
