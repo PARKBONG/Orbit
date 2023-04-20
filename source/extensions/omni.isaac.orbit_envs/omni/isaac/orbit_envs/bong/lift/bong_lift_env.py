@@ -226,7 +226,7 @@ class LiftEnv(IsaacEnv):
         # -- compute MDP signals
         # reward
         self.reward_buf = self._reward_manager.compute()
-        self.reward_buf = self.reward_buf * (self.dummy_buf == 0)
+        # self.reward_buf = self.reward_buf * (self.dummy_buf == 0)
         # terminations
         self._check_termination()
         # -- store history
