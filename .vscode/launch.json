@@ -8,9 +8,7 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train Bong-Lift-Robotiq-4d
-            // "args" : ["--task","Isaac-Ant-v0"],  // train RLGAMES
-            "args" : ["--task","Bong-Lift-Roqotiq-v0"],  // train RLGAMES
+            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train Bong-Lift-Robotiq-4d
             // "args" : ["--task","Bong-Lift-Robotiq-4dof-v0","--num_envs","2", "--cpu"],  // 4dof
             // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu", "--checkpoint", // play
 
@@ -22,7 +20,6 @@
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_18-41-29/model_16384000_steps.zip"], // play good, little high
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_19-48-02/model_16384000_steps.zip"], // play good, little high
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_19-48-02/model_16384000_steps.zip"], // new_inv, reward weight changed
-            "justMyCode": false,
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
