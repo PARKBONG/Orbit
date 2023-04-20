@@ -158,6 +158,15 @@ class LiftEnv(IsaacEnv):
     def _reset_idx(self, env_ids: VecEnvIndices):
         # randomize the MDP
         # -- robot DOF state
+        print("dummy")
+        for _ in range(200):
+            # print()
+            # set actions into buffers
+            self._dummy_actions(self.robot_actions, env_ids)
+            self.robot.apply_action(self.robot_actions)
+            # simulate
+            self.sim.step(render=self.enable_render)
+
         dof_pos, dof_vel = self.robot.get_default_dof_state(env_ids=env_ids)
         self.robot.set_dof_state(dof_pos, dof_vel, env_ids=env_ids)
         # -- object pose
@@ -231,13 +240,13 @@ class LiftEnv(IsaacEnv):
         # -- compute MDP signals
         # reward
         self.reward_buf = self._reward_manager.compute()
-        self.reward_buf = self.reward_buf * (self.dummy_buf == 0)
+        # self.reward_buf = self.reward_buf * (self.dummy_buf == 0)
         # terminations
         self._check_termination()
         # -- store history
         self.previous_actions = self.actions.clone()
         object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
-        self.dummy_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)
+        # self.dummy_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)
         # -- add information to extra if timeout occurred due to episode length
         # Note: this is used by algorithms like PPO where time-outs are handled differently
         self.extras["time_outs"] = self.episode_length_buf >= self.max_episode_length
@@ -254,7 +263,7 @@ class LiftEnv(IsaacEnv):
         # close gripper_func
 
     def _dummy_actions(self, actions, dummy_env_ids):
-        actions[dummy_env_ids, 0] = actions[dummy_env_ids, 0] + 0.1
+        actions[dummy_env_ids, 0] += 0.01
         return actions
 
     def _get_observations(self) -> VecEnvObs:
@@ -485,7 +494,7 @@ class LiftObservationManager(ObservationManager):
     def arm_dof_vel_3D(self, env: LiftEnv):
         """DOF velocity of the arm."""
         return env.robot.data.arm_dof_vel[:, :3]
-    
+
     def tool_dof_pos_scaled(self, env: LiftEnv):
         """DOF positions of the tool normalized to its max and min ranges."""
         return scale_transform(

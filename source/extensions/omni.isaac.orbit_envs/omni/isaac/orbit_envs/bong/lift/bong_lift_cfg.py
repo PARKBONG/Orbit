@@ -189,13 +189,12 @@ class TerminationsCfg:
     """Termination terms for the MDP."""
 
     episode_timeout = True  # reset when episode length ended
-    object_falling = True  # reset when object falls off the table
+    object_falling = True  # True  # reset when object falls off the table
     is_success = False  # reset when object is lifted
     is_catch = False  # reset when object is lifted
     fail_to_catch = False  # reset when object is lifted
-    robot_out_of_box = True
+    robot_out_of_box = False  # True
     # is_obj_desired = False
-
 
 @configclass
 class ControlCfg:

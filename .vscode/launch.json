@@ -8,9 +8,9 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train Bong-Lift-Robotiq-4d
+            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train Bong-Lift-Robotiq-4d
             // "args" : ["--task","Isaac-Ant-v0"],  // train RLGAMES
-            "args" : ["--task","Bong-Lift-Roqotiq-v0"],  // train RLGAMES
+            // "args" : ["--task","Bong-Lift-Roqotiq-v0"],  // train RLGAMES
             // "args" : ["--task","Bong-Lift-Robotiq-4dof-v0","--num_envs","2", "--cpu"],  // 4dof
             // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu", "--checkpoint", // play
 
