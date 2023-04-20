@@ -60,7 +60,7 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
 
     ),
     ee_info=SingleArmManipulatorCfg.EndEffectorFrameCfg(
-        body_name="base", pos_offset=(0.0, 0.0, 0.12), rot_offset=(1.0, 0.0, 0.0, 0.0)  # xform / head
+        body_name="base", pos_offset=(0.0, 0.0, 0.15), rot_offset=(1.0, 0.0, 0.0, 0.0)  # xform / head
     ),
     rigid_props=SingleArmManipulatorCfg.RigidBodyPropertiesCfg(
         # solver_position_iteration_count=16,  # bong
@@ -110,9 +110,9 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
             mimic_multiplier={"bot_joint_0_p": 1, "top_joint_0_p": -1, "bot_joint_1_p": 1, "top_joint_1_p": -1, "bot_joint_2_p": -1, "top_joint_2_p": 1},
             # speed=1,
             open_dof_pos=0,
-            # close_dof_pos=0.3,
+            close_dof_pos=0.35,
             # close_dof_pos=0.785398,
-            close_dof_pos=0.4,
+            # close_dof_pos=0.4,
         )
     },
 )
