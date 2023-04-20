@@ -187,7 +187,7 @@ class RewardsCfg:
     # bong_catch_failure = {"weight": 50}
     bong_is_success = {"weight": 100}
     # bong_robot_out_of_box = {"weight": 10}
-    bong_object_height = {"weight": 1000}
+    # bong_object_height = {"weight": 1000}
 
 
 @configclass
