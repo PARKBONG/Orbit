@@ -141,7 +141,7 @@ class ObservationsCfg:
         # tool_positions = {"scale": 1.0}
         # tool_orientations = {"scale": 1.0}
         # -- object state
-        object_positions = {"scale": 1.0}
+        # object_positions = {"scale": 1.0}
         # object_orientations = {"scale": 1.0}
         object_relative_tool_positions = {"scale": 1.0}
         # object_relative_tool_orientations = {"scale": 1.0}
@@ -152,7 +152,7 @@ class ObservationsCfg:
         tool_actions = {"scale": 1.0}
         bong_is_catch = {"scale": 1.0}
         # bong_obj_to_desire = {"scale": 1.0}
-        # bong_obj_height = {"scale": 1.0}
+        bong_obj_height = {"scale": 1.0}
 
     # global observation settings
     return_dict_obs_in_group = False
@@ -182,13 +182,13 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 300}
+    bong_catch_object = {"weight": 100}
     # bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
-    # bong_is_success = {"weight": 100}
+    bong_is_success = {"weight": 300}
     # bong_robot_out_of_box = {"weight": 10}
-    # bong_object_height = {"weight": 1000}
-    bong_object_falling = {"weight" : 500}
+    bong_object_height = {"weight": 100}
+    # bong_object_falling = {"weight" : 500}
 
 @configclass
 class TerminationsCfg:
@@ -196,11 +196,11 @@ class TerminationsCfg:
 
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
-    is_success = False  # reset when object is lifted
+    is_success = True  # reset when object is lifted
     is_catch = False  # reset when object is lifted
     fail_to_catch = True  # reset when object is lifted
     is_obj_desired = False
-    robot_out_of_box = False
+    # robot_out_of_box = False
 
 @configclass
 class ControlCfg:
