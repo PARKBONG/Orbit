@@ -268,9 +268,9 @@ class IsaacEnv(gym.Env):
             # perform the stepping of simulation
 
             # ------------------------------------------------------------------
-            dummy_env_ids = self.dummy_buf.nonzero(as_tuple=False).squeeze(-1)
-            if len(dummy_env_ids) > 0:
-                actions = self._dummy_actions(actions, dummy_env_ids)
+            dummy_env_idx = self.dummy_buf.nonzero(as_tuple=False).squeeze(-1)
+            if len(dummy_env_idx) > 0:
+                actions = self._dummy_actions(actions, dummy_env_idx)
             # ------------------------------------------------------------------
             self._step_impl(actions)
             # check if the simulation timeline is stopped, do not update buffers

@@ -248,10 +248,10 @@ class LiftEnv(IsaacEnv):
             self._debug_vis()
         # close gripper_func
 
-    def _dummy_actions(self, actions, dummy_env_ids):
-        # actions[dummy_env_ids, 0] = actions[dummy_env_ids, 0] + 0.1
-        # actions[dummy_env_ids, :3] = torch.tensor([[0, 0, 0]])
-        actions[dummy_env_ids, :3] = self.previous_actions[dummy_env_ids, :3] + torch.tensor([[0.01, 0, 0]]).repeat(len(dummy_env_ids), 1)
+    def _dummy_actions(self, actions, dummy_env_idx):
+        # actions[dummy_env_idx, 0] = actions[dummy_env_idx, 0] + 0.1
+        # actions[dummy_env_idx, :3] = torch.tensor([[0, 0, 0]])
+        actions[dummy_env_idx, :3] = self.previous_actions[dummy_env_idx, :3] + torch.tensor([[0.01, 0, 0]]).repeat(len(dummy_env_idx), 1)
         return actions
 
     def _get_observations(self) -> VecEnvObs:

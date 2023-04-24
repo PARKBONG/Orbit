@@ -253,8 +253,8 @@ class LiftEnv(IsaacEnv):
             self._debug_vis()
         # close gripper_func
 
-    def _dummy_actions(self, actions, dummy_env_ids):
-        actions[dummy_env_ids, 1] = actions[dummy_env_ids, 1] + 0.1
+    def _dummy_actions(self, actions, dummy_env_idx):
+        actions[dummy_env_idx, 1] = actions[dummy_env_idx, 1] + 0.1
         return actions
 
     def _get_observations(self) -> VecEnvObs:

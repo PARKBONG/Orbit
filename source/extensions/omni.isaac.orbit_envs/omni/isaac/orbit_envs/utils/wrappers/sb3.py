@@ -141,6 +141,7 @@ class Sb3VecEnvWrapper(gym.Wrapper, VecEnv):
         self._async_actions = actions
 
     def step_wait(self):  # noqa: D102
+            # self.step_async JH
         return self.step(self._async_actions)
 
     def get_attr(self, attr_name, indices):  # noqa: D102
