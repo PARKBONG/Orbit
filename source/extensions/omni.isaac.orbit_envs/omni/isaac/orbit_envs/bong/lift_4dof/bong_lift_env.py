@@ -185,7 +185,7 @@ class LiftEnv(IsaacEnv):
 
         # bong
         self.ee_to_obj_l2[env_ids] = 0
-        self.robot_actions.zero_()
+        self.robot_actions[env_ids] = 0
 
     def _step_impl(self, actions: torch.Tensor):
         # pre-step: set actions into buffer

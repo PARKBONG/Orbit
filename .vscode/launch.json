@@ -8,12 +8,12 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train 
-            // "args" : ["--task","Bong-Lift-Robotiq-soft-v0","--num_envs","2", "--cpu"],  // Bong-Lift-Robotiq-soft-v0
+            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train 
+            "args" : ["--task","Bong-Lift-Robotiq-soft-v0","--num_envs","2", "--cpu"],  // Bong-Lift-Robotiq-soft-v0
             // "args" : ["--task","Bong-Lift-Robotiq-4dof-v0","--num_envs","2", "--cpu"],  // 4dof
-            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","32", "--cpu", "--checkpoint", // play
+            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","32", "--cpu", "--checkpoint", // play
 
-                     "logs/sb3/Bong-Lift-Robotiq-v0/Apr20_13-30-21_fddd569e1c564879a856adb5274fd411757fd577/model_60518400_steps.zip"], // play
+                    //  "logs/sb3/Bong-Lift-Robotiq-v0/Apr20_13-30-21_fddd569e1c564879a856adb5274fd411757fd577/model_60518400_steps.zip"], // play
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_11-56-02/model_16384000_steps.zip"], // play
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_12-44-11/model_137420800_steps.zip"], // play
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_17-06-59/model_57958400_steps.zip"], // play

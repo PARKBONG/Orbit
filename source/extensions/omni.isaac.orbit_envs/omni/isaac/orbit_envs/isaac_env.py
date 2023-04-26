@@ -156,7 +156,7 @@ class IsaacEnv(gym.Env):
         physics_scene_path = self.sim.get_physics_context().prim_path
         cloner.filter_collisions(
             physics_scene_path, "/World/collisions", prim_paths=self.envs_prim_paths, global_paths=global_prim_paths
-        )
+        )  # soft
 
     """
     Properties

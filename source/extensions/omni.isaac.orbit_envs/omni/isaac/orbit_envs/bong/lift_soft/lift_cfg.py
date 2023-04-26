@@ -36,7 +36,7 @@ class ManipulationObjectCfg(RigidObjectCfg):
     init_state = RigidObjectCfg.InitialStateCfg(
         pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
     )
-    rigid_props = RigidObjectCfg.RigidBodyPropertiesCfg(
+    soft_props = RigidObjectCfg.RigidBodyPropertiesCfg(
         solver_position_iteration_count=16,
         solver_velocity_iteration_count=1,
         max_angular_velocity=1000.0,
