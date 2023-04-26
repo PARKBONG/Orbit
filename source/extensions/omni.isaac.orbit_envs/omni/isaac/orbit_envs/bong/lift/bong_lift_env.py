@@ -232,7 +232,7 @@ class LiftEnv(IsaacEnv):
         # -- store history
         self.previous_actions = self.actions.clone()
         object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
-        self.dummy_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)
+        # self.dummy_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)
         # -- add information to extra if timeout occurred due to episode length
         # Note: this is used by algorithms like PPO where time-outs are handled differently
         self.extras["time_outs"] = self.episode_length_buf >= self.max_episode_length
