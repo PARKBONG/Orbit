@@ -27,7 +27,7 @@ from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
 
 
 class LiftEnv(IsaacEnv):
-    """Environment for lifting an object off a table with a single-arm manipulator."""
+    """Environment for lifting an object off a table with a single-arm manipulator..."""
 
     def __init__(self, cfg: LiftEnvCfg = None, headless: bool = False):
 
