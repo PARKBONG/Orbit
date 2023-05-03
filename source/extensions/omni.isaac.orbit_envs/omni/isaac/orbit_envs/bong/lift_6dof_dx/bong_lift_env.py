@@ -241,7 +241,7 @@ class LiftEnv(IsaacEnv):
         # -- add information to extra if timeout occurred due to episode length
         # Note: this is used by algorithms like PPO where time-outs are handled differently
         self.extras["time_outs"] = self.episode_length_buf >= self.max_episode_length
-        self.extras["dummy_steps"] = self.episode_length_buf >= torch.randint(low=3, high=100, size=(2,))
+        # self.extras["dummy_steps"] = self.episode_length_buf >= torch.randint(low=3, high=100, size=(2,))
         # -- add information to extra if task completed
 
         # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # original
@@ -254,7 +254,7 @@ class LiftEnv(IsaacEnv):
         # close gripper_func
 
     def _dummy_actions(self, actions, dummy_env_idx):
-        actions[dummy_env_idx, 1] = actions[dummy_env_idx, 1] + 0.1
+        # actions[dummy_env_idx, 1] = actions[dummy_env_idx, 1] + 0.1
         return actions
 
     def _get_observations(self) -> VecEnvObs:
