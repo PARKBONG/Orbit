@@ -9,7 +9,7 @@ Submodule containing all objects abstractions.
 
 from .articulated import ArticulatedObject, ArticulatedObjectCfg, ArticulatedObjectData
 from .rigid import RigidObject, RigidObjectCfg, RigidObjectData
-from .bong_soft import SoftObject, SoftObjectCfg, SoftObjectData
+# from .bong_soft import SoftObject, SoftObjectCfg, SoftObjectData
 
 __all__ = [
     # rigid objects
@@ -21,7 +21,7 @@ __all__ = [
     "ArticulatedObjectData",
     "ArticulatedObject",
     # bong_soft objects
-    "SoftObjectCfg",
-    "SoftObjectData",
-    "SoftObject",
+    # "SoftObjectCfg",
+    # "SoftObjectData",
+    # "SoftObject",
 ]
