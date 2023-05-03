@@ -142,7 +142,7 @@ class ObservationsCfg:
         # tool_positions = {"scale": 1.0}
         # tool_orientations = {"scale": 1.0}
         # -- object state
-        # object_positions = {"scale": 1.0}
+        object_positions = {"scale": 1.0}
         # object_orientations = {"scale": 1.0}
         object_relative_tool_positions = {"scale": 1.0}
         object_relative_tool_orientations = {"scale": 1.0}
@@ -151,7 +151,7 @@ class ObservationsCfg:
         # -- previous action
         # arm_actions = {"scale": 1.0}
         tool_actions = {"scale": 1.0}
-        bong_is_catch = {"scale": 1.0}
+        bong_is_catch = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
         # bong_obj_height = {"scale": 1.0}
 
@@ -183,7 +183,7 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 300}
+    bong_catch_object = {"weight": 1000}
     # bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
     # bong_is_success = {"weight": 100}
