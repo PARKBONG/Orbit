@@ -141,7 +141,7 @@ class ObservationsCfg:
         # tool_positions = {"scale": 1.0}
         # tool_orientations = {"scale": 1.0}
         # -- object state
-        # object_positions = {"scale": 1.0}
+        object_positions = {"scale": 1.0}
         # object_orientations = {"scale": 1.0}
         object_relative_tool_positions = {"scale": 1.0}
         # object_relative_tool_orientations = {"scale": 1.0}
