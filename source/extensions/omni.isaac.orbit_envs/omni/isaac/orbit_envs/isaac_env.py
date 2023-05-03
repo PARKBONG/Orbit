@@ -121,7 +121,7 @@ class IsaacEnv(gym.Env):
         # initialize common environment buffers
         self.reward_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
         self.reset_buf = torch.ones(self.num_envs, device=self.device, dtype=torch.long)
-        self.dummy_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)  # dummy
+        # self.dummy_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)  # dummy
         self.episode_length_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)
         # allocate dictionary to store metrics
         self.extras = {}
@@ -268,9 +268,9 @@ class IsaacEnv(gym.Env):
             # perform the stepping of simulation
 
             # ------------------------------------------------------------------
-            dummy_env_idx = self.dummy_buf.nonzero(as_tuple=False).squeeze(-1)
-            if len(dummy_env_idx) > 0:
-                actions = self._dummy_actions(actions, dummy_env_idx)
+            # dummy_env_idx = self.dummy_buf.nonzero(as_tuple=False).squeeze(-1)
+            # if len(dummy_env_idx) > 0:
+            #     actions = self._dummy_actions(actions, dummy_env_idx)
             # ------------------------------------------------------------------
             self._step_impl(actions)
             # check if the simulation timeline is stopped, do not update buffers
