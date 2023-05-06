@@ -91,7 +91,8 @@ class LiftEnv(IsaacEnv):
         self.ee_to_obj_l2 = torch.tensor([0 for _ in range(self.num_envs)], dtype=torch.float32)
         # self.catch_threshold = 0.0025
         self.catch_threshold = 0.002
-        self.action_bound = torch.tensor([[-0.22, -0.4, 0], [1, 0.4, 0.6]])
+        self.action_bound = torch.tensor([[-0.29, -0.6, -0.4, -torch.pi, -torch.pi, -torch.pi],
+                                          [0.3, 0.6, 0.4, torch.pi, torch.pi, torch.pi]])
         # bong, vis
         # self._markers1.set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
         # for i in range(6):
@@ -212,13 +213,14 @@ class LiftEnv(IsaacEnv):
             self.robot_actions[:, :-1] += self.actions  # bong
             # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]   # good: [-0.215, 0.07, 0, 0, 0, 0]
             # self.robot_actions[:, :-1] = torch.tensor([[0, 0, -0.4, 0, 0, 0], [0, 0, 0, 0, 0, 0]], dtype=torch.float32)  # bong
-            self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=20)  # open = 0.785398
+            self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=50)  # open = 0.785398
             # self.robot_actions[:, -1] = 0 # close
+            self.robot_actions[:, :-1] = torch.clamp(self.robot_actions[:, :-1], min=self.action_bound[0, :], max=self.action_bound[1, :])
+
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
             # print()
             # set actions into buffers
-            self.robot_actions[:, 3] = torch.clamp(self.robot_actions[:, 3], min=torch.pi, max=torch.pi)
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
