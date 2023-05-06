@@ -39,7 +39,7 @@ class LiftEnv(IsaacEnv):
         # create classes (these are called by the function :meth:`_design_scene`)
         self.robot = SingleArmManipulator(cfg=self.cfg.robot)
         self.object = RigidObject(cfg=self.cfg.object)
-
+        self.visual_object = RigidObject(cfg=self.cfg.visual_object)
         # initialize the base class to setup the scene.
         super().__init__(self.cfg, headless=headless)
         # parse the configuration for information
@@ -86,7 +86,8 @@ class LiftEnv(IsaacEnv):
         # bong
         self.ee_to_obj_l2 = torch.tensor([0 for _ in range(self.num_envs)], dtype=torch.float32)
         # self.catch_threshold = 0.0025
-        self.catch_threshold = 0.002
+        # self.catch_threshold = 0.002
+        self.catch_threshold = 0.001
         # bong, vis
         # self._markers1.set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
         # for i in range(6):
@@ -107,7 +108,9 @@ class LiftEnv(IsaacEnv):
         self.robot.spawn(self.template_env_ns + "/Robot")
         # object
         self.object.spawn(self.template_env_ns + "/Object")
-
+        # visual object
+        self.visual_object.spawn(self.template_env_ns + "/VisualObject")
+        # self.visual_object.disable_rigid_body_physics()
         # setup debug visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             # create point instancer to visualize the goal points
@@ -208,7 +211,7 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, :-1] += self.actions  # bong
             # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]   # good: [-0.215, 0.07, 0, 0, 0, 0]
             # self.robot_actions[:, :-1] = torch.tensor([[0, 0, -0.4, 0, 0, 0], [0, 0, 0, 0, 0, 0]], dtype=torch.float32)  # bong
-            self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=40)  # open = 0.785398
+            self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=50)  # open = 0.785398
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
@@ -557,7 +560,7 @@ class LiftObservationManager(ObservationManager):
         return env.object.data.root_pos_w[:, 2:3]
 
     def bong_is_catch(self, env: LiftEnv):
-        return torch.where((env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002), 1.0, 0.0).unsqueeze(1)
+        return torch.where((env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.001), 1.0, 0.0).unsqueeze(1)
         # return torch.where((-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002), 1, 0).unsqueeze(1)
 
 class LiftRewardManager(RewardManager):
@@ -642,10 +645,10 @@ class LiftRewardManager(RewardManager):
         return torch.where(env.object.data.root_pos_w[:, 2] > env.object_des_pose_w[:, 2], 1.0, 0.0)
 
     def bong_catch_object(self, env: LiftEnv): 
-        return 1 * (env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002)  # descremental, bong
+        return 1 * (env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.001)  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):  
-        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002)
+        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.001)
 
     def bong_after_catch(self, env: LiftEnv):
 
@@ -656,7 +659,7 @@ class LiftRewardManager(RewardManager):
 
     def bong_obj_finish(self, env: LiftEnv):
         object_position_error = torch.norm(env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3], dim=1)
-        return torch.where(object_position_error < 0.002, 1, 0)
+        return torch.where(object_position_error < 0.001, 1, 0)
 
     # def bong_robot_out_of_box(self, env: LiftEnv):
     #     robot_pos = env.robot.data.ee_state_w[:, 0:3] - env.envs_positions
