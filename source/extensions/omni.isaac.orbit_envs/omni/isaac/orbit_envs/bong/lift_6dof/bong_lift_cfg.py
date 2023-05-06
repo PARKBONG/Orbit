@@ -26,12 +26,12 @@ class TableCfg:
     usd_path = f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
 
 
-@configclass
-class PointCfg:
-    """Properties for the point."""
+# @configclass
+# class PointCfg:
+#     """Properties for the point."""
 
-    # note: we use instanceable asset since it consumes less memory
-    usd_path = f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
+#     # note: we use instanceable asset since it consumes less memory
+#     usd_path = f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
 
 
 @configclass
@@ -58,24 +58,25 @@ class ManipulationObjectCfg(RigidObjectCfg):
     )
 
 
-@configclass
-class VisualObjectCfg(RigidObjectCfg):
-    """Properties for the object to manipulate in the scene."""
+# @configclass
+# class VisualObjectCfg(RigidObjectCfg):
+#     """Properties for the object to manipulate in the scene."""
 
-    meta_info = RigidObjectCfg.MetaInfoCfg(
-        usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
-        scale=(1, 1, 1),
-    )
-    init_state = RigidObjectCfg.InitialStateCfg(
-        pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
-    )
+#     meta_info = RigidObjectCfg.MetaInfoCfg(
+#         usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
+#         scale=(1, 1, 1),
+#     )
+#     init_state = RigidObjectCfg.InitialStateCfg(
+#         pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
+#     )
 
-    collision_props = RigidObjectCfg.CollisionPropertiesCfg(
-        collision_enabled=False
-    )
-    rigid_props = RigidObjectCfg.RigidBodyPropertiesCfg(
-        disable_gravity=True,
-    )
+#     collision_props = RigidObjectCfg.CollisionPropertiesCfg(
+#         collision_enabled=False
+#     )
+#     rigid_props = RigidObjectCfg.RigidBodyPropertiesCfg(
+#         disable_gravity=True,
+#     )
+
 
 @configclass
 class GoalMarkerCfg:
@@ -203,6 +204,7 @@ class RewardsCfg:
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
     bong_catch_object = {"weight": 1000}
+    bong_object_falling = {"weight": 50}
     # bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
     # bong_is_success = {"weight": 100}

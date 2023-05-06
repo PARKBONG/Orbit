@@ -377,9 +377,9 @@ class LiftEnv(IsaacEnv):
             object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
             self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
 
-        if self.cfg.terminations.robot_out_of_box:  # bong
-            self.reset_buf = torch.where(torch.any(robot_pos < self.action_bound[0, :], dim=1), 1, self.reset_buf)  # bigger than min
-            self.reset_buf = torch.where(torch.any(robot_pos > self.action_bound[1, :], dim=1), 1, self.reset_buf)  # smaller than min
+        # if self.cfg.terminations.robot_out_of_box:  # bong
+        #     self.reset_buf = torch.where(torch.any(robot_pos < self.action_bound[0, :], dim=1), 1, self.reset_buf)  # bigger than min
+            # self.reset_buf = torch.where(torch.any(robot_pos > self.action_bound[1, :], dim=1), 1, self.reset_buf)  # smaller than min
             # print(object_pos)
         # -- object fell off the table (table at height: 0.0 m)
         if self.cfg.terminations.object_falling:
@@ -551,6 +551,10 @@ class LiftObservationManager(ObservationManager):
 
     def bong_obj_to_desire(self, env: LiftEnv):
         return env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3]
+
+    def bong_is_catch(self, env: LiftEnv):
+        return torch.where((env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0015), 1.0, 0.0).unsqueeze(1)
+        # return torch.where((-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002), 1, 0).unsqueeze(1)
 
 
 class LiftRewardManager(RewardManager):
