@@ -141,7 +141,7 @@ class ObservationsCfg:
         # tool_positions = {"scale": 1.0}
         # tool_orientations = {"scale": 1.0}
         # -- object state
-        # object_positions = {"scale": 1.0}
+        object_positions = {"scale": 1.0}
         # object_orientations = {"scale": 1.0}
         object_relative_tool_positions = {"scale": 1.0}
         # object_relative_tool_orientations = {"scale": 1.0}
@@ -197,7 +197,7 @@ class TerminationsCfg:
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
     is_success = True  # reset when object is lifted
-    is_catch = False  # reset when object is lifted
+    is_catch = True  # reset when object is lifted
     fail_to_catch = False  # reset when object is lifted
     is_obj_desired = False
 
@@ -223,6 +223,7 @@ class ControlCfg:
 ##
 # Environment configuration
 ##
+
 
 @configclass
 class LiftEnvCfg(IsaacEnvCfg):
