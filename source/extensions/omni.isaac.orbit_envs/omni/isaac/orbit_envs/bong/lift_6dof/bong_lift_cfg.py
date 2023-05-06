@@ -271,7 +271,7 @@ class LiftEnvCfg(IsaacEnvCfg):
     # -- object
     object: ManipulationObjectCfg = ManipulationObjectCfg()
     # -- bong
-    visual_object: VisualObjectCfg = VisualObjectCfg()
+    # visual_object: VisualObjectCfg = VisualObjectCfg()
     # -- table
     table: TableCfg = TableCfg()
     # -- visualization marker
