@@ -8,12 +8,14 @@
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
-            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train 
+            // "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","2", "--cpu"],  // train 
             // "args" : ["--task","Bong-Lift-Robotiq-soft-v0","--num_envs","2", "--cpu"],  // Bong-Lift-Robotiq-soft-v0
             // "args" : ["--task","Bong-Lift-Robotiq-4dof-v0","--num_envs","2", "--cpu"],  // 4dof
-            "args" : ["--task","Bong-Lift-Robotiq-v0","--num_envs","32", "--cpu", "--checkpoint", // play
-
-                     "logs/sb3/Bong-Lift-Robotiq-v0/Apr24_18-22-32_21963ee01bf5d64c00794fa07547cae6c0972c6b/model_163840000_steps.zip"], // play
+            // "args" : ["--task","Bong-Lift-Robotiq-6dof-v0","--num_envs","2", "--cpu"],  // 4dof
+            "args" : ["--task","Bong-Lift-Robotiq-6dof-dx-v0","--num_envs","2", "--cpu"],  // 4dof
+            // "args" : ["--task","Bong-Lift-Robotiq-6dof-v0","--num_envs","32", "--cpu", "--checkpoint", // play
+                    //  "logs/sb3/Bong-Lift-Robotiq-6dof-v0/May03_19-45-44_4cadc762b6f044603ae051b323a510bd042aba3a/model_31027200_steps.zip"], // play
+                    // "logs/sb3/Bong-Lift-Robotiq-6dof-v0/May03_14-50-46_c463dbce9a903ab9d27924cf1997886e2bc9cf4f/model_15872000_steps.zip"],
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_11-56-02/model_16384000_steps.zip"], // play
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_12-44-11/model_137420800_steps.zip"], // play
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_17-06-59/model_57958400_steps.zip"], // play
@@ -21,7 +23,6 @@
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_18-41-29/model_16384000_steps.zip"], // play good, little high
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_19-48-02/model_16384000_steps.zip"], // play good, little high
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_19-48-02/model_16384000_steps.zip"], // new_inv, reward weight changed
-            "justMyCode": false,
             "program": "${file}",
             "console": "integratedTerminal",
             "env": {
@@ -29,7 +30,8 @@
                 "RESOURCE_NAME": "IsaacSim"
             },
             "envFile": "${workspaceFolder}/.vscode/.python.env",
-            "preLaunchTask": "setup_python_env"
+            "preLaunchTask": "setup_python_env",
+            "justMyCode": false
         },
         {
             "name": "Python: Attach (windows-x86_64/linux-x86_64)",

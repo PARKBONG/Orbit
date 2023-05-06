@@ -14,7 +14,7 @@ import omni.isaac.core.utils.prims as prim_utils
 import omni.isaac.orbit.utils.kit as kit_utils
 from omni.isaac.orbit.controllers.differential_inverse_kinematics import DifferentialInverseKinematics
 from omni.isaac.orbit.markers import StaticMarker
-from omni.isaac.orbit.objects import RigidObject
+from omni.isaac.orbit.objects import SoftObject  # RigidObject
 from omni.isaac.orbit.robots.single_arm import SingleArmManipulator
 # from omni.isaac.orbit.bong.bong_single_arm import Bong_SingleArmManipulator
 from omni.isaac.orbit.utils.dict import class_to_dict
@@ -24,7 +24,9 @@ from omni.isaac.orbit.utils.mdp import ObservationManager, RewardManager
 from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 
 from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
-
+from omni.isaac.core.utils.stage import add_reference_to_stage
+# from omni.isaac.core.prims import XFormPrimView
+from omni.isaac.orbit.utils.assets import ISAAC_NUCLEUS_DIR
 
 class LiftEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator."""
@@ -38,7 +40,8 @@ class LiftEnv(IsaacEnv):
         self._pre_process_cfg()
         # create classes (these are called by the function :meth:`_design_scene`)
         self.robot = SingleArmManipulator(cfg=self.cfg.robot)
-        self.object = RigidObject(cfg=self.cfg.object)
+        # self.object = RigidObject(cfg=self.cfg.object)
+        self.object = SoftObject(cfg=self.cfg.object)
 
         # initialize the base class to setup the scene.
         super().__init__(self.cfg, headless=headless)
@@ -80,7 +83,7 @@ class LiftEnv(IsaacEnv):
         # This is required to compute quantities like Jacobians used in step().
         self.sim.step()
         # -- fill up buffers
-        self.object.update_buffers(self.dt)
+        self.object.update_buffers(self.dt)  # soft
         self.robot.update_buffers(self.dt)
 
         # bong
@@ -107,6 +110,11 @@ class LiftEnv(IsaacEnv):
         self.robot.spawn(self.template_env_ns + "/Robot")
         # object
         self.object.spawn(self.template_env_ns + "/Object")
+        # self.soft_usd = "omniverse://localhost/Users/chanyoung/Asset/oring.usd"
+        # self.soft_usd = f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd"
+        # self.soft_usd = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft_cube_instanceable.usd"
+        # add_reference_to_stage(self.soft_usd, "/World/envs/env_0/Oring")
+        # self.object = XFormPrimView(prim_paths_expr="/World/envs/env_0/Oring")  # "/World/envs/env_0/Oring/object"
 
         # setup debug visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
@@ -157,9 +165,9 @@ class LiftEnv(IsaacEnv):
         dof_pos, dof_vel = self.robot.get_default_dof_state(env_ids=env_ids)
         self.robot.set_dof_state(dof_pos, dof_vel, env_ids=env_ids)
         # -- object pose
-        self._randomize_object_initial_pose(env_ids=env_ids, cfg=self.cfg.randomization.object_initial_pose)
+        self._randomize_object_initial_pose(env_ids=env_ids, cfg=self.cfg.randomization.object_initial_pose)  # soft
         # -- goal pose
-        self._randomize_object_desired_pose(env_ids=env_ids, cfg=self.cfg.randomization.object_desired_pose)
+        self._randomize_object_desired_pose(env_ids=env_ids, cfg=self.cfg.randomization.object_desired_pose)  # soft
 
         # -- Reward logging
         # fill extras with episode information
@@ -208,11 +216,11 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, :-1] += self.actions  # bong
             # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]   # good: [-0.215, 0.07, 0, 0, 0, 0]
             # self.robot_actions[:, :-1] = torch.tensor([[0, 0, -0.4, 0, 0, 0], [0, 0, 0, 0, 0, 0]], dtype=torch.float32)  # bong
-            self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=40)  # open = 0.785398
+            self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=40)  # open = 0.785398  # soft
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
-
+            self.robot_actions[:, :3] = torch.tensor([[-0.29, 0, 0]])
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
@@ -222,7 +230,7 @@ class LiftEnv(IsaacEnv):
         # post-step:
         # -- compute common buffers
         self.robot.update_buffers(self.dt)
-        self.object.update_buffers(self.dt)
+        self.object.update_buffers(self.dt)  # soft
         # -- compute MDP signals
         # reward
         self.reward_buf = self._reward_manager.compute()
@@ -231,18 +239,18 @@ class LiftEnv(IsaacEnv):
         self._check_termination()
         # -- store history
         self.previous_actions = self.actions.clone()
-        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
-        self.dummy_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)
+        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong  # soft
+        self.dummy_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)  # soft
         # -- add information to extra if timeout occurred due to episode length
         # Note: this is used by algorithms like PPO where time-outs are handled differently
         self.extras["time_outs"] = self.episode_length_buf >= self.max_episode_length
-        self.extras["dummy_steps"] = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)
+        self.extras["dummy_steps"] = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)  # soft
         # -- add information to extra if task completed
 
         # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # original
         # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         # object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
-        self.extras["is_success"] = torch.where(self.object.data.root_pos_w[:, 2] > 0.2, 1, 0)  # original
+        self.extras["is_success"] = torch.where(self.object.data.root_pos_w[:, 2] > 0.2, 1, 0)  # original  # soft
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
@@ -305,7 +313,7 @@ class LiftEnv(IsaacEnv):
 
         # define views over instances
         self.robot.initialize(self.env_ns + "/.*/Robot")
-        self.object.initialize(self.env_ns + "/.*/Object")
+        self.object.initialize(self.env_ns + "/.*/Object")  # soft
 
         # create controller
         if self.cfg.control.control_type == "inverse_kinematics":
@@ -339,7 +347,7 @@ class LiftEnv(IsaacEnv):
         # print(self.robot.data.ee_state_w[:, 0:3]) #printbong
         self._ee_markers.set_world_poses(self.robot.data.ee_state_w[:, 0:3], self.robot.data.ee_state_w[:, 3:7])
 
-        self._object_markers.set_world_poses(self.object.data.root_pos_w, self.object.data.root_quat_w)
+        self._object_markers.set_world_poses(self.object.data.root_pos_w, self.object.data.root_quat_w)  # soft
         # -- task-space commands
         if self.cfg.control.control_type == "inverse_kinematics":
             # convert to world frame
@@ -353,40 +361,44 @@ class LiftEnv(IsaacEnv):
     """
 
     def _check_termination(self) -> None:  # change
-        # access buffers from simulator
-        object_pos = self.object.data.root_pos_w - self.envs_positions  # original
-        # robot_pos = self.robot.data.ee_state_w[:, 0:3] - self.envs_positions  # bong
-        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  #
-        # extract values from buffer
-        self.reset_buf[:] = 0
-        # compute resets
-        # -- when task is successful
-        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
-        object_position_error_bool_fail = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) > 1.1 * self.catch_threshold)  # bong
-        if self.cfg.terminations.is_success:  # original
-            # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
-            self.reset_buf = torch.where(self.object.data.root_pos_w[:, 2] > 0.2, 1, self.reset_buf)
+
+        # # soft --------------------------===============================++++++++++++++++++++++++++++++++=
+        # # access buffers from simulator
+        # object_pos = self.object.data.root_pos_w - self.envs_positions  # original
+        # # robot_pos = self.robot.data.ee_state_w[:, 0:3] - self.envs_positions  # bong
+        # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  #
+        # # extract values from buffer
+        # self.reset_buf[:] = 0
+        # # compute resets
+        # # -- when task is successful
+        # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
+        # object_position_error_bool_fail = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) > 1.1 * self.catch_threshold)  # bong
+        # if self.cfg.terminations.is_success:  # original
+        #     # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
+        #     self.reset_buf = torch.where(self.object.data.root_pos_w[:, 2] > 0.2, 1, self.reset_buf)
         
-        if self.cfg.terminations.is_catch:  # original
-            # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
-            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, self.reset_buf)
+        # if self.cfg.terminations.is_catch:  # original
+        #     # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
+        #     self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, self.reset_buf)
 
-        if self.cfg.terminations.fail_to_catch:
-            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool_fail), 1, self.reset_buf)
+        # if self.cfg.terminations.fail_to_catch:
+        #     self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool_fail), 1, self.reset_buf)
 
-        # if self.cfg.terminations.is_obj_desired:  # original
-        #     object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
-        #     self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
+        # # if self.cfg.terminations.is_obj_desired:  # original
+        # #     object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
+        # #     self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
 
-        # if self.cfg.terminations.robot_out_of_box:  # bong
-        #     self.reset_buf = torch.where(torch.any(robot_pos < self.action_bound[0, :], dim=1), 1, self.reset_buf)  # bigger than min
-        #     self.reset_buf = torch.where(torch.any(robot_pos > self.action_bound[1, :], dim=1), 1, self.reset_buf)  # smaller than min
-            # print(object_pos)
-        # -- object fell off the table (table at height: 0.0 m)
-        if self.cfg.terminations.object_falling:
-            # print(object_pos[:, 2])
-            self.reset_buf = torch.where(object_pos[:, 2] < -0.05, 1, self.reset_buf)
-        # -- episode length
+        # # if self.cfg.terminations.robot_out_of_box:  # bong
+        # #     self.reset_buf = torch.where(torch.any(robot_pos < self.action_bound[0, :], dim=1), 1, self.reset_buf)  # bigger than min
+        # #     self.reset_buf = torch.where(torch.any(robot_pos > self.action_bound[1, :], dim=1), 1, self.reset_buf)  # smaller than min
+        #     # print(object_pos)
+        # # -- object fell off the table (table at height: 0.0 m)
+        # if self.cfg.terminations.object_falling:
+        #     # print(object_pos[:, 2])
+        #     self.reset_buf = torch.where(object_pos[:, 2] < -0.05, 1, self.reset_buf)
+        # # -- episode length
+
+        # # --------------------------===============================++++++++++++++++++++++++++++++++=
         if self.cfg.terminations.episode_timeout:
             self.reset_buf = torch.where(self.episode_length_buf >= self.max_episode_length, 1, self.reset_buf)
 

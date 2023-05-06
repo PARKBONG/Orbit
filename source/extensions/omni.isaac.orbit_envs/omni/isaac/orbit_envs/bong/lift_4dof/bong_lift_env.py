@@ -178,14 +178,14 @@ class LiftEnv(IsaacEnv):
         # -- MDP reset
         self.reset_buf[env_ids] = 0
         self.episode_length_buf[env_ids] = 0
-        self.dummy_buf[env_ids] = 0
+        # self.dummy_buf[env_ids] = 0
         # controller reset
         if self.cfg.control.control_type == "inverse_kinematics":
             self._ik_controller.reset_idx(env_ids)
 
         # bong
         self.ee_to_obj_l2[env_ids] = 0
-        self.robot_actions.zero_()
+        self.robot_actions[env_ids] = 0
 
     def _step_impl(self, actions: torch.Tensor):
         # pre-step: set actions into buffer
@@ -232,12 +232,12 @@ class LiftEnv(IsaacEnv):
         # -- compute MDP signals
         # reward
         self.reward_buf = self._reward_manager.compute()
-        self.reward_buf = self.reward_buf * (self.dummy_buf == 0)
+        # self.reward_buf = self.reward_buf * (self.dummy_buf == 0)
         # terminations
         self._check_termination()
         # -- store history
         self.previous_actions = self.actions.clone()
-        self.dummy_buf = self.episode_length_buf >= 100
+        # self.dummy_buf = self.episode_length_buf >= 100
         # -- add information to extra if timeout occurred due to episode length
         # Note: this is used by algorithms like PPO where time-outs are handled differently
         self.extras["time_outs"] = self.episode_length_buf >= self.max_episode_length
