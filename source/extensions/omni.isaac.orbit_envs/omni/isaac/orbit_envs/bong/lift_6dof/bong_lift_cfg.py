@@ -40,7 +40,7 @@ class ManipulationObjectCfg(RigidObjectCfg):
 
     meta_info = RigidObjectCfg.MetaInfoCfg(
         usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
-        scale=(1, 1, 1),
+        scale=(2, 1, 1),
     )
     init_state = RigidObjectCfg.InitialStateCfg(
         pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
@@ -57,6 +57,25 @@ class ManipulationObjectCfg(RigidObjectCfg):
         static_friction=0.5, dynamic_friction=0.5, restitution=0.0, prim_path="/World/Materials/cubeMaterial", density=0.001
     )
 
+
+@configclass
+class VisualObjectCfg(RigidObjectCfg):
+    """Properties for the object to manipulate in the scene."""
+
+    meta_info = RigidObjectCfg.MetaInfoCfg(
+        usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
+        scale=(1, 1, 1),
+    )
+    init_state = RigidObjectCfg.InitialStateCfg(
+        pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
+    )
+
+    collision_props = RigidObjectCfg.CollisionPropertiesCfg(
+        collision_enabled=False
+    )
+    rigid_props = RigidObjectCfg.RigidBodyPropertiesCfg(
+        disable_gravity=True,
+    )
 
 @configclass
 class GoalMarkerCfg:
@@ -130,11 +149,12 @@ class ObservationsCfg:
         enable_corruption: bool = False
         # observation terms
         # -- joint state
-        # arm_dof_pos = {"scale": 1.0}
-        arm_dof_pos_3D = {"scale": 1.0}
+        arm_dof_pos = {"scale": 1.0}
+        # arm_dof_pos_3D = {"scale": 1.0}
         # arm_dof_pos_scaled = {"scale": 1.0}
         # arm_dof_vel = {"scale": 0.5, "noise": {"name": "uniform", "min": -0.01, "max": 0.01}}
-        arm_dof_vel_3D = {"scale": 1.0}
+        arm_dof_vel = {"scale": 1.0}
+        # arm_dof_vel_3D = {"scale": 1.0}
         # tool_vel = {"scale": 1.0}
         # tool_dof_pos_scaled = {"scale": 1.0}
         # -- end effector state
@@ -144,12 +164,12 @@ class ObservationsCfg:
         object_positions = {"scale": 1.0}
         # object_orientations = {"scale": 1.0}
         object_relative_tool_positions = {"scale": 1.0}
-        # object_relative_tool_orientations = {"scale": 1.0}
+        object_relative_tool_orientations = {"scale": 1.0}
         # -- object desired state
         # object_desired_positions = {"scale": 1.0}
         # -- previous action
         # arm_actions = {"scale": 1.0}
-        tool_actions = {"scale": 1.0}
+        # tool_actions = {"scale": 1.0}
         bong_is_catch = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
         # bong_obj_height = {"scale": 1.0}
@@ -170,7 +190,7 @@ class RewardsCfg:
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
-    penalizing_arm_dof_velocity_l2 = {"weight": 5}
+    penalizing_arm_dof_velocity_l2 = {"weight": 1}
     # penalizing_tool_dof_velocity_l2 = {"weight": 1}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
     # -- action-centric
@@ -182,13 +202,13 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 100}
+    bong_catch_object = {"weight": 1000}
     # bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
     # bong_is_success = {"weight": 100}
     # bong_robot_out_of_box = {"weight": 10}
     # bong_object_height = {"weight": 1000}
-    bong_object_falling = {"weight" : 100}  # no!
+
 
 @configclass
 class TerminationsCfg:
@@ -224,7 +244,6 @@ class ControlCfg:
 # Environment configuration
 ##
 
-
 @configclass
 class LiftEnvCfg(IsaacEnvCfg):
     """Configuration for the Lift environment."""
@@ -251,6 +270,8 @@ class LiftEnvCfg(IsaacEnvCfg):
     robot: SingleArmManipulatorCfg = ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG
     # -- object
     object: ManipulationObjectCfg = ManipulationObjectCfg()
+    # -- bong
+    visual_object: VisualObjectCfg = VisualObjectCfg()
     # -- table
     table: TableCfg = TableCfg()
     # -- visualization marker

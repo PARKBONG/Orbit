@@ -17,7 +17,12 @@ import omni.isaac.orbit.utils.kit as kit_utils
 from .soft_object_cfg import SoftObjectCfg
 from .soft_object_data import SoftObjectData
 
-# from omni.isaac.core.utils.stage import add_reference_to_stage
+# bong
+from omni.physx.scripts import deformableUtils, physicsUtils
+import omni.usd
+from pxr import UsdGeom, UsdLux, Gf, UsdPhysics
+import omni.isaac.core.utils.stage as stage_utils
+from omni.isaac.core.utils.stage import add_reference_to_stage
 
 
 class SoftObject:
@@ -97,6 +102,32 @@ class SoftObject:
 
         # -- save prim path for later
         self._spawn_prim_path = prim_path
+
+        # -=
+        # stage = stage_utils.get_current_stage()
+
+        # # Create sphere mesh used as the 'skin mesh' for the deformable body
+        # # skin_mesh = self.create_sphere_mesh(stage, self._spawn_prim_path + "/deformableBody")
+        # prim = add_reference_to_stage(self.cfg.meta_info.usd_path, self._spawn_prim_path)
+        # physicsUtils.set_or_add_translate_op(prim, translate=Gf.Vec3f(0.0, 0.0, 300.0))
+        # physicsUtils.set_or_add_orient_op(prim, orient=Gf.Quatf(0.707, 0.707, 0, 0))
+        # physicsUtils.set_or_add_scale_op(prim, scale=Gf.Vec3f(2.0, 2.0, 0.5))
+
+        # color = demo.get_primary_color()
+        # skin_mesh.CreateDisplayColorAttr().Set([color])
+
+        # Create tet meshes for simulation and collision based on the skin mesh
+        # simulation_resolution = 10
+
+        # Apply PhysxDeformableBodyAPI and PhysxCollisionAPI to skin mesh and set parameter to default values
+        # success = deformableUtils.add_physx_deformable_body(
+        #     stage,
+        #     prim.GetPath(),
+        #     collision_simplification=True,
+        #     simulation_hexahedral_resolution=simulation_resolution,
+        #     self_collision=False,
+        # )
+
         # -- spawn asset if it doesn't exist.
         if not prim_utils.is_prim_path_valid(prim_path):
             # add prim as reference to stage
@@ -108,7 +139,7 @@ class SoftObject:
                 scale=self.cfg.meta_info.scale,
             )
 
-            # add_reference_to_stage(self.cfg.meta_info.usd_path, self._spawn_prim_path)
+        #     # add_reference_to_stage(self.cfg.meta_info.usd_path, self._spawn_prim_path)
 
         else:
             carb.log_warn(f"A prim already exists at prim path: '{prim_path}'. Skipping...")
@@ -136,6 +167,17 @@ class SoftObject:
             )
             # -- apply physics material
             kit_utils.apply_nested_physics_material(prim_path, material.prim_path)
+            # stage = stage_utils.get_current_stage()
+            # deformable_material_path = omni.usd.get_stage_next_free_path(stage, default_prim_path + "/deformableBodyMaterial", True)
+            # deformableUtils.add_deformable_body_material(
+            #     stage,
+            #     deformable_material_path,
+            #     youngs_modulus=10000.0,
+            #     poissons_ratio=0.49,
+            #     damping_scale=0.0,
+            #     dynamic_friction=0.5,
+            # )
+            # physicsUtils.add_physics_material_to_prim(stage, skin_mesh.GetPrim(), deformable_material_path)
 
     def initialize(self, prim_paths_expr: Optional[str] = None):
         """Initializes the PhysX handles and internal buffers.
