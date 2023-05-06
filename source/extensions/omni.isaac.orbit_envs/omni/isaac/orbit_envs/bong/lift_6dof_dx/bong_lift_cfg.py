@@ -130,24 +130,26 @@ class ObservationsCfg:
         enable_corruption: bool = False
         # observation terms
         # -- joint state
-        # arm_dof_pos = {"scale": 1.0}
-        arm_dof_pos_3D = {"scale": 1.0}
+        arm_dof_pos = {"scale": 1.0}
+        # arm_dof_pos_3D = {"scale": 1.0}
         # arm_dof_pos_scaled = {"scale": 1.0}
         # arm_dof_vel = {"scale": 0.5, "noise": {"name": "uniform", "min": -0.01, "max": 0.01}}
+        arm_dof_vel = {"scale": 1.0}
         # tool_dof_pos_scaled = {"scale": 1.0}
         # -- end effector state
         # tool_positions = {"scale": 1.0}
         # tool_orientations = {"scale": 1.0}
         # -- object state
-        # object_positions = {"scale": 1.0}
+        object_positions = {"scale": 1.0}
         # object_orientations = {"scale": 1.0}
         object_relative_tool_positions = {"scale": 1.0}
-        # object_relative_tool_orientations = {"scale": 1.0}
+        object_relative_tool_orientations = {"scale": 1.0}
         # -- object desired state
         # object_desired_positions = {"scale": 1.0}
         # -- previous action
         # arm_actions = {"scale": 1.0}
-        tool_actions = {"scale": 1.0}
+        # tool_actions = {"scale": 1.0}
+        bong_is_catch = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
 
     # global observation settings
@@ -162,11 +164,11 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     # -- robot-centric
-    reaching_object_position_l2 = {"weight": 50}  # Penalty
+    reaching_object_position_l2 = {"weight": 100}  # Penalty
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
-    # penalizing_arm_dof_velocity_l2 = {"weight": 1e-5}
+    penalizing_arm_dof_velocity_l2 = {"weight": 1}
     # penalizing_tool_dof_velocity_l2 = {"weight": 1e-5}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
     # -- action-centric
@@ -178,14 +180,15 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 200}  # Reward
+    bong_catch_object = {"weight": 1000}  # Reward
+    bong_object_falling = {"weight": 50}
     # bong_catch_failure = {"weight": 50}  # penalty + Reset
 
     # -----------------------------------------
     # bong_after_catch = {"weight": 50}  # penalty
     # bong_obj_finish = {"weight": 200}  # reward + Reset
-    bong_robot_out_of_box = {"weight": 25}
-    bong_object_falling = {"weight": 25}
+    # bong_robot_out_of_box = {"weight": 25}
+    # bong_object_falling = {"weight": 25}
 
 
 @configclass
@@ -194,12 +197,10 @@ class TerminationsCfg:
 
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
-    # is_success = False  # reset when object is lifted
+    is_success = True  # reset when object is lifted
     is_catch = True  # reset when object is lifted
-    # -------------------------------------------
     fail_to_catch = False  # reset when object is lifted
     is_obj_desired = False
-    robot_out_of_box = True
 
 
 @configclass
