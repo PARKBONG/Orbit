@@ -95,3 +95,15 @@ gym.register(
     entry_point="omni.isaac.orbit_envs.bong.lift:LiftEnv",
     kwargs={"cfg_entry_point": "omni.isaac.orbit_envs.bong.lift:LiftEnvCfg"},
 )
+
+gym.register(
+    id="Bong-Lift-Robotiq-soft-v0",
+    entry_point="omni.isaac.orbit_envs.bong.lift_soft:LiftEnv",
+    kwargs={"cfg_entry_point": "omni.isaac.orbit_envs.bong.lift_soft:LiftEnvCfg"},
+)
+
+gym.register(
+    id="Bong-Lift-Robotiq-4dof-v0",
+    entry_point="omni.isaac.orbit_envs.bong.lift_4dof:LiftEnv",
+    kwargs={"cfg_entry_point": "omni.isaac.orbit_envs.bong.lift_4dof:LiftEnvCfg"},
+)

@@ -125,6 +125,7 @@ class RigidObject:
                 static_friction=self.cfg.physics_material.static_friction,
                 dynamic_friction=self.cfg.physics_material.dynamic_friction,
                 restitution=self.cfg.physics_material.restitution,
+                # density=self.cfg.physics_material.density,
             )
             # -- apply physics material
             kit_utils.apply_nested_physics_material(prim_path, material.prim_path)
