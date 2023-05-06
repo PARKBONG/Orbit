@@ -652,7 +652,6 @@ class LiftRewardManager(RewardManager):
         return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0015)
 
     def bong_after_catch(self, env: LiftEnv):
-
         new = (env.robot_actions[:, -1] != 0)
         old = (env.previous_actions[:, -1] != 0)
         pen = -1 * ((old ^ new) * (torch.sum(torch.square(env.object_des_pose_w[:, 0:3] - env.object.data.root_pos_w), dim=1)))
