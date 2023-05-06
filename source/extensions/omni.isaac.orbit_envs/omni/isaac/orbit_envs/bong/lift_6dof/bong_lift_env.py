@@ -234,7 +234,7 @@ class LiftEnv(IsaacEnv):
         self._check_termination()
         # -- store history
         self.previous_actions = self.actions.clone()
-        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
+        # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         # self.dummy_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, 0)
         # -- add information to extra if timeout occurred due to episode length
         # Note: this is used by algorithms like PPO where time-outs are handled differently
@@ -369,7 +369,7 @@ class LiftEnv(IsaacEnv):
         if self.cfg.terminations.is_success:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
             self.reset_buf = torch.where(self.object.data.root_pos_w[:, 2] > 0.2, 1, self.reset_buf)
-        
+
         if self.cfg.terminations.is_catch:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
             self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, self.reset_buf)
@@ -563,6 +563,7 @@ class LiftObservationManager(ObservationManager):
         return torch.where((env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0015), 1.0, 0.0).unsqueeze(1)
         # return torch.where((-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002), 1, 0).unsqueeze(1)
 
+
 class LiftRewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""
 
@@ -644,10 +645,10 @@ class LiftRewardManager(RewardManager):
         """Sparse reward if object is lifted successfully."""
         return torch.where(env.object.data.root_pos_w[:, 2] > env.object_des_pose_w[:, 2], 1.0, 0.0)
 
-    def bong_catch_object(self, env: LiftEnv): 
+    def bong_catch_object(self, env: LiftEnv):
         return 1 * (env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0015)  # descremental, bong
 
-    def bong_catch_failure(self, env: LiftEnv):  
+    def bong_catch_failure(self, env: LiftEnv):
         return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.0015)
 
     def bong_after_catch(self, env: LiftEnv):
@@ -674,9 +675,8 @@ class LiftRewardManager(RewardManager):
         # print(env.object.data.root_pos_w[:, 2])
         return torch.where(env.object.data.root_pos_w[:, 2] > 0.2, 1, 0)
 
-    def bong_object_height(self, env: LiftEnv):    
+    def bong_object_height(self, env: LiftEnv):
         # print(env.object.data.root_pos_w[:, 2])
         # print(env.object.data.root_pos_w )
         # print(env.object.data.root_pos_w[:, 2])
         return (env.object.data.root_pos_w[:, 2] - 0.0300)
-
