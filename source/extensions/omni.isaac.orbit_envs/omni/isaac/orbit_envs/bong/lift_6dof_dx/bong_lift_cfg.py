@@ -250,6 +250,7 @@ class LiftEnvCfg(IsaacEnvCfg):
     robot: SingleArmManipulatorCfg = ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG
     # -- object
     object: ManipulationObjectCfg = ManipulationObjectCfg()
+    # visual_object: VisualObjectCfg = VisualObjectCfg()
     # -- table
     table: TableCfg = TableCfg()
     # -- visualization marker

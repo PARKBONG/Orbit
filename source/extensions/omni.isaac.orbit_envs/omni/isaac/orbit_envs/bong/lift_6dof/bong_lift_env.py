@@ -39,7 +39,7 @@ class LiftEnv(IsaacEnv):
         # create classes (these are called by the function :meth:`_design_scene`)
         self.robot = SingleArmManipulator(cfg=self.cfg.robot)
         self.object = RigidObject(cfg=self.cfg.object)
-
+        self.visual_object = RigidObject(cfg=self.cfg.visual_object)
         # initialize the base class to setup the scene.
         super().__init__(self.cfg, headless=headless)
         # parse the configuration for information
@@ -107,7 +107,9 @@ class LiftEnv(IsaacEnv):
         self.robot.spawn(self.template_env_ns + "/Robot")
         # object
         self.object.spawn(self.template_env_ns + "/Object")
-
+        # visual object
+        self.visual_object.spawn(self.template_env_ns + "/VisualObject")
+        # self.visual_object.disable_rigid_body_physics()
         # setup debug visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             # create point instancer to visualize the goal points

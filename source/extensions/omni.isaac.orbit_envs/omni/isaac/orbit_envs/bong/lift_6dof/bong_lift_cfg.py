@@ -59,6 +59,25 @@ class ManipulationObjectCfg(RigidObjectCfg):
 
 
 @configclass
+class VisualObjectCfg(RigidObjectCfg):
+    """Properties for the object to manipulate in the scene."""
+
+    meta_info = RigidObjectCfg.MetaInfoCfg(
+        usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
+        scale=(1, 1, 1),
+    )
+    init_state = RigidObjectCfg.InitialStateCfg(
+        pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
+    )
+
+    collision_props = RigidObjectCfg.CollisionPropertiesCfg(
+        collision_enabled=False
+    )
+    rigid_props = RigidObjectCfg.RigidBodyPropertiesCfg(
+        disable_gravity=True,
+    )
+
+@configclass
 class GoalMarkerCfg:
     """Properties for visualization marker."""
 
@@ -251,6 +270,8 @@ class LiftEnvCfg(IsaacEnvCfg):
     robot: SingleArmManipulatorCfg = ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG
     # -- object
     object: ManipulationObjectCfg = ManipulationObjectCfg()
+    # -- bong
+    visual_object: VisualObjectCfg = VisualObjectCfg()
     # -- table
     table: TableCfg = TableCfg()
     # -- visualization marker
