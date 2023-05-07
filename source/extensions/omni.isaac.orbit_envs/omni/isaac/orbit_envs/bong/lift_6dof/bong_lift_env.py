@@ -215,7 +215,8 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
-
+            
+            self.robot_actions[0, :-1] = torch.tensor([[-0.29, 0, 0, 0, 0, 0]])
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
@@ -563,6 +564,10 @@ class LiftObservationManager(ObservationManager):
         return torch.where((env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.001), 1.0, 0.0).unsqueeze(1)
         # return torch.where((-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002), 1, 0).unsqueeze(1)
 
+    def bong_obj_pcd(self, env: LiftEnv):
+        obj_pos = msh.get_mesh_vertices_relative_to(mesh_prim=self.mesh_prim, 
+                                                    coord_prim=self.coord_prim)[:8]
+        
 
 class LiftRewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""

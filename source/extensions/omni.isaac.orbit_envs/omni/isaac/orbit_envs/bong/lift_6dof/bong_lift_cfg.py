@@ -40,7 +40,7 @@ class ManipulationObjectCfg(RigidObjectCfg):
 
     meta_info = RigidObjectCfg.MetaInfoCfg(
         usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
-        scale=(2, 1, 1),
+        scale=(1, 1, 1),
     )
     init_state = RigidObjectCfg.InitialStateCfg(
         pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
@@ -219,7 +219,7 @@ class TerminationsCfg:
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
     is_success = True  # reset when object is lifted
-    is_catch = True  # reset when object is lifted
+    is_catch = False  # reset when object is lifted
     fail_to_catch = False  # reset when object is lifted
     is_obj_desired = False
 
