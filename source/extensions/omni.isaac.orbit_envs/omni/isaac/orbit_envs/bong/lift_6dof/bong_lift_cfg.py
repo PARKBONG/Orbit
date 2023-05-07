@@ -150,7 +150,7 @@ class ObservationsCfg:
         enable_corruption: bool = False
         # observation terms
         # -- joint state
-        # arm_dof_pos = {"scale": 1.0}
+        arm_dof_pos = {"scale": 1.0}
         # arm_dof_pos_3D = {"scale": 1.0}
         # arm_dof_pos_scaled = {"scale": 1.0}
         # arm_dof_vel = {"scale": 0.5, "noise": {"name": "uniform", "min": -0.01, "max": 0.01}}
@@ -159,11 +159,11 @@ class ObservationsCfg:
         # tool_vel = {"scale": 1.0}
         # tool_dof_pos_scaled = {"scale": 1.0}
         # -- end effector state
-        tool_positions = {"scale": 1.0}
-        tool_orientations = {"scale": 1.0}
+        # tool_positions = {"scale": 1.0}
+        # tool_orientations = {"scale": 1.0}
         # -- object state
         object_positions = {"scale": 1.0}
-        object_orientations = {"scale": 1.0}
+        # object_orientations = {"scale": 1.0}
         object_relative_tool_positions = {"scale": 1.0}
         object_relative_tool_orientations = {"scale": 1.0}
         # -- object desired state
