@@ -70,7 +70,7 @@ class LiftEnv(IsaacEnv):
 
         # for 3-DoF
         self.action_space = gym.spaces.Box(low=np.array([-0.29, -0.6, -0.4, -torch.pi, -torch.pi, -torch.pi]),
-                                           high=np.array([0.3, 0.6, 0.4, torch.pi, torch.pi, torch.pi]),
+                                           high=np.array([0.6, 0.6, 0.4, torch.pi, torch.pi, torch.pi]),
                                            shape=(self.num_actions,))  # bong, clipping
 
         # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]
@@ -246,6 +246,7 @@ class LiftEnv(IsaacEnv):
         # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         # object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
         self.extras["is_success"] = torch.where(self.object.data.root_pos_w[:, 2] > 0.2, 1, 0)  # original
+        # print(self.object.data.root_pos_w[:, 2])
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
