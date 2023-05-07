@@ -113,7 +113,7 @@ class RandomizationCfg:
 
         # category
         position_cat: str = "uniform"  # randomize position: "default", "uniform"
-        orientation_cat: str = "default"  # randomize position: "default", "uniform"
+        orientation_cat: str = "uniform"  # randomize position: "default", "uniform"
         # randomize position
         position_uniform_min = [0.4, -0.25, 0.030]  # position (x,y,z) z = 0.05
         position_uniform_max = [0.6, 0.25, 0.030]  # position (x,y,z)
