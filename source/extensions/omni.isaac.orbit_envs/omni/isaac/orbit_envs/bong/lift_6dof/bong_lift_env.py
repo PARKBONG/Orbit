@@ -26,6 +26,9 @@ from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
 
 
+catch_threshold = 0.0015
+
+
 class LiftEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator..."""
 
@@ -87,7 +90,7 @@ class LiftEnv(IsaacEnv):
         self.ee_to_obj_l2 = torch.tensor([0 for _ in range(self.num_envs)], dtype=torch.float32)
         # self.catch_threshold = 0.0025
         # self.catch_threshold = 0.002
-        self.catch_threshold = 0.0015
+        self.catch_threshold = catch_threshold
         # bong, vis
         # self._markers1.set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
         # for i in range(6):
@@ -459,12 +462,9 @@ class LiftEnv(IsaacEnv):
         # print(self.ee_to_obj_l2, -1 * (self.ee_to_obj_l2 > stacks)) # printbong
         return (self.ee_to_obj_l2 >= stacks)
 
-
 class LiftObservationManager(ObservationManager):
     """Reward manager for single-arm reaching environment."""
 
-    def __init__(self):
-        self.catch_threshold = 0.0015
 
     def arm_dof_pos_3D(self, env: LiftEnv):
         """DOF positions for the arm."""
@@ -563,7 +563,7 @@ class LiftObservationManager(ObservationManager):
         return env.object.data.root_pos_w[:, 2:3]
 
     def bong_is_catch(self, env: LiftEnv):
-        return torch.where((env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < self.catch_threshold), 1.0, 0.0).unsqueeze(1)
+        return torch.where((env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < catch_threshold), 1.0, 0.0).unsqueeze(1)
         # return torch.where((-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002), 1, 0).unsqueeze(1)
 
 
@@ -649,10 +649,10 @@ class LiftRewardManager(RewardManager):
         return torch.where(env.object.data.root_pos_w[:, 2] > env.object_des_pose_w[:, 2], 1.0, 0.0)
 
     def bong_catch_object(self, env: LiftEnv):
-        return 1 * (env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < self.catch_threshold)  # descremental, bong
+        return 1 * (env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < catch_threshold)  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):
-        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < self.catch_threshold)
+        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < catch_threshold)
 
     def bong_after_catch(self, env: LiftEnv):
         new = (env.robot_actions[:, -1] != 0)
@@ -662,7 +662,7 @@ class LiftRewardManager(RewardManager):
 
     def bong_obj_finish(self, env: LiftEnv):
         object_position_error = torch.norm(env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3], dim=1)
-        return torch.where(object_position_error < self.catch_threshold, 1, 0)
+        return torch.where(object_position_error < catch_threshold, 1, 0)
 
     # def bong_robot_out_of_box(self, env: LiftEnv):
     #     robot_pos = env.robot.data.ee_state_w[:, 0:3] - env.envs_positions
