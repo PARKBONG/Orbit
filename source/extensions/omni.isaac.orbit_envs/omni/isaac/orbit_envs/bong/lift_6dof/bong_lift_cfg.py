@@ -37,10 +37,11 @@ class TableCfg:
 @configclass
 class ManipulationObjectCfg(RigidObjectCfg):
     """Properties for the object to manipulate in the scene."""
-
+    my_dir = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs"
     meta_info = RigidObjectCfg.MetaInfoCfg(
-        usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
-        scale=(2, 1, 1),
+        # usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd"
+        usd_path=my_dir + "/sphere_col.usd",
+        scale=(1, 1, 1),
     )
     init_state = RigidObjectCfg.InitialStateCfg(
         pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
@@ -53,6 +54,10 @@ class ManipulationObjectCfg(RigidObjectCfg):
         max_depenetration_velocity=5.0,
         disable_gravity=False,
     )
+    # collision_props = RigidObjectCfg.CollisionPropertiesCfg(
+    #     collision_enabled=True
+
+    # )
     physics_material = RigidObjectCfg.PhysicsMaterialCfg(
         static_friction=0.5, dynamic_friction=0.5, restitution=0.0, prim_path="/World/Materials/cubeMaterial", density=0.001
     )
