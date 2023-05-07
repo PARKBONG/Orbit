@@ -215,8 +215,7 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
-            
-            self.robot_actions[0, :-1] = torch.tensor([[-0.29, 0, 0, 0, 0, 0]])
+            # self.robot_actions[0, :-1] = torch.tensor([[-0.29, 0, 0, 0, 0, 0]])
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
