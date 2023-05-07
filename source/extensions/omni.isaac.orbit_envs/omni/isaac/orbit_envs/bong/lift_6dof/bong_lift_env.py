@@ -684,3 +684,6 @@ class LiftRewardManager(RewardManager):
         # print(env.object.data.root_pos_w )
         # print(env.object.data.root_pos_w[:, 2])
         return (env.object.data.root_pos_w[:, 2] - 0.0300)
+
+    def bong_is_cheating(self, env: LiftEnv):
+        return torch.where(env.object.data.root_pos_w[:, 2] > env.robot.data.ee_state_w[:, 2], -1, 0)
