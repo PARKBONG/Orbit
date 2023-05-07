@@ -10,10 +10,5 @@
 
 from .bong_lift_cfg import LiftEnvCfg
 from .bong_lift_env import LiftEnv
-# from .lift_cfg import LiftEnvCfg
-# from .lift_env import LiftEnv
-
-from .bong_lift_cfg import LiftEnvCfg
-from .bong_lift_env import LiftEnv
 
 __all__ = ["LiftEnv", "LiftEnvCfg"]

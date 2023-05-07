@@ -10,11 +10,11 @@ gamma: 0.99
 n_epochs: 12
 ent_coef: 0.01
 vf_coef: 0.0001
-learning_rate: !!float 3e-4
+learning_rate: !!float 1e-4
 clip_range: 0.2
 policy_kwargs: "dict(
                   activation_fn=nn.ELU,
-                  net_arch=[32, 32, dict(pi=[256, 128, 64], vf=[256, 128, 64])]
+                  net_arch=[32, 64, dict(pi=[256, 128, 64], vf=[256, 128, 64])]
                 )"
 
 
@@ -23,7 +23,6 @@ max_grad_norm: 1.0
 seed: 42 # bong
 
 # # Uses VecNormalize class to normalize obs
-normalize_input: False
 normalize_input: False
 # # Uses VecNormalize class to normalize rew
 normalize_value: False

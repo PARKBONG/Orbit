@@ -26,9 +26,9 @@ _ROBOTIQ_WRIST_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022
 # _ROBOTIQ_WRIST_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/bong/robotiq_wrist_resized_direction_mass.usd"
 
 VELOCITY_LIMIT = 100
-TORQUE_LIMIT = 50
-STIFFNESS = 50
-DAMPING = 7
+TORQUE_LIMIT = 100
+STIFFNESS = 400
+DAMPING = 0.5 * STIFFNESS
 
 ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
     meta_info=SingleArmManipulatorCfg.MetaInfoCfg(
@@ -60,7 +60,7 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
 
     ),
     ee_info=SingleArmManipulatorCfg.EndEffectorFrameCfg(
-        body_name="base", pos_offset=(0.0, 0.0, 0.15), rot_offset=(1.0, 0.0, 0.0, 0.0)  # xform / head
+        body_name="base", pos_offset=(0.0, 0.0, 0.12), rot_offset=(1.0, 0.0, 0.0, 0.0)  # xform / head
     ),
     rigid_props=SingleArmManipulatorCfg.RigidBodyPropertiesCfg(
         # solver_position_iteration_count=16,  # bong
@@ -74,9 +74,6 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
     ),
     articulation_props=SingleArmManipulatorCfg.ArticulationRootPropertiesCfg(
         enable_self_collisions=True,
-    ),
-    physics_material=SingleArmManipulatorCfg.PhysicsMaterialCfg(
-        static_friction=5, dynamic_friction=5, restitution=0.0, prim_path="/World/Materials/gripperMaterial"
     ),
     actuator_groups={
         "wrist_trans": ActuatorGroupCfg(
@@ -93,27 +90,25 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
                 },
             ),
         ),
-        # "wrist_rev": ActuatorGroupCfg(
-        #     dof_names=["rev_[x]"],
-        #     model_cfg=ImplicitActuatorCfg(velocity_limit=VELOCITY_LIMIT, torque_limit=TORQUE_LIMIT),
-        #     control_cfg=ActuatorControlCfg(
-        #         command_types=["p_abs"],
-        #         stiffness={".*": STIFFNESS},
-        #         damping={".*": DAMPING},
-        #         dof_pos_offset={"rev_x": 0, "rev_y": 0, "rev_z": 0.0},
-        #     ),
-        # ),
-
+        "wrist_rev": ActuatorGroupCfg(
+            dof_names=["rev_[x]"],
+            model_cfg=ImplicitActuatorCfg(velocity_limit=VELOCITY_LIMIT, torque_limit=TORQUE_LIMIT),
+            control_cfg=ActuatorControlCfg(
+                command_types=["p_abs"],
+                stiffness={".*": STIFFNESS},
+                damping={".*": DAMPING},
+                dof_pos_offset={"rev_x": 0, "rev_y": 0, "rev_z": 0.0},
+            ),
+        ),
         "robotiq_hand": GripperActuatorGroupCfg(
             dof_names=["bot_joint_0_p", "top_joint_0_p", "bot_joint_1_p", "top_joint_1_p", "bot_joint_2_p", "top_joint_2_p"],
-            model_cfg=ImplicitActuatorCfg(velocity_limit=VELOCITY_LIMIT, torque_limit=1000),
-            control_cfg=ActuatorControlCfg(command_types=["p_abs"], stiffness={".*": 400}, damping={".*": 20}),
+            model_cfg=ImplicitActuatorCfg(velocity_limit=VELOCITY_LIMIT, torque_limit=200),
+            control_cfg=ActuatorControlCfg(command_types=["p_abs"], stiffness={".*": STIFFNESS}, damping={".*": DAMPING}),
             mimic_multiplier={"bot_joint_0_p": 1, "top_joint_0_p": -1, "bot_joint_1_p": 1, "top_joint_1_p": -1, "bot_joint_2_p": -1, "top_joint_2_p": 1},
             # speed=1,
             open_dof_pos=0,
-            close_dof_pos=0.35,
+            close_dof_pos=0.3,
             # close_dof_pos=0.785398,
-            # close_dof_pos=0.4,
         )
     },
 )

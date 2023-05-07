@@ -5,8 +5,7 @@
 
 from omni.isaac.orbit.controllers.differential_inverse_kinematics import DifferentialInverseKinematicsCfg
 from omni.isaac.orbit.objects import RigidObjectCfg
-# from .robots.franka import FRANKA_PANDA_ARM_WITH_PANDA_HAND_CFG
-from .robots.robotiq import ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG
+from omni.isaac.orbit.robots.config.franka import FRANKA_PANDA_ARM_WITH_PANDA_HAND_CFG
 from omni.isaac.orbit.robots.single_arm import SingleArmManipulatorCfg
 from omni.isaac.orbit.utils import configclass
 from omni.isaac.orbit.utils.assets import ISAAC_NUCLEUS_DIR
@@ -27,20 +26,12 @@ class TableCfg:
 
 
 @configclass
-class PointCfg:
-    """Properties for the point."""
-
-    # note: we use instanceable asset since it consumes less memory
-    usd_path = f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
-
-
-@configclass
 class ManipulationObjectCfg(RigidObjectCfg):
     """Properties for the object to manipulate in the scene."""
 
     meta_info = RigidObjectCfg.MetaInfoCfg(
         usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
-        scale=(1, 1, 1),
+        scale=(0.8, 0.8, 0.8),
     )
     init_state = RigidObjectCfg.InitialStateCfg(
         pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
@@ -54,7 +45,7 @@ class ManipulationObjectCfg(RigidObjectCfg):
         disable_gravity=False,
     )
     physics_material = RigidObjectCfg.PhysicsMaterialCfg(
-        static_friction=0.5, dynamic_friction=0.5, restitution=0.0, prim_path="/World/Materials/cubeMaterial", density=0.001
+        static_friction=0.5, dynamic_friction=0.5, restitution=0.0, prim_path="/World/Materials/cubeMaterial"
     )
 
 
@@ -92,18 +83,18 @@ class RandomizationCfg:
         """Randomization of object initial pose."""
 
         # category
-        position_cat: str = "uniform"  # randomize position: "default", "uniform"
+        position_cat: str = "default"  # randomize position: "default", "uniform"
         orientation_cat: str = "default"  # randomize position: "default", "uniform"
         # randomize position
-        position_uniform_min = [0.4, -0.25, 0.030]  # position (x,y,z) z = 0.05
-        position_uniform_max = [0.6, 0.25, 0.030]  # position (x,y,z)
+        position_uniform_min = [0.4, -0.25, 0.075]  # position (x,y,z)
+        position_uniform_max = [0.6, 0.25, 0.075]  # position (x,y,z)
 
     @configclass
     class ObjectDesiredPoseCfg:
         """Randomization of object desired pose."""
 
         # category
-        position_cat: str = "uniform"  # randomize position: "default", "uniform"
+        position_cat: str = "default"  # randomize position: "default", "uniform"
         orientation_cat: str = "default"  # randomize position: "default", "uniform"
         # randomize position
         position_default = [0.5, 0.0, 0.5]  # position default (x,y,z)
@@ -126,33 +117,26 @@ class ObservationsCfg:
         """Observations for policy group."""
 
         # global group settings
-        # enable_corruption: bool = True
-        enable_corruption: bool = False
+        enable_corruption: bool = True
         # observation terms
         # -- joint state
-        # arm_dof_pos = {"scale": 1.0}
-        # arm_dof_pos_3D = {"scale": 1.0}
+        arm_dof_pos = {"scale": 1.0}
         # arm_dof_pos_scaled = {"scale": 1.0}
         # arm_dof_vel = {"scale": 0.5, "noise": {"name": "uniform", "min": -0.01, "max": 0.01}}
-        # arm_dof_vel_3D = {"scale": 1.0}
-        # tool_vel = {"scale": 1.0}
-        # tool_dof_pos_scaled = {"scale": 1.0}
+        tool_dof_pos_scaled = {"scale": 1.0}
         # -- end effector state
-        # tool_positions = {"scale": 1.0}
-        # tool_orientations = {"scale": 1.0}
+        tool_positions = {"scale": 1.0}
+        tool_orientations = {"scale": 1.0}
         # -- object state
-        object_positions = {"scale": 1.0}
+        # object_positions = {"scale": 1.0}
         # object_orientations = {"scale": 1.0}
         object_relative_tool_positions = {"scale": 1.0}
         # object_relative_tool_orientations = {"scale": 1.0}
         # -- object desired state
-        # object_desired_positions = {"scale": 1.0}
+        object_desired_positions = {"scale": 1.0}
         # -- previous action
-        # arm_actions = {"scale": 1.0}
+        arm_actions = {"scale": 1.0}
         tool_actions = {"scale": 1.0}
-        bong_is_catch = {"scale": 10}
-        # bong_obj_to_desire = {"scale": 1.0}
-        # bong_obj_height = {"scale": 1.0}
 
     # global observation settings
     return_dict_obs_in_group = False
@@ -166,29 +150,20 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     # -- robot-centric
-    reaching_object_position_l2 = {"weight": 100}
-    # reaching_object_height = {"weight": 50}
+    # reaching_object_position_l2 = {"weight": 0.0}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
-    # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
-    penalizing_arm_dof_velocity_l2 = {"weight": 5}
-    # penalizing_tool_dof_velocity_l2 = {"weight": 1}
+    reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
+    # penalizing_arm_dof_velocity_l2 = {"weight": 1e-5}
+    # penalizing_tool_dof_velocity_l2 = {"weight": 1e-5}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
     # -- action-centric
-    # penalizing_arm_action_rate_l2 = {"weight": 0.5}
+    penalizing_arm_action_rate_l2 = {"weight": 1e-2}
     # penalizing_tool_action_l2 = {"weight": 1e-2}
     # -- object-centric
-    # tracking_object_position_l2 = {"weight": 1}
     # tracking_object_position_exp = {"weight": 5.0, "sigma": 0.25, "threshold": 0.08}
-    # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
-    # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
-    # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 100}
-    # bong_catch_object = {"weight": 300}
-    # bong_catch_failure = {"weight": 50}
-    # bong_is_success = {"weight": 100}
-    # bong_robot_out_of_box = {"weight": 10}
-    # bong_object_height = {"weight": 1000}
-    bong_object_falling = {"weight" : 100}  # no!
+    tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
+    lifting_object_success = {"weight": 3.5, "threshold": 0.08}
+
 
 @configclass
 class TerminationsCfg:
@@ -196,11 +171,8 @@ class TerminationsCfg:
 
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
-    is_success = True  # reset when object is lifted
-    is_catch = True  # reset when object is lifted
-    fail_to_catch = False  # reset when object is lifted
-    is_obj_desired = False
-    # robot_out_of_box = False
+    is_success = False  # reset when object is lifted
+
 
 @configclass
 class ControlCfg:
@@ -209,7 +181,7 @@ class ControlCfg:
     # action space
     control_type = "default"  # "default", "inverse_kinematics"
     # decimation: Number of control action updates @ sim dt per policy dt
-    decimation = 1
+    decimation = 2
 
     # configuration loaded when control_type == "inverse_kinematics"
     inverse_kinematics: DifferentialInverseKinematicsCfg = DifferentialInverseKinematicsCfg(
@@ -247,8 +219,7 @@ class LiftEnvCfg(IsaacEnvCfg):
 
     # Scene Settings
     # -- robot
-    # robot: SingleArmManipulatorCfg = FRANKA_PANDA_ARM_WITH_PANDA_HAND_CFG
-    robot: SingleArmManipulatorCfg = ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG
+    robot: SingleArmManipulatorCfg = FRANKA_PANDA_ARM_WITH_PANDA_HAND_CFG
     # -- object
     object: ManipulationObjectCfg = ManipulationObjectCfg()
     # -- table

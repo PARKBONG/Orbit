@@ -19,7 +19,8 @@
                 "RESOURCE_NAME": "IsaacSim"
             },
             "envFile": "${workspaceFolder}/.vscode/.python.env",
-            "preLaunchTask": "setup_python_env"
+            "preLaunchTask": "setup_python_env",
+            "justMyCode": false
         },
         {
             "name": "Python: Attach (windows-x86_64/linux-x86_64)",

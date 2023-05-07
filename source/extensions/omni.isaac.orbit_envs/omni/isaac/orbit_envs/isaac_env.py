@@ -121,6 +121,7 @@ class IsaacEnv(gym.Env):
         # initialize common environment buffers
         self.reward_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.float)
         self.reset_buf = torch.ones(self.num_envs, device=self.device, dtype=torch.long)
+        # self.dummy_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)  # dummy
         self.episode_length_buf = torch.zeros(self.num_envs, device=self.device, dtype=torch.long)
         # allocate dictionary to store metrics
         self.extras = {}
@@ -155,7 +156,7 @@ class IsaacEnv(gym.Env):
         physics_scene_path = self.sim.get_physics_context().prim_path
         cloner.filter_collisions(
             physics_scene_path, "/World/collisions", prim_paths=self.envs_prim_paths, global_paths=global_prim_paths
-        )
+        )  # soft
 
     """
     Properties
@@ -265,6 +266,12 @@ class IsaacEnv(gym.Env):
             # increment the number of steps
             self.episode_length_buf += 1
             # perform the stepping of simulation
+
+            # ------------------------------------------------------------------
+            # dummy_env_idx = self.dummy_buf.nonzero(as_tuple=False).squeeze(-1)
+            # if len(dummy_env_idx) > 0:
+            #     actions = self._dummy_actions(actions, dummy_env_idx)
+            # ------------------------------------------------------------------
             self._step_impl(actions)
             # check if the simulation timeline is stopped, do not update buffers
             if not self.sim.is_stopped():
@@ -320,6 +327,15 @@ class IsaacEnv(gym.Env):
         """
         raise NotImplementedError
 
+    @abc.abstractmethod
+    def _dummy_idx(self, env_ids: VecEnvIndices):  # dummy
+        """Resets the MDP for given environment instances.
+
+        Args:
+            env_ids (VecEnvIndices): Indices of environment instances to reset.
+        """
+        raise NotImplementedError
+    
     @abc.abstractmethod
     def _step_impl(self, actions: torch.Tensor):
         """Apply actions on the environment and computes MDP signals.
