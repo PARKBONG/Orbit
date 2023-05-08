@@ -215,7 +215,7 @@ class RewardsCfg:
     bong_is_success = {"weight": 100}
     # bong_robot_out_of_box = {"weight": 10}
     bong_object_height = {"weight": 1000}
-    bong_is_cheating = {"weight": 100}
+    # bong_is_cheating = {"weight": 100}
 
 
 @configclass
