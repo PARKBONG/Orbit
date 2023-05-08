@@ -24,8 +24,8 @@ from omni.isaac.orbit.utils.mdp import ObservationManager, RewardManager
 from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 
 from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
-# catch_threshold = 0.001
-catch_threshold = 0.072   # sphere
+
+catch_threshold = 0.001
 class LiftEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator..."""
 
@@ -454,7 +454,6 @@ class LiftEnv(IsaacEnv):
     def bong_is_ee_close_to_object(self, stacks=2):
         # change need if there is false -> reset
         bool_tensor = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)
-        # print(torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1))
         self.ee_to_obj_l2[~bool_tensor & (self.ee_to_obj_l2 < stacks)] = 0
         self.ee_to_obj_l2 += bool_tensor
         # print(self.ee_to_obj_l2)  # printbong
@@ -655,7 +654,7 @@ class LiftRewardManager(RewardManager):
         return 1 * (env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < catch_threshold)  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):
-        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < catch_threshold)
+        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 1.1 * catch_threshold)
 
     def bong_after_catch(self, env: LiftEnv):
         new = (env.robot_actions[:, -1] != 0)
