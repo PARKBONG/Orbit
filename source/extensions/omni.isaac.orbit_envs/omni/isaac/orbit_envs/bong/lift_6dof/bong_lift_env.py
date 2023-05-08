@@ -25,8 +25,8 @@ from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 
 from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
 
-# catch_threshold = 0.001
-catch_threshold = 0.04
+catch_threshold = 0.001
+# catch_threshold = 0.04
 class LiftEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator..."""
 
