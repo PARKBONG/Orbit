@@ -113,7 +113,7 @@ def main():
     agent.set_logger(new_logger)
 
     # callbacks for agent
-    checkpoint_callback = CheckpointCallback(save_freq=100, save_path=log_dir, name_prefix="model", verbose=2)
+    checkpoint_callback = CheckpointCallback(save_freq=300, save_path=log_dir, name_prefix="model", verbose=2)
     # gripperclose_callback = GripperCloseCallback(threshold=0.1)
     # train the agent
     # agent.learn(total_timesteps=n_timesteps)  # sb3.py/reset
