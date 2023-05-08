@@ -60,7 +60,7 @@ ROBOTIQ_WRIST_WITH_ROBOTIQ_CFG = SingleArmManipulatorCfg(
 
     ),
     ee_info=SingleArmManipulatorCfg.EndEffectorFrameCfg(
-        body_name="base", pos_offset=(0.0, 0.0, 0.15), rot_offset=(-0.5, 0.5, 0.5, 0.5)  # xform / head
+        body_name="base", pos_offset=(0.0, 0.0, 0.13), rot_offset=(-0.5, 0.5, 0.5, 0.5)  # xform / head
         # rot_offset=(1.0, 0.0, 0.0, 0.0)  # xform / head
     ),
     rigid_props=SingleArmManipulatorCfg.RigidBodyPropertiesCfg(
