@@ -216,7 +216,7 @@ class RewardsCfg:
     # bong_robot_out_of_box = {"weight": 10}
     bong_object_height = {"weight": 1000}
     # bong_is_cheating = {"weight": 100}
-    bong_ee_to_obj_scalar = {"weight": 50}
+    bong_ee_to_obj_scalar = {"weight": 25}
     
 @configclass
 class TerminationsCfg:
