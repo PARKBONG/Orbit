@@ -128,12 +128,12 @@ class RandomizationCfg:
         """Randomization of object desired pose."""
 
         # category
-        position_cat: str = "uniform"  # randomize position: "default", "uniform"
+        position_cat: str = "default"  # randomize position: "default", "uniform"
         orientation_cat: str = "default"  # randomize position: "default", "uniform"
         # randomize position
-        position_default = [0.5, 0.0, 0.5]  # position default (x,y,z)
-        position_uniform_min = [0.4, -0.25, 0.25]  # position (x,y,z)
-        position_uniform_max = [0.6, 0.25, 0.5]  # position (x,y,z)
+        position_default = [0.4, 0, 0.45]  # position default (x,y,z)
+        position_uniform_min = [0, -0.3, 0.35]  # position (x,y,z) [0, -0.25, 0.55]
+        position_uniform_max = [0.8, 0.3, 0.55]  # position (x,y,z)   [0.8, 0.3, 0.55]
         # randomize orientation
         orientation_default = [1.0, 0.0, 0.0, 0.0]  # orientation default
 
