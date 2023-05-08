@@ -178,7 +178,7 @@ class ObservationsCfg:
         # tool_actions = {"scale": 1.0}
         bong_is_catch = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
-        bong_obj_height = {"scale": 10}
+        # bong_obj_height = {"scale": 10}
 
     # global observation settings
     return_dict_obs_in_group = False
@@ -212,9 +212,9 @@ class RewardsCfg:
     bong_object_falling = {"weight": 50}
     # bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
-    bong_is_success = {"weight": 100}
+    # bong_is_success = {"weight": 100}
     # bong_robot_out_of_box = {"weight": 10}
-    bong_object_height = {"weight": 1000}
+    # bong_object_height = {"weight": 1000}
     # bong_is_cheating = {"weight": 100}
 
 
@@ -225,8 +225,8 @@ class TerminationsCfg:
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
     is_success = True  # reset when object is lifted
-    is_catch = False  # reset when object is lifted
-    fail_to_catch = True  # reset when object is lifted
+    is_catch = True  # reset when object is lifted
+    fail_to_catch = False  # reset when object is lifted
     is_obj_desired = False
 
 
