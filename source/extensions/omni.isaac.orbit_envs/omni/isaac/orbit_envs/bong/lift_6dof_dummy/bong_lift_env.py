@@ -25,7 +25,7 @@ from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 
 from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
 
-catch_threshold = 0.0015
+catch_threshold = 0.002
 class LiftEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator..."""
 
@@ -69,7 +69,7 @@ class LiftEnv(IsaacEnv):
         #                                    shape=(self.num_actions,))  # bong, clipping
 
         # for 3-DoF
-        self.action_space = gym.spaces.Box(low=np.array([-0.29, -0.6, -0.4, -torch.pi, -torch.pi, -torch.pi]),
+        self.action_space = gym.spaces.Box(low=np.array([-0.3, -0.6, -0.4, -torch.pi, -torch.pi, -torch.pi]),
                                            high=np.array([0.4, 0.6, 0.4, torch.pi, torch.pi, torch.pi]),
                                            shape=(self.num_actions,))  # bong, clipping
 
@@ -693,4 +693,4 @@ class LiftRewardManager(RewardManager):
         # make the first element positive
         quat_ee[quat_ee[:, 0] < 0] *= -1
         mat = matrix_from_quat(quat_ee)
-        return torch.square(torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2])) - 0.5
+        return torch.pow(torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2]), 4) - 0.25
