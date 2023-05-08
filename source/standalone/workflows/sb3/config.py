@@ -26,6 +26,7 @@ SB3_PPO_CONFIG_FILE = {
     "Bong-Lift-Robotiq-4dof-v0": os.path.join(ORBIT_ENVS_DATA_DIR, "sb3/bong_lift_robotiq_4dof_ppo.yaml"),
     "Bong-Lift-Robotiq-6dof-dx-v0": os.path.join(ORBIT_ENVS_DATA_DIR, "sb3/bong_lift_robotiq_6dof_dx_ppo.yaml"),
     "Bong-Lift-Robotiq-6dof-v0": os.path.join(ORBIT_ENVS_DATA_DIR, "sb3/bong_lift_robotiq_6dof_ppo.yaml"),
+    "Bong-Lift-Robotiq-6dof-dummy-v0": os.path.join(ORBIT_ENVS_DATA_DIR, "sb3/bong_lift_robotiq_6dof_dummy_ppo.yaml"),
 }
 """Mapping from environment names to PPO agent files."""
 

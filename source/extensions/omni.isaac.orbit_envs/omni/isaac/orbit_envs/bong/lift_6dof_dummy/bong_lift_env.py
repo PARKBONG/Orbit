@@ -18,7 +18,7 @@ from omni.isaac.orbit.objects import RigidObject
 from omni.isaac.orbit.robots.single_arm import SingleArmManipulator
 # from omni.isaac.orbit.bong.bong_single_arm import Bong_SingleArmManipulator
 from omni.isaac.orbit.utils.dict import class_to_dict
-from omni.isaac.orbit.utils.math import quat_inv, quat_mul, random_orientation, sample_uniform, scale_transform
+from omni.isaac.orbit.utils.math import quat_inv, quat_mul, random_orientation, sample_uniform, scale_transform, matrix_from_quat
 from omni.isaac.orbit.utils.mdp import ObservationManager, RewardManager
 
 from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
@@ -26,7 +26,6 @@ from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
 
 catch_threshold = 0.0015
-# catch_threshold = 0.04
 class LiftEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator..."""
 
@@ -71,7 +70,7 @@ class LiftEnv(IsaacEnv):
 
         # for 3-DoF
         self.action_space = gym.spaces.Box(low=np.array([-0.29, -0.6, -0.4, -torch.pi, -torch.pi, -torch.pi]),
-                                           high=np.array([0.6, 0.6, 0.4, torch.pi, torch.pi, torch.pi]),
+                                           high=np.array([0.4, 0.6, 0.4, torch.pi, torch.pi, torch.pi]),
                                            shape=(self.num_actions,))  # bong, clipping
 
         # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]
@@ -216,7 +215,7 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
-            # self.robot_actions[0, :-1] = torch.tensor([[-0.27, 0, 0, 0, 0, 0]])
+            # self.robot_actions[0, :-1] = torch.tensor([[0.4, 0, 0, 0, 0, 0]])
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
@@ -455,10 +454,8 @@ class LiftEnv(IsaacEnv):
     def bong_is_ee_close_to_object(self, stacks=2):
         # change need if there is false -> reset
         bool_tensor = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)
-        # print(torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1))
         self.ee_to_obj_l2[~bool_tensor & (self.ee_to_obj_l2 < stacks)] = 0
         self.ee_to_obj_l2 += bool_tensor
-        # print(torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1))
         # print(self.ee_to_obj_l2)  # printbong
         # print(self.ee_to_obj_l2, -1 * (self.ee_to_obj_l2 > stacks)) # printbong
         return (self.ee_to_obj_l2 >= stacks)
@@ -657,7 +654,7 @@ class LiftRewardManager(RewardManager):
         return 1 * (env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < catch_threshold)  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):
-        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < catch_threshold)
+        return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 1.1 * catch_threshold)
 
     def bong_after_catch(self, env: LiftEnv):
         new = (env.robot_actions[:, -1] != 0)
@@ -690,3 +687,10 @@ class LiftRewardManager(RewardManager):
 
     def bong_is_cheating(self, env: LiftEnv):
         return torch.where(env.object.data.root_pos_w[:, 2] > env.robot.data.ee_state_w[:, 2], -1, 0)
+
+    def bong_ee_to_obj_scalar(self, env: LiftEnv):
+        quat_ee = quat_mul(quat_inv(env.robot.data.ee_state_w[:, 3:7]), env.object.data.root_quat_w)
+        # make the first element positive
+        quat_ee[quat_ee[:, 0] < 0] *= -1
+        mat = matrix_from_quat(quat_ee)
+        return torch.square(torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2])) - 0.5

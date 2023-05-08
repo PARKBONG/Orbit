@@ -14,7 +14,7 @@ import os
 
 from omni.isaac.kit import SimulationApp
 
-from omni.isaac.orbit_envs.bong.utils import git_hash
+from omni.isaac.orbit_envs.bong.utils import git_hash, save_files
 
 # add argparse arguments
 parser = argparse.ArgumentParser("Welcome to Orbit: Omniverse Robotics Environments!")
@@ -77,6 +77,13 @@ def main():
     dump_pickle(os.path.join(log_dir, "params", "env.pkl"), env_cfg)
     dump_pickle(os.path.join(log_dir, "params", "agent.pkl"), agent_cfg)
 
+    # save_files(log_dir=log_dir, task_name="lift_6dof", env_name="bong_lift_robotiq_6dof_ppo", file_target = "bong_lift")
+    if args_cli.task == "Bong-Lift-Robotiq-6dof-v0":
+        save_files(log_dir=log_dir, task_name="lift_6dof", env_name="bong_lift_robotiq_6dof_ppo", file_target="bong_lift")
+    elif args_cli.task == "Bong-Lift-Robotiq-6dof-dummy-v0":
+        save_files(log_dir=log_dir, task_name="lift_6dof_dummy", env_name="bong_lift_robotiq_6dof_dummy_ppo", file_target="bong_lift")
+    else:
+        raise Exception('Bong~!') 
     # read configurations about the agent-training
     policy_arch = agent_cfg.pop("policy")  # 'MlpPolicy'
     n_timesteps = agent_cfg.pop("n_timesteps")
@@ -106,7 +113,7 @@ def main():
     agent.set_logger(new_logger)
 
     # callbacks for agent
-    checkpoint_callback = CheckpointCallback(save_freq=100, save_path=log_dir, name_prefix="model", verbose=2)
+    checkpoint_callback = CheckpointCallback(save_freq=300, save_path=log_dir, name_prefix="model", verbose=2)
     # gripperclose_callback = GripperCloseCallback(threshold=0.1)
     # train the agent
     # agent.learn(total_timesteps=n_timesteps)  # sb3.py/reset

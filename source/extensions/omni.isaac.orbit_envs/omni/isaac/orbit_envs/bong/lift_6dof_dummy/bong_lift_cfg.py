@@ -41,7 +41,7 @@ class ManipulationObjectCfg(RigidObjectCfg):
     meta_info = RigidObjectCfg.MetaInfoCfg(
         usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
         # usd_path=my_dir + "/sphere_col.usd",
-        scale=(2, 1, 1),
+        scale=(1, 1, 2),
     )
     init_state = RigidObjectCfg.InitialStateCfg(
         pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
@@ -128,12 +128,12 @@ class RandomizationCfg:
         """Randomization of object desired pose."""
 
         # category
-        position_cat: str = "uniform"  # randomize position: "default", "uniform"
+        position_cat: str = "default"  # randomize position: "default", "uniform"
         orientation_cat: str = "default"  # randomize position: "default", "uniform"
         # randomize position
-        position_default = [0.5, 0.0, 0.5]  # position default (x,y,z)
-        position_uniform_min = [0.4, -0.25, 0.25]  # position (x,y,z)
-        position_uniform_max = [0.6, 0.25, 0.5]  # position (x,y,z)
+        position_default = [0.4, 0, 0.45]  # position default (x,y,z)
+        position_uniform_min = [0, -0.3, 0.35]  # position (x,y,z) [0, -0.25, 0.55]
+        position_uniform_max = [0.8, 0.3, 0.55]  # position (x,y,z)   [0.8, 0.3, 0.55]
         # randomize orientation
         orientation_default = [1.0, 0.0, 0.0, 0.0]  # orientation default
 
@@ -211,13 +211,13 @@ class RewardsCfg:
     bong_catch_object = {"weight": 1000}
     bong_object_falling = {"weight": 50}
     # bong_catch_object = {"weight": 300}
-    # bong_catch_failure = {"weight": 50}
-    # bong_is_success = {"weight": 100}
+    bong_catch_failure = {"weight": 50}
+    bong_is_success = {"weight": 1000}
     # bong_robot_out_of_box = {"weight": 10}
-    # bong_object_height = {"weight": 1000}
+    bong_object_height = {"weight": 1000}
     # bong_is_cheating = {"weight": 100}
-
-
+    bong_ee_to_obj_scalar = {"weight": 25}
+    
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
@@ -225,8 +225,8 @@ class TerminationsCfg:
     episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
     is_success = True  # reset when object is lifted
-    is_catch = True  # reset when object is lifted
-    fail_to_catch = False  # reset when object is lifted
+    is_catch = False  # reset when object is lifted
+    fail_to_catch = True  # reset when object is lifted
     is_obj_desired = False
 
 
