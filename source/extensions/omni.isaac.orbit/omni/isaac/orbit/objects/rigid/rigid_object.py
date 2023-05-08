@@ -187,6 +187,7 @@ class RigidObject:
         """
         # frame states
         position_w, quat_w = self.objects.get_world_poses(indices=self._ALL_INDICES, clone=False)
+        # print(position_w)
         self._data.root_state_w[:, 0:3] = position_w
         self._data.root_state_w[:, 3:7] = quat_w
         self._data.root_state_w[:, 7:] = self.objects.get_velocities(indices=self._ALL_INDICES, clone=False)
