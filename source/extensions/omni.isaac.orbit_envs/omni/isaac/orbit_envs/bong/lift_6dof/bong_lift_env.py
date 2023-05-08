@@ -26,6 +26,7 @@ from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
 
 catch_threshold = 0.001
+# catch_threshold = 0.04
 class LiftEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator..."""
 
@@ -215,7 +216,7 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
-            # self.robot_actions[0, :-1] = torch.tensor([[-0.29, 0, 0, 0, 0, 0]])
+            # self.robot_actions[0, :-1] = torch.tensor([[-0.27, 0, 0, 0, 0, 0]])
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
@@ -456,6 +457,7 @@ class LiftEnv(IsaacEnv):
         bool_tensor = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)
         self.ee_to_obj_l2[~bool_tensor & (self.ee_to_obj_l2 < stacks)] = 0
         self.ee_to_obj_l2 += bool_tensor
+        # print(torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1))
         # print(self.ee_to_obj_l2)  # printbong
         # print(self.ee_to_obj_l2, -1 * (self.ee_to_obj_l2 > stacks)) # printbong
         return (self.ee_to_obj_l2 >= stacks)
