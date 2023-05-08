@@ -78,7 +78,12 @@ def main():
     dump_pickle(os.path.join(log_dir, "params", "agent.pkl"), agent_cfg)
 
     # save_files(log_dir=log_dir, task_name="lift_6dof", env_name="bong_lift_robotiq_6dof_ppo", file_target = "bong_lift")
-    save_files(log_dir=log_dir, task_name="lift_6dof_dummy", env_name="bong_lift_robotiq_6dof_dummy_ppo", file_target = "bong_lift")
+    if args_cli.task == "Bong-Lift-Robotiq-6dof-v0":
+        save_files(log_dir=log_dir, task_name="lift_6dof", env_name="bong_lift_robotiq_6dof_ppo", file_target="bong_lift")
+    elif args_cli.task == "Bong-Lift-Robotiq-6dof-dummy-v0":
+        save_files(log_dir=log_dir, task_name="lift_6dof_dummy", env_name="bong_lift_robotiq_6dof_dummy_ppo", file_target="bong_lift")
+    else:
+        raise Exception('Bong~!') 
     # read configurations about the agent-training
     policy_arch = agent_cfg.pop("policy")  # 'MlpPolicy'
     n_timesteps = agent_cfg.pop("n_timesteps")
