@@ -69,7 +69,7 @@ class LiftEnv(IsaacEnv):
         #                                    shape=(self.num_actions,))  # bong, clipping
 
         # for 3-DoF
-        self.action_space = gym.spaces.Box(low=np.array([-0.3, -0.6, -0.4, -torch.pi, -torch.pi, -torch.pi]),
+        self.action_space = gym.spaces.Box(low=np.array([-0.285, -0.6, -0.4, -torch.pi, -torch.pi, -torch.pi]),
                                            high=np.array([0.4, 0.6, 0.4, torch.pi, torch.pi, torch.pi]),
                                            shape=(self.num_actions,))  # bong, clipping
 
