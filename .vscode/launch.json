@@ -14,7 +14,7 @@
             "args" : ["--task","Bong-Lift-Robotiq-6dof-v0","--num_envs","2", "--cpu"],  // 4dof
             // "args" : ["--task","Bong-Lift-Robotiq-6dof-dx-v0","--num_envs","2", "--cpu"],  // 4dof
             // "args" : ["--task","Bong-Lift-Robotiq-6dof-v0","--num_envs","2", "--cpu", "--checkpoint", // play
-                    //  "logs/sb3/Bong-Lift-Robotiq-6dof-v0/May08_06-10-10_01744b479a6fc9de73a0d742e98c9a22a0935215/model_42291200_steps.zip"], // play
+                    //  "logs/sb3/Bong-Lift-Robotiq-6dof-v0/May08_06-58-47_7b11e655d2f941d61a51d1d3da68aa4ca7ce34f3/model_163840000_steps.zip"], // play
                     // "logs/sb3/Bong-Lift-Robotiq-6dof-v0/May03_14-50-46_c463dbce9a903ab9d27924cf1997886e2bc9cf4f/model_15872000_steps.zip"],
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_11-56-02/model_16384000_steps.zip"], // play
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_12-44-11/model_137420800_steps.zip"], // play
