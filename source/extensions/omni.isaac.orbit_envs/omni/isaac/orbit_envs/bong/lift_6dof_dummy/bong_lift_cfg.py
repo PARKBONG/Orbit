@@ -41,7 +41,7 @@ class ManipulationObjectCfg(RigidObjectCfg):
     meta_info = RigidObjectCfg.MetaInfoCfg(
         usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
         # usd_path=my_dir + "/sphere_col.usd",
-        scale=(2, 1, 1),
+        scale=(1, 1, 2),
     )
     init_state = RigidObjectCfg.InitialStateCfg(
         pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
@@ -216,8 +216,8 @@ class RewardsCfg:
     # bong_robot_out_of_box = {"weight": 10}
     # bong_object_height = {"weight": 1000}
     # bong_is_cheating = {"weight": 100}
-
-
+    bong_ee_to_obj_scalar = {"weight": 50}
+    
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""

@@ -18,7 +18,7 @@ from omni.isaac.orbit.objects import RigidObject
 from omni.isaac.orbit.robots.single_arm import SingleArmManipulator
 # from omni.isaac.orbit.bong.bong_single_arm import Bong_SingleArmManipulator
 from omni.isaac.orbit.utils.dict import class_to_dict
-from omni.isaac.orbit.utils.math import quat_inv, quat_mul, random_orientation, sample_uniform, scale_transform
+from omni.isaac.orbit.utils.math import quat_inv, quat_mul, random_orientation, sample_uniform, scale_transform, matrix_from_quat
 from omni.isaac.orbit.utils.mdp import ObservationManager, RewardManager
 
 from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
@@ -687,3 +687,10 @@ class LiftRewardManager(RewardManager):
 
     def bong_is_cheating(self, env: LiftEnv):
         return torch.where(env.object.data.root_pos_w[:, 2] > env.robot.data.ee_state_w[:, 2], -1, 0)
+
+    def bong_ee_to_obj_scalar(self, env: LiftEnv):
+        quat_ee = quat_mul(quat_inv(env.robot.data.ee_state_w[:, 3:7]), env.object.data.root_quat_w)
+        # make the first element positive
+        quat_ee[quat_ee[:, 0] < 0] *= -1
+        mat = matrix_from_quat(quat_ee)
+        return torch.square(torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2]))
