@@ -708,6 +708,11 @@ class LiftRewardManager(RewardManager):
         # make the first element positive
         quat_ee[quat_ee[:, 0] < 0] *= -1
         mat = matrix_from_quat(quat_ee)
-        return torch.pow(torch.cos(4 * torch.arccos(mat[:, 0, 0])) * torch.abs(mat[:, 2, 2]),9)
+
+        val = torch.abs(torch.cos(2 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2])  # ver1
+        print(torch.where(val > 0.9, val, 0))
+        return torch.where(val > 0.9, val, 0)  # ver 1
+
+        # return torch.pow(torch.cos(4 * torch.arccos(mat[:, 0, 0])) * torch.abs(mat[:, 2, 2]),9)
         # val = torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2])
         # return torch.where(val > 0.9, val, 0)
