@@ -164,12 +164,12 @@ class ObservationsCfg:
         # tool_vel = {"scale": 1.0}
         # tool_dof_pos_scaled = {"scale": 1.0}
         # -- end effector state
-        tool_positions = {"scale": 1.0}
+        # tool_positions = {"scale": 1.0}
         tool_orientations = {"scale": 1.0}
         # -- object state
         object_positions = {"scale": 1.0}
         object_orientations = {"scale": 1.0}
-        # object_relative_tool_positions = {"scale": 1.0}
+        object_relative_tool_positions = {"scale": 1.0}
         # object_relative_tool_orientations = {"scale": 1.0}
         # -- object desired state
         # object_desired_positions = {"scale": 1.0}
@@ -196,7 +196,7 @@ class RewardsCfg:
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
-    penalizing_arm_dof_velocity_l2 = {"weight": 2.5}
+    penalizing_arm_dof_velocity_l2 = {"weight": 1}
     # penalizing_tool_dof_velocity_l2 = {"weight": 1}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
     # -- action-centric
