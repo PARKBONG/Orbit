@@ -48,6 +48,11 @@ class LiftEnv(IsaacEnv):
         self._initialize_views()  # here, action space set
 
         # prepare the observation manager
+        pcd_list = torch.tensor([[1, 1, 2], [-1, 1, 2], [1, -1, 2], [1, 1, -2], [-1, -1, 2], [-1, 1, -2], [1, -1, -2], [-1, -1, -2]], dtype=torch.float32)
+        self.pcd_num_points = pcd_list.shape[0]
+        pcd_list = pcd_list.unsqueeze(1).repeat(1, self.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
+        self.pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
+
         self._observation_manager = LiftObservationManager(class_to_dict(self.cfg.observations), self, self.device)
         # prepare the reward manager
         self._reward_manager = LiftRewardManager(
@@ -88,10 +93,10 @@ class LiftEnv(IsaacEnv):
         # self.catch_threshold = 0.0025
         # self.catch_threshold = 0.002
         self.catch_threshold = catch_threshold
-        pcd_list = torch.tensor([[1, 1, 2], [-1, 1, 2], [1, -1, 2], [1, 1, -2], [-1, -1, 2], [-1, 1, -2], [1, -1, -2], [-1, -1, -2]], dtype=torch.float32)
-        self.pcd_num_points = pcd_list.shape[0]
-        pcd_list = pcd_list.unsqueeze(1).repeat(1, self.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
-        self.pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
+        # pcd_list = torch.tensor([[1, 1, 2], [-1, 1, 2], [1, -1, 2], [1, 1, -2], [-1, -1, 2], [-1, 1, -2], [1, -1, -2], [-1, -1, -2]], dtype=torch.float32)
+        # self.pcd_num_points = pcd_list.shape[0]
+        # pcd_list = pcd_list.unsqueeze(1).repeat(1, self.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
+        # self.pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
     """
     Implementation specifics.
     """
