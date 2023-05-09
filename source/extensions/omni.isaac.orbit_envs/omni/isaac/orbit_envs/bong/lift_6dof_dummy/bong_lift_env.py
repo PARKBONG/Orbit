@@ -694,4 +694,5 @@ class LiftRewardManager(RewardManager):
         quat_ee[quat_ee[:, 0] < 0] *= -1
         mat = matrix_from_quat(quat_ee)
         # return torch.pow(torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2]), 4) - 0.4
-        return torch.where(torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2]) > 0.9, 1, 0)
+        val = torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2])
+        return torch.where(val > 0.9, val, 0)
