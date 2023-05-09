@@ -569,16 +569,19 @@ class LiftObservationManager(ObservationManager):
                                                     coord_prim=self.coord_prim)[:8]
         
     def bong_object_ang_vel(self, env: LiftEnv):
+        print(env.object.data.root_ang_vel_w)
         return env.object.data.root_ang_vel_w
 
     def bong_object_lin_vel(self, env: LiftEnv):
+        # print(env.object.data.root_lin_vel_w)
         return env.object.data.root_lin_vel_w
-    
-    def bong_ee_ang_vel(self, env: LiftEnv):
-        return env.robot.data.root_ang_vel_w
 
-    def bong_ee_lin_vel(self, env: LiftEnv):
-        return env.robot.data.root_lin_vel_w
+    # def bong_ee_ang_vel(self, env: LiftEnv):
+    #     return env.robot.data.root_ang_vel_w
+
+    # def bong_ee_lin_vel(self, env: LiftEnv):
+    #     print(env.robot.data.root_lin_vel_w)
+    #     return env.robot.data.root_lin_vel_w
     
 class LiftRewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""

@@ -181,8 +181,6 @@ class ObservationsCfg:
         # bong_obj_height = {"scale": 10}
         bong_object_ang_vel = {"scale": 1.0}
         bong_object_lin_vel = {"scale": 1.0}
-        bong_ee_ang_vel = {"scale": 1.0}
-        bong_ee_lin_vel = {"scale": 1.0}
 
     # global observation settings
     return_dict_obs_in_group = False
