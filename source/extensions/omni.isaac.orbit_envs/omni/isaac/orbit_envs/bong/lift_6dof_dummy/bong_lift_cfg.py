@@ -195,7 +195,7 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     # -- robot-centric
-    reaching_object_position_l2 = {"weight": 10}
+    reaching_object_position_l2 = {"weight": 20}
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
