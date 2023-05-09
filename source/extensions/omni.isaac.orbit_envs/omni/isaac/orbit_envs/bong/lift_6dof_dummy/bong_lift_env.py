@@ -568,7 +568,18 @@ class LiftObservationManager(ObservationManager):
         obj_pos = msh.get_mesh_vertices_relative_to(mesh_prim=self.mesh_prim, 
                                                     coord_prim=self.coord_prim)[:8]
         
+    def bong_object_ang_vel(self, env: LiftEnv):
+        return env.object.data.root_ang_vel_w
 
+    def bong_object_lin_vel(self, env: LiftEnv):
+        return env.object.data.root_lin_vel_w
+    
+    def bong_ee_ang_vel(self, env: LiftEnv):
+        return env.robot.data.root_ang_vel_w
+
+    def bong_ee_lin_vel(self, env: LiftEnv):
+        return env.robot.data.root_lin_vel_w
+    
 class LiftRewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""
 
@@ -693,6 +704,6 @@ class LiftRewardManager(RewardManager):
         # make the first element positive
         quat_ee[quat_ee[:, 0] < 0] *= -1
         mat = matrix_from_quat(quat_ee)
-        # return torch.pow(torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2]), 4) - 0.4
-        val = torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2])
-        return torch.where(val > 0.9, val, 0)
+        return torch.pow(torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2]), 4) - 0.4
+        # val = torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2])
+        # return torch.where(val > 0.9, val, 0)

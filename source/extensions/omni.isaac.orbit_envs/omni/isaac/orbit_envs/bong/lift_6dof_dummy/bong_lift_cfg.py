@@ -175,10 +175,14 @@ class ObservationsCfg:
         # object_desired_positions = {"scale": 1.0}
         # -- previous action
         # arm_actions = {"scale": 1.0}
-        # tool_actions = {"scale": 1.0}
+        tool_actions = {"scale": 1.0}
         bong_is_catch = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
         # bong_obj_height = {"scale": 10}
+        bong_object_ang_vel = {"scale": 1.0}
+        bong_object_lin_vel = {"scale": 1.0}
+        bong_ee_ang_vel = {"scale": 1.0}
+        bong_ee_lin_vel = {"scale": 1.0}
 
     # global observation settings
     return_dict_obs_in_group = False
@@ -211,12 +215,12 @@ class RewardsCfg:
     bong_catch_object = {"weight": 1000}
     bong_object_falling = {"weight": 50}
     # bong_catch_object = {"weight": 300}
-    bong_catch_failure = {"weight": 50}
+    # bong_catch_failure = {"weight": 50}
     # bong_is_success = {"weight": 1000}  #this
     # bong_robot_out_of_box = {"weight": 10}
     # bong_object_height = {"weight": 1000}  #this
     # bong_is_cheating = {"weight": 100}
-    bong_ee_to_obj_scalar = {"weight": 25}
+    bong_ee_to_obj_scalar = {"weight": 50}
     
 @configclass
 class TerminationsCfg:
