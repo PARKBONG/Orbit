@@ -164,13 +164,13 @@ class ObservationsCfg:
         # tool_vel = {"scale": 1.0}
         # tool_dof_pos_scaled = {"scale": 1.0}
         # -- end effector state
-        tool_positions = {"scale": 1.0}
-        tool_orientations = {"scale": 1.0}
+        # tool_positions = {"scale": 1.0}
+        # tool_orientations = {"scale": 1.0}
         # -- object state
         object_positions = {"scale": 1.0}
-        object_orientations = {"scale": 1.0}
+        # object_orientations = {"scale": 1.0}
         # object_relative_tool_positions = {"scale": 1.0}
-        # object_relative_tool_orientations = {"scale": 1.0}
+        object_relative_tool_orientations = {"scale": 1.0}
         # -- object desired state
         # object_desired_positions = {"scale": 1.0}
         # -- previous action
@@ -179,9 +179,10 @@ class ObservationsCfg:
         # bong_is_catch = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
         # bong_obj_height = {"scale": 10}
-        bong_object_ang_vel = {"scale": 1.0}
-        bong_object_lin_vel = {"scale": 1.0}
+        # bong_object_ang_vel = {"scale": 1.0}
+        # bong_object_lin_vel = {"scale": 1.0}
         bong_cube_pcd = {"scale": 1.0}
+
     # global observation settings
     return_dict_obs_in_group = False
     """Whether to return observations as dictionary or flattened vector within groups."""
@@ -218,7 +219,7 @@ class RewardsCfg:
     # bong_robot_out_of_box = {"weight": 10}
     # bong_object_height = {"weight": 1000}  #this
     # bong_is_cheating = {"weight": 100}
-    bong_ee_to_obj_scalar = {"weight": 10}
+    # bong_ee_to_obj_scalar = {"weight": 10}
     
 @configclass
 class TerminationsCfg:
