@@ -569,7 +569,7 @@ class LiftObservationManager(ObservationManager):
                                                     coord_prim=self.coord_prim)[:8]
         
     def bong_object_ang_vel(self, env: LiftEnv):
-        print(env.object.data.root_ang_vel_w)
+        # print(env.object.data.root_ang_vel_w)
         return env.object.data.root_ang_vel_w
 
     def bong_object_lin_vel(self, env: LiftEnv):
