@@ -181,7 +181,7 @@ class ObservationsCfg:
         # bong_obj_height = {"scale": 10}
         bong_object_ang_vel = {"scale": 1.0}
         bong_object_lin_vel = {"scale": 1.0}
-
+        bong_cube_pcd = {"scale": 1.0}
     # global observation settings
     return_dict_obs_in_group = False
     """Whether to return observations as dictionary or flattened vector within groups."""
@@ -224,9 +224,9 @@ class RewardsCfg:
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    episode_timeout = True  # reset when episode length ended
+    episode_timeout = False  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
-    is_success = True  # reset when object is lifted
+    is_success = False  # reset when object is lifted
     is_catch = True  # reset when object is lifted
     fail_to_catch = False  # reset when object is lifted
     is_obj_desired = False

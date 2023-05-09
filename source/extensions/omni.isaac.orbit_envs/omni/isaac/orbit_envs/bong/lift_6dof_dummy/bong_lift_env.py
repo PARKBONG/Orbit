@@ -88,13 +88,10 @@ class LiftEnv(IsaacEnv):
         # self.catch_threshold = 0.0025
         # self.catch_threshold = 0.002
         self.catch_threshold = catch_threshold
-        # bong, vis
-        # self._markers1.set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
-        # for i in range(6):
-        #     self._markers_list[i].set_world_poses(self.envs_positions - torch.tensor([], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
-        #     self._markers_list[i].set_world_poses(self.envs_positions - torch.tensor([self.action_space.high[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
-        #     self._markers_list[i + 1].set_world_poses(self.envs_positions - torch.tensor([self.action_space.low[0], 0, 0], dtype=torch.float32), torch.tensor([[1, 0, 0, 0] for _ in range(self.num_envs)]))
-
+        pcd_list = torch.tensor([[1, 1, 2], [-1, 1, 2], [1, -1, 2], [1, 1, -2], [-1, -1, 2], [-1, 1, -2], [1, -1, -2], [-1, -1, -2]], dtype=torch.float32)
+        self.pcd_num_points = pcd_list.shape[0]
+        pcd_list = pcd_list.unsqueeze(1).repeat(1, self.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
+        self.pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
     """
     Implementation specifics.
     """
@@ -144,12 +141,19 @@ class LiftEnv(IsaacEnv):
                 scale=self.cfg.frame_marker.scale,
             )
 
+            # self._pcd_markers = StaticMarker(
+            #     "/Visuals/pcd1",
+            #     self.num_envs,
+            #     usd_path=self.cfg.frame_marker.usd_path,
+            #     scale=self.cfg.frame_marker.scale,
+            # )
+
             # self._markers_list = [StaticMarker(
             #     "/Visuals/bong_" + str(i),
             #     self.num_envs,
             #     usd_path=self.cfg.frame_marker.usd_path,
             #     scale=self.cfg.frame_marker.scale,
-            # ) for i in range(6)]
+            # ) for i in range(8)]
 
         # return list of global prims
         return ["/World/defaultGroundPlane"]
@@ -344,6 +348,29 @@ class LiftEnv(IsaacEnv):
         self._ee_markers.set_world_poses(self.robot.data.ee_state_w[:, 0:3], self.robot.data.ee_state_w[:, 3:7])
 
         self._object_markers.set_world_poses(self.object.data.root_pos_w, self.object.data.root_quat_w)
+
+        # ======================================
+        # pcd_list = torch.tensor([[1, 1, 2], [-1, 1, 2], [1, -1, 2], [1, 1, -2], [-1, -1, 2], [-1, 1, -2], [1, -1, -2], [-1, -1, -2]], dtype=torch.float32)
+        # self.pcd_num_points = pcd_list.shape[0]
+
+        # # Expand the points_list tensor and multiply by 0.035
+        # pcd_list = pcd_list.unsqueeze(1).repeat(1, self.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
+        # self.pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
+
+        # matrix_batch = matrix_from_quat(self.object.data.root_quat_w).unsqueeze(1).repeat(1, self.pcd_num_points, 1, 1)  # Shape: 2 x 8 x 3 x 3
+        # transformed_points = torch.matmul(matrix_batch, self.pcd_list.unsqueeze(3)).squeeze(3) + self.object.data.root_pos_w.unsqueeze(1)  # Shape: 2 x 8 x 3
+
+        # envs_positions_expanded = self.envs_positions.unsqueeze(1).repeat(1, self.pcd_num_points, 1)  # Shape: 2 x 8 x 3
+        # result = transformed_points - envs_positions_expanded  # Shape: 2 x 8 x 3
+
+        # for idx, point in enumerate(result.transpose(0, 1)):
+        #     self._markers_list[idx].set_world_poses(point, self.object.data.root_quat_w)
+
+        # result.view(2, -1)
+        # for idx, point in enumerate(transformed_points.transpose(0, 1)):
+        #     self._markers_list[idx].set_world_poses(point, self.object.data.root_quat_w)
+
+        # =======================================
         # -- task-space commands
         if self.cfg.control.control_type == "inverse_kinematics":
             # convert to world frame
@@ -564,9 +591,13 @@ class LiftObservationManager(ObservationManager):
         return torch.where((env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < catch_threshold), 1.0, 0.0).unsqueeze(1)
         # return torch.where((-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002), 1, 0).unsqueeze(1)
 
-    def bong_obj_pcd(self, env: LiftEnv):
-        obj_pos = msh.get_mesh_vertices_relative_to(mesh_prim=self.mesh_prim, 
-                                                    coord_prim=self.coord_prim)[:8]
+    def bong_cube_pcd(self, env: LiftEnv):
+        matrix_batch = matrix_from_quat(env.object.data.root_quat_w).unsqueeze(1).repeat(1, env.pcd_num_points, 1, 1)  # Shape: 2 x 8 x 3 x 3
+        transformed_points = torch.matmul(matrix_batch, env.pcd_list.unsqueeze(3)).squeeze(3) + env.object.data.root_pos_w.unsqueeze(1)  # Shape: 2 x 8 x 3
+
+        envs_positions_expanded = env.envs_positions.unsqueeze(1).repeat(1, env.pcd_num_points, 1)  # Shape: 2 x 8 x 3
+        result = transformed_points - envs_positions_expanded  # Shape: 2 x 8 x 3
+        return result.view(2,-1)
         
     def bong_object_ang_vel(self, env: LiftEnv):
         # print(env.object.data.root_ang_vel_w)

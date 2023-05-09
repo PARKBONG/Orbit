@@ -12,10 +12,10 @@
             // "args" : ["--task","Bong-Lift-Robotiq-soft-v0","--num_envs","2", "--cpu"],  // Bong-Lift-Robotiq-soft-v0
             // "args" : ["--task","Bong-Lift-Robotiq-4dof-v0","--num_envs","2", "--cpu"],  // 4dof
             // "args" : ["--task","Bong-Lift-Robotiq-6dof-v0","--num_envs","2", "--cpu"],  // 4dof
-            // "args" : ["--task","Bong-Lift-Robotiq-6dof-dummy-v0","--num_envs","2", "--cpu"],  // 4dof
+            "args" : ["--task","Bong-Lift-Robotiq-6dof-dummy-v0","--num_envs","4", "--cpu"],  // 4dof
             // "args" : ["--task","Bong-Lift-Robotiq-6dof-dx-v0","--num_envs","2", "--cpu"],  // 4dof
-            "args" : ["--task","Bong-Lift-Robotiq-6dof-dummy-v0","--num_envs","2", "--cpu", "--checkpoint", // play
-                     "logs/sb3/Bong-Lift-Robotiq-6dof-dummy-v0/May09_09-41-46_5679678b8b1867703c46ca9e18aeb58190a57d84/model_24576000_steps.zip"], // play
+            // "args" : ["--task","Bong-Lift-Robotiq-6dof-dummy-v0","--num_envs","2", "--cpu", "--checkpoint", // play
+                    //  "logs/sb3/Bong-Lift-Robotiq-6dof-dummy-v0/May09_09-41-46_5679678b8b1867703c46ca9e18aeb58190a57d84/model_24576000_steps.zip"], // play
                     // "logs/sb3/Bong-Lift-Robotiq-6dof-v0/May03_14-50-46_c463dbce9a903ab9d27924cf1997886e2bc9cf4f/model_15872000_steps.zip"],
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_11-56-02/model_16384000_steps.zip"], // play
                     // "./logs/sb3/Bong-Lift-Robotiq-v0/Apr12_12-44-11/model_137420800_steps.zip"], // play
