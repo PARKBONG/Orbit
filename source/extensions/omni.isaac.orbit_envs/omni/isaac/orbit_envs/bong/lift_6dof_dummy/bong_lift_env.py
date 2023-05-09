@@ -602,7 +602,7 @@ class LiftObservationManager(ObservationManager):
 
         envs_positions_expanded = env.envs_positions.unsqueeze(1).repeat(1, env.pcd_num_points, 1)  # Shape: 2 x 8 x 3
         result = transformed_points - envs_positions_expanded  # Shape: 2 x 8 x 3
-        return result.view(2,-1)
+        return result.view(env.num_envs, -1)
         
     def bong_object_ang_vel(self, env: LiftEnv):
         # print(env.object.data.root_ang_vel_w)
