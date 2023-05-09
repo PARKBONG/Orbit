@@ -81,7 +81,10 @@ def main():
         actions, model_info = agent.predict(obs, deterministic=True)
         # actions[:, 0] *= 1.1
         # env stepping
+        # print("actions", actions[0,:6])
+        # actions[:, 0] = -0.28
         obs, reward, done, env_info = env.step(actions)
+        # print("obs", obs[0,:6])
         # print(reward)
         # print(env.robot)
         # print(reward)
