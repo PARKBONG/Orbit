@@ -594,7 +594,8 @@ class LiftRewardManager(RewardManager):
         # print("ee", env.robot.data.ee_state_w[:, 0:3])  # printbong
         # print("obj", env.object.data.root_pos_w)  # printbong
         value = torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) 
-        return torch.where(value < 0.0015, 0.1, -value)
+        return value
+        # return torch.where(value < 0.0015, 0.1, -value)
 
     def reaching_object_height(self, env: LiftEnv):
         """Penalize end-effector tracking position error using L2-kernel."""
