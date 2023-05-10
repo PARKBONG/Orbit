@@ -654,12 +654,12 @@ class LiftObservationManager(ObservationManager):
         # print(env.object.data.root_lin_vel_w)
         return env.object.data.root_lin_vel_w
 
-    # def bong_ee_ang_vel(self, env: LiftEnv):
-    #     return env.robot.data.root_ang_vel_w
+    def bong_ee_ang_vel(self, env: LiftEnv):
+        return env.robot.data.ee_state_w[:, 10:]
 
-    # def bong_ee_lin_vel(self, env: LiftEnv):
-    #     print(env.robot.data.root_lin_vel_w)
-    #     return env.robot.data.root_lin_vel_w
+    def bong_ee_lin_vel(self, env: LiftEnv):
+        # print(env.robot.data.root_lin_vel_w)
+        return env.robot.data.ee_state_w[:, 7:10]
     
 class LiftRewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""
