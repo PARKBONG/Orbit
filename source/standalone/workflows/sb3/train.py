@@ -82,6 +82,8 @@ def main():
         save_files(log_dir=log_dir, task_name="lift_6dof", env_name="bong_lift_robotiq_6dof_ppo", file_target="bong_lift")
     elif args_cli.task == "Bong-Lift-Robotiq-6dof-dummy-v0":
         save_files(log_dir=log_dir, task_name="lift_6dof_dummy", env_name="bong_lift_robotiq_6dof_dummy_ppo", file_target="bong_lift")
+    elif args_cli.task == "Bong-Lift-Robotiq-6dof-dx-v0":
+        save_files(log_dir=log_dir, task_name="lift_6dof_dx", env_name="bong_lift_robotiq_6dof_dx_ppo", file_target="bong_lift")
     else:
         raise Exception('Bong~!') 
     # read configurations about the agent-training

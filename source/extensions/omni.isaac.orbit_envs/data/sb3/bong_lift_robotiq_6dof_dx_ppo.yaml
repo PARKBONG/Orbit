@@ -6,20 +6,22 @@ n_steps: 64
 # mini batch size: num_envs * nsteps / nminibatches 2048×512÷2048
 batch_size: 65536
 gae_lambda: 0.95
-gamma: 0.99
+gamma: 0.995
 n_epochs: 12
-ent_coef: 0.01
+ent_coef: 0.005
 vf_coef: 0.0001
-learning_rate: !!float 1e-4
+# vf_coef: 0.5
+learning_rate: !!float 5e-4
 clip_range: 0.2
 policy_kwargs: "dict(
                   activation_fn=nn.ELU,
-                  net_arch=[32, 64, dict(pi=[256, 128, 64], vf=[256, 128, 64])]
+                  net_arch=[256, 256,  dict(pi=[256, 128, 64], vf=[256, 128, 64])]
                 )"
 
 
-target_kl: 0.02
+target_kl: 0.08
 max_grad_norm: 1.0
+# max_grad_norm: 1.5
 seed: 42 # bong
 
 # # Uses VecNormalize class to normalize obs
