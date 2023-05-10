@@ -225,7 +225,7 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
-            # self.robot_actions[0, :-1] = torch.tensor([[-0.26, 0, 0, 0, 0, 0]])
+            # self.robot_actions[0, :-1] = torch.tensor([[-0.22, 0, 0, 0, 0, 0]])
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
@@ -654,12 +654,12 @@ class LiftObservationManager(ObservationManager):
         # print(env.object.data.root_lin_vel_w)
         return env.object.data.root_lin_vel_w
 
-    # def bong_ee_ang_vel(self, env: LiftEnv):
-    #     return env.robot.data.root_ang_vel_w
+    def bong_ee_ang_vel(self, env: LiftEnv):
+        return env.robot.data.ee_state_w[:, 10:]
 
-    # def bong_ee_lin_vel(self, env: LiftEnv):
-    #     print(env.robot.data.root_lin_vel_w)
-    #     return env.robot.data.root_lin_vel_w
+    def bong_ee_lin_vel(self, env: LiftEnv):
+        # print(env.robot.data.root_lin_vel_w)
+        return env.robot.data.ee_state_w[:, 7:10]
     
 class LiftRewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""
@@ -805,6 +805,22 @@ class LiftRewardManager(RewardManager):
         # print(torch.where(val > 0.9, val, 0))
         return torch.where(val > 0.9, val, 0)  # ver 1
 
+    def bong_ee_to_obj_vel(self, env: LiftEnv):
+        direction = torch.nn.functional.normalize(env.object.data.root_pos_w - env.robot.data.ee_state_w[:, 0:3], dim=1)
+
+# Compute the unit vector representing the direction of V1
+        vel = env.robot.data.ee_state_w[:, 7:10]
+        velocity_direction = torch.nn.functional.normalize(vel, dim=1)
+        velocity_norms = torch.sqrt(torch.sum(torch.square(vel), dim=1))
+        mask = velocity_norms > 0.001
+        vel[mask] = velocity_direction[mask]
+        # Compute the dot product between the two unit vectors
+        # dot_product = torch.sum(direction * velocity_direction, dim=-1)
+        dot_product = torch.sum(direction * vel, dim=1)
+        # print(dot_product)
+        # print(dot_product)
+        # Define the reward function
+        return dot_product
         # return torch.pow(torch.cos(4 * torch.arccos(mat[:, 0, 0])) * torch.abs(mat[:, 2, 2]),9)
         # val = torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2])
         # return torch.where(val > 0.9, val, 0)
