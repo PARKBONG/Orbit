@@ -11,7 +11,7 @@ n_epochs: 12
 ent_coef: 0.005
 vf_coef: 0.0001
 # vf_coef: 0.5
-learning_rate: !!float 5e-4
+learning_rate: !!float 2e-4
 clip_range: 0.2
 policy_kwargs: "dict(
                   activation_fn=nn.ELU,
