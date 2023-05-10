@@ -165,7 +165,7 @@ class ObservationsCfg:
         # tool_dof_pos_scaled = {"scale": 1.0}
         # -- end effector state
         # tool_positions = {"scale": 1.0}
-        # tool_orientations = {"scale": 1.0}
+        tool_orientations = {"scale": 1.0}
         # -- object state
         object_positions = {"scale": 1}
         object_orientations = {"scale": 1}
