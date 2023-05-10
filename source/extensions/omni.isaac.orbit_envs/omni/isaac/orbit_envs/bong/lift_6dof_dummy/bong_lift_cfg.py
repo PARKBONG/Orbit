@@ -167,9 +167,9 @@ class ObservationsCfg:
         # tool_positions = {"scale": 1.0}
         # tool_orientations = {"scale": 1.0}
         # -- object state
-        object_positions = {"scale": 1.0}
-        # object_orientations = {"scale": 1.0}
-        # object_relative_tool_positions = {"scale": 1.0}
+        object_positions = {"scale": 1}
+        object_orientations = {"scale": 1}
+        object_relative_tool_positions = {"scale": 10}
         object_relative_tool_orientations = {"scale": 1.0}
         # -- object desired state
         # object_desired_positions = {"scale": 1.0}
@@ -195,7 +195,7 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     # -- robot-centric
-    reaching_object_position_l2 = {"weight": 10}
+    reaching_object_position_l2 = {"weight": 20}
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
@@ -225,7 +225,7 @@ class RewardsCfg:
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    episode_timeout = False  # reset when episode length ended
+    episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
     is_success = False  # reset when object is lifted
     is_catch = True  # reset when object is lifted
