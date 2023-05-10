@@ -624,6 +624,20 @@ class LiftObservationManager(ObservationManager):
         return torch.where((env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < catch_threshold), 1.0, 0.0).unsqueeze(1)
         # return torch.where((-env.robot_actions[:, -1] != 0) & (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 0.002), 1, 0).unsqueeze(1)
 
+    def bong_is_catch_pcd(self, env: LiftEnv):
+        _pcd_list = torch.tensor([[0, 0, 1], [0, 0, -1]], dtype=torch.float32)
+        pcd_list = _pcd_list.unsqueeze(1).repeat(1, self.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
+        pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
+        matrix_batch = matrix_from_quat(env.object.data.root_quat_w).unsqueeze(1).repeat(1, _pcd_list.shape[0], 1, 1)  # Shape: 2 x 8 x 3 x 3
+        transformed_points = torch.matmul(matrix_batch, pcd_list.unsqueeze(3)).squeeze(3) + env.object.data.root_pos_w.unsqueeze(1)
+    
+        grasp_bool_tensor0 = (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < catch_threshold)
+        grasp_bool_tensor1 = (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - transformed_points[:, 0, :]), dim=1) < catch_threshold)
+        grasp_bool_tensor2 = (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - transformed_points[:, 1, :]), dim=1) < catch_threshold)
+
+        grasp_bool_tensor = grasp_bool_tensor0 | grasp_bool_tensor1 | grasp_bool_tensor2
+        return torch.where((env.robot_actions[:, -1] != 0) & (grasp_bool_tensor), 1.0, 0.0).unsqueeze(1)
+    
     def bong_cube_pcd(self, env: LiftEnv):
         matrix_batch = matrix_from_quat(env.object.data.root_quat_w).unsqueeze(1).repeat(1, env.pcd_num_points, 1, 1)  # Shape: 2 x 8 x 3 x 3
         transformed_points = torch.matmul(matrix_batch, env.pcd_list.unsqueeze(3)).squeeze(3) + env.object.data.root_pos_w.unsqueeze(1)  # Shape: 2 x 8 x 3
