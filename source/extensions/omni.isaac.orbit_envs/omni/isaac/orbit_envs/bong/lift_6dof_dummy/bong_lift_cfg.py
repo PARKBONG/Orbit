@@ -235,7 +235,7 @@ class RewardsCfg:
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    episode_timeout = False  # reset when episode length ended
+    episode_timeout = True  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
     is_success = False  # reset when object is lifted
     is_catch = False  # reset when object is lifted
