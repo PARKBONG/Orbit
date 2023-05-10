@@ -744,7 +744,8 @@ class LiftRewardManager(RewardManager):
         grasp_bool_tensor2 = (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - transformed_points[:, 1, :]), dim=1) < catch_threshold)
 
         grasp_bool_tensor = grasp_bool_tensor0 | grasp_bool_tensor1 | grasp_bool_tensor2
-        return 1 * (env.robot_actions[:, -1] != 0) & (grasp_bool_tensor)  # descremental, bong
+        self.catch_object_int = 1 * (env.robot_actions[:, -1] != 0) & (grasp_bool_tensor)
+        return self.catch_object_int  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):
         return -1 * (-env.robot_actions[:, -1] != 0) & ~(torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) < 1.1 * catch_threshold)
@@ -778,6 +779,12 @@ class LiftRewardManager(RewardManager):
         # print(env.object.data.root_pos_w[:, 2])
         return (env.object.data.root_pos_w[:, 2] - 0.0300)
 
+    def bong_object_height_after_grasp(self, env: LiftEnv):
+        # print(env.object.data.root_pos_w[:, 2])
+        # print(env.object.data.root_pos_w )
+        # print(env.object.data.root_pos_w[:, 2])
+        return (env.object.data.root_pos_w[:, 2] - 0.0300) * self.catch_object_int
+    
     def bong_is_cheating(self, env: LiftEnv):
         return torch.where(env.object.data.root_pos_w[:, 2] > env.robot.data.ee_state_w[:, 2], -1, 0)
 

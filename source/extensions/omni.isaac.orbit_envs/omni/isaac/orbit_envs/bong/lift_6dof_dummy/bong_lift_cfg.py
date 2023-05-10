@@ -178,7 +178,8 @@ class ObservationsCfg:
         tool_actions = {"scale": 1.0}
         # bong_is_catch = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
-        bong_obj_height = {"scale": 10}
+        # bong_obj_height = {"scale": 10}
+        bong_object_height_after_grasp = {"scale": 10}
         # bong_object_ang_vel = {"scale": 1.0}
         # bong_object_lin_vel = {"scale": 1.0}
         bong_cube_pcd = {"scale": 1.0}
