@@ -176,12 +176,12 @@ class ObservationsCfg:
         # -- previous action
         # arm_actions = {"scale": 1.0}
         # tool_actions = {"scale": 1.0}
-        # bong_is_catch = {"scale": 10}
+        bong_is_catch = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
         # bong_obj_height = {"scale": 10}
         # bong_object_ang_vel = {"scale": 1.0}
         # bong_object_lin_vel = {"scale": 1.0}
-        bong_cube_pcd = {"scale": 1.0}
+        # bong_cube_pcd = {"scale": 1.0}
 
     # global observation settings
     return_dict_obs_in_group = False
@@ -195,11 +195,11 @@ class RewardsCfg:
     """Reward terms for the MDP."""
 
     # -- robot-centric
-    reaching_object_position_l2 = {"weight": 20}
+    reaching_object_position_l2 = {"weight": 100}
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
-    penalizing_arm_dof_velocity_l2 = {"weight": 0.3}
+    penalizing_arm_dof_velocity_l2 = {"weight": 0.5}
     # penalizing_tool_dof_velocity_l2 = {"weight": 1}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
     # -- action-centric
@@ -211,8 +211,8 @@ class RewardsCfg:
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
-    bong_catch_object = {"weight": 200}
-    bong_object_falling = {"weight": 10}
+    bong_catch_object = {"weight": 1000}
+    bong_object_falling = {"weight": 50}
     # bong_catch_object = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
     # bong_is_success = {"weight": 1000}  #this
