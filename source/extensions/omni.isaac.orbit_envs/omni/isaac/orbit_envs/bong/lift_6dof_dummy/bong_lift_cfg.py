@@ -182,7 +182,7 @@ class ObservationsCfg:
         # bong_obj_height = {"scale": 10}
         # bong_object_ang_vel = {"scale": 1.0}
         # bong_object_lin_vel = {"scale": 1.0}
-        bong_cube_pcd = {"scale": 1.0}
+        # bong_cube_pcd = {"scale": 1.0}
 
     # global observation settings
     return_dict_obs_in_group = False
@@ -200,7 +200,7 @@ class RewardsCfg:
     # reaching_object_height = {"weight": 50}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
-    penalizing_arm_dof_velocity_l2 = {"weight": 0.5}
+    penalizing_arm_dof_velocity_l2 = {"weight": 1}
     # penalizing_tool_dof_velocity_l2 = {"weight": 1}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
     # -- action-centric
@@ -223,7 +223,8 @@ class RewardsCfg:
     # bong_object_height = {"weight": 1000}  #this/
     # bong_is_cheating = {"weight": 100}
     # bong_ee_to_obj_scalar = {"weight": 10}
-    
+    bong_ee_to_obj_vel = {"weight": 100}
+
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
