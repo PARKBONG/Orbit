@@ -25,7 +25,7 @@ from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 
 from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
 
-catch_threshold = 0.002
+catch_threshold = 0.0015
 class LiftEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator..."""
 
@@ -221,7 +221,7 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, :-1] += self.actions  # bong
             # range // 1 = [-0.215 , 0.3] 2 = [-0.6, 0.7 ], 3 = [-0.4, 0.4]   # good: [-0.215, 0.07, 0, 0, 0, 0]
             # self.robot_actions[:, :-1] = torch.tensor([[0, 0, -0.4, 0, 0, 0], [0, 0, 0, 0, 0, 0]], dtype=torch.float32)  # bong
-            self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=40)  # open = 0.785398
+            self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=10)  # open = 0.785398
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
