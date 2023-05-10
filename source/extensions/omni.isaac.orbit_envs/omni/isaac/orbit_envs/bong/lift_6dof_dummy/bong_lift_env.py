@@ -25,7 +25,7 @@ from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 
 from .bong_lift_cfg import LiftEnvCfg, RandomizationCfg
 
-catch_threshold = 0.0015
+catch_threshold = 0.00125
 class LiftEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator..."""
 
@@ -225,7 +225,7 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
-            # self.robot_actions[0, :-1] = torch.tensor([[0.4, 0, 0, 0, 0, 0]])
+            # self.robot_actions[0, :-1] = torch.tensor([[-0.26, 0, 0, 0, 0, 0]])
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
@@ -236,6 +236,19 @@ class LiftEnv(IsaacEnv):
         # -- compute common buffers
         self.robot.update_buffers(self.dt)
         self.object.update_buffers(self.dt)
+
+        # ===============================
+        # pcd_list = torch.tensor([[0, 0, 1], [0, 0, -1]], dtype=torch.float32)
+        # self.pcd_num_points = pcd_list.shape[0]
+
+        # # Expand the points_list tensor and multiply by 0.035
+        # pcd_list = pcd_list.unsqueeze(1).repeat(1, self.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
+        # self.pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
+
+        # matrix_batch = matrix_from_quat(self.object.data.root_quat_w).unsqueeze(1).repeat(1, self.pcd_num_points, 1, 1)  # Shape: 2 x 8 x 3 x 3
+        # transformed_points = torch.matmul(matrix_batch, self.pcd_list.unsqueeze(3)).squeeze(3) + self.object.data.root_pos_w.unsqueeze(1)
+        # ===============================
+
         # -- compute MDP signals
         # reward
         self.reward_buf = self._reward_manager.compute()
@@ -356,19 +369,22 @@ class LiftEnv(IsaacEnv):
         self._object_markers.set_world_poses(self.object.data.root_pos_w, self.object.data.root_quat_w)
 
         # ======================================
-        # pcd_list = torch.tensor([[1, 1, 2], [-1, 1, 2], [1, -1, 2], [1, 1, -2], [-1, -1, 2], [-1, 1, -2], [1, -1, -2], [-1, -1, -2]], dtype=torch.float32)
-        # self.pcd_num_points = pcd_list.shape[0]
+        # pcd_list = torch.tensor([[0, 0, 1], [-1, 1, 2], [1, -1, 2], [1, 1, -2], [-1, -1, 2], [-1, 1, -2], [1, -1, -2], [-1, -1, -2]], dtype=torch.float32)
+        # pcd_list = torch.tensor([[0, 0, 1], [0, 0, -1]], dtype=torch.float32)
+        # pcd_num_points = pcd_list.shape[0]
 
         # # Expand the points_list tensor and multiply by 0.035
         # pcd_list = pcd_list.unsqueeze(1).repeat(1, self.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
-        # self.pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
+        # pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
 
-        # matrix_batch = matrix_from_quat(self.object.data.root_quat_w).unsqueeze(1).repeat(1, self.pcd_num_points, 1, 1)  # Shape: 2 x 8 x 3 x 3
-        # transformed_points = torch.matmul(matrix_batch, self.pcd_list.unsqueeze(3)).squeeze(3) + self.object.data.root_pos_w.unsqueeze(1)  # Shape: 2 x 8 x 3
+        # matrix_batch = matrix_from_quat(self.object.data.root_quat_w).unsqueeze(1).repeat(1, pcd_num_points, 1, 1)  # Shape: 2 x 8 x 3 x 3
+        # transformed_points = torch.matmul(matrix_batch, pcd_list.unsqueeze(3)).squeeze(3) + self.object.data.root_pos_w.unsqueeze(1)  # Shape: 2 x 8 x 3
 
-        # envs_positions_expanded = self.envs_positions.unsqueeze(1).repeat(1, self.pcd_num_points, 1)  # Shape: 2 x 8 x 3
+        # envs_positions_expanded = self.envs_positions.unsqueeze(1).repeat(1, pcd_num_points, 1)  # Shape: 2 x 8 x 3
         # result = transformed_points - envs_positions_expanded  # Shape: 2 x 8 x 3
 
+        # # self._markers_list[0].set_world_poses(result.transpose(0, 1)[0], self.object.data.root_quat_w)
+        # self._markers_list[0].set_world_poses(transformed_points.transpose(0, 1)[0], self.object.data.root_quat_w)
         # for idx, point in enumerate(result.transpose(0, 1)):
         #     self._markers_list[idx].set_world_poses(point, self.object.data.root_quat_w)
 
@@ -393,12 +409,12 @@ class LiftEnv(IsaacEnv):
         # access buffers from simulator
         object_pos = self.object.data.root_pos_w - self.envs_positions  # original
         # robot_pos = self.robot.data.ee_state_w[:, 0:3] - self.envs_positions  # bong
-        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  #
+        # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  #
         # extract values from buffer
         self.reset_buf[:] = 0
         # compute resets
         # -- when task is successful
-        object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
+        # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         object_position_error_bool_fail = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) > 1.1 * self.catch_threshold)  # bong
         if self.cfg.terminations.is_success:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
@@ -406,7 +422,7 @@ class LiftEnv(IsaacEnv):
 
         if self.cfg.terminations.is_catch:  # original
             # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)  # origianl
-            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool), 1, self.reset_buf)
+            self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & self.grasp_bool_tensor), 1, self.reset_buf)
 
         if self.cfg.terminations.fail_to_catch:
             self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool_fail), 1, self.reset_buf)
@@ -486,9 +502,20 @@ class LiftEnv(IsaacEnv):
 
     def bong_is_ee_close_to_object(self, stacks=2):
         # change need if there is false -> reset
-        bool_tensor = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)
-        self.ee_to_obj_l2[~bool_tensor & (self.ee_to_obj_l2 < stacks)] = 0
-        self.ee_to_obj_l2 += bool_tensor
+
+        _pcd_list = torch.tensor([[0, 0, 1], [0, 0, -1]], dtype=torch.float32)
+        pcd_list = _pcd_list.unsqueeze(1).repeat(1, self.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
+        pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
+        matrix_batch = matrix_from_quat(self.object.data.root_quat_w).unsqueeze(1).repeat(1, _pcd_list.shape[0], 1, 1)  # Shape: 2 x 8 x 3 x 3
+        transformed_points = torch.matmul(matrix_batch, pcd_list.unsqueeze(3)).squeeze(3) + self.object.data.root_pos_w.unsqueeze(1)
+    
+        grasp_bool_tensor0 = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)
+        grasp_bool_tensor1 = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - transformed_points[:, 0, :]), dim=1) < self.catch_threshold)
+        grasp_bool_tensor2 = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - transformed_points[:, 1, :]), dim=1) < self.catch_threshold)
+
+        self.grasp_bool_tensor = grasp_bool_tensor0 | grasp_bool_tensor1 | grasp_bool_tensor2
+        self.ee_to_obj_l2[~self.grasp_bool_tensor & (self.ee_to_obj_l2 < stacks)] = 0
+        self.ee_to_obj_l2 += self.grasp_bool_tensor
         # print(self.ee_to_obj_l2)  # printbong
         # print(self.ee_to_obj_l2, -1 * (self.ee_to_obj_l2 > stacks)) # printbong
         return (self.ee_to_obj_l2 >= stacks)
