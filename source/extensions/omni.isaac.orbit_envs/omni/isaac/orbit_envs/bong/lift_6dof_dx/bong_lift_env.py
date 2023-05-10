@@ -91,7 +91,8 @@ class LiftEnv(IsaacEnv):
         # bong
         self.ee_to_obj_l2 = torch.tensor([0 for _ in range(self.num_envs)], dtype=torch.float32)
         self.catch_threshold = catch_threshold
-        self.action_bound = torch.tensor([[-0.29, -0.6, -0.4, -torch.pi, -torch.pi, -torch.pi],
+        # self.action_bound = torch.tensor([[-0.29, -0.6, -0.4, -torch.pi, -torch.pi, -torch.pi],
+        self.action_bound = torch.tensor([[-0.255, -0.6, -0.4, -torch.pi, -torch.pi, -torch.pi],
                                           [0.3, 0.6, 0.4, torch.pi, torch.pi, torch.pi]])
 
     """
@@ -219,6 +220,7 @@ class LiftEnv(IsaacEnv):
             # self.robot_actions[:, :-1] = torch.tensor([[0, 0, -0.4, 0, 0, 0], [0, 0, 0, 0, 0, 0]], dtype=torch.float32)  # bong
             self.robot_actions[:, -1] = -1 * self.bong_is_ee_close_to_object(stacks=10)  # open = 0.785398
             self.robot_actions[:, :-1] = torch.clamp(self.robot_actions[:, :-1], min=self.action_bound[0, :], max=self.action_bound[1, :])
+            # print(self.robot_actions[:, :-1])
             # self.robot_actions[:, -1] = 0 # close
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
@@ -668,6 +670,7 @@ class LiftRewardManager(RewardManager):
         """Penalize end-effector tracking position error using L2-kernel."""
         # print("ee", env.robot.data.ee_state_w[:, 0:3])  # printbong
         # print("obj", env.object.data.root_pos_w)  # printbong
+        # print(-torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) + 0.002)
         return -torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1) + 0.002
         # return torch.where(value < 0.0015, 0.1, -value)
 
@@ -699,6 +702,7 @@ class LiftRewardManager(RewardManager):
 
     def penalizing_arm_dof_velocity_l2(self, env: LiftEnv):
         """Penalize large movements of the robot arm."""
+        # print(-torch.sum(torch.square(env.robot.data.arm_dof_vel), dim=1))
         return -torch.sum(torch.square(env.robot.data.arm_dof_vel), dim=1)
 
     def penalizing_tool_dof_velocity_l2(self, env: LiftEnv):
@@ -755,6 +759,7 @@ class LiftRewardManager(RewardManager):
         grasp_bool_tensor2 = (torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - transformed_points[:, 1, :]), dim=1) < catch_threshold)
 
         grasp_bool_tensor = grasp_bool_tensor0 | grasp_bool_tensor1 | grasp_bool_tensor2
+        # print(1 * (env.robot_actions[:, -1] != 0) & (grasp_bool_tensor))
         return 1 * (env.robot_actions[:, -1] != 0) & (grasp_bool_tensor)  # descremental, bong
 
     def bong_catch_failure(self, env: LiftEnv):
@@ -817,6 +822,7 @@ class LiftRewardManager(RewardManager):
         # print(dot_product)
         # print(dot_product)
         # Define the reward function
+        # print(dot_product)
         return dot_product
         # return torch.pow(torch.cos(4 * torch.arccos(mat[:, 0, 0])) * torch.abs(mat[:, 2, 2]),9)
         # val = torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2])
