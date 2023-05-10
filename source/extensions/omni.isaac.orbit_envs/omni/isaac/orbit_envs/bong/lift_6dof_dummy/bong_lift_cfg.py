@@ -170,13 +170,14 @@ class ObservationsCfg:
         object_positions = {"scale": 1}
         object_orientations = {"scale": 1}
         object_relative_tool_positions = {"scale": 10}
-        object_relative_tool_orientations = {"scale": 1.0}
+        object_relative_tool_orientations = {"scale": 10}
         # -- object desired state
         # object_desired_positions = {"scale": 1.0}
         # -- previous action
         # arm_actions = {"scale": 1.0}
         # tool_actions = {"scale": 10}
-        bong_is_catch = {"scale": 10}
+        # bong_is_catch = {"scale": 10}
+        bong_is_catch_pcd = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
         # bong_obj_height = {"scale": 10}
         # bong_object_ang_vel = {"scale": 1.0}
