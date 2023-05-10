@@ -626,7 +626,7 @@ class LiftObservationManager(ObservationManager):
 
     def bong_is_catch_pcd(self, env: LiftEnv):
         _pcd_list = torch.tensor([[0, 0, 1], [0, 0, -1]], dtype=torch.float32)
-        pcd_list = _pcd_list.unsqueeze(1).repeat(1, self.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
+        pcd_list = _pcd_list.unsqueeze(1).repeat(1, env.num_envs, 1) * 0.035  # Shape: 8 x 2 x 3
         pcd_list = pcd_list.transpose(0, 1)  # Shape: 2 x 8 x 3
         matrix_batch = matrix_from_quat(env.object.data.root_quat_w).unsqueeze(1).repeat(1, _pcd_list.shape[0], 1, 1)  # Shape: 2 x 8 x 3 x 3
         transformed_points = torch.matmul(matrix_batch, pcd_list.unsqueeze(3)).squeeze(3) + env.object.data.root_pos_w.unsqueeze(1)
