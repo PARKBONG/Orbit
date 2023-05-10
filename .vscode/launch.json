@@ -12,8 +12,8 @@
             // "args" : ["--task","Bong-Lift-Robotiq-soft-v0","--num_envs","2", "--cpu"],  // Bong-Lift-Robotiq-soft-v0
             // "args" : ["--task","Bong-Lift-Robotiq-4dof-v0","--num_envs","2", "--cpu"],  // 4dof
             // "args" : ["--task","Bong-Lift-Robotiq-6dof-v0","--num_envs","2", "--cpu"],  // 4dof
-            // "args" : ["--task","Bong-Lift-Robotiq-6dof-dummy-v0","--num_envs","4", "--cpu"],  // 4dof
-            "args" : ["--task","Bong-Lift-Robotiq-6dof-dx-v0","--num_envs","2", "--cpu"],  // 4dof
+            "args" : ["--task","Bong-Lift-Robotiq-6dof-dummy-v0","--num_envs","4", "--cpu"],  // 4dof
+            // "args" : ["--task","Bong-Lift-Robotiq-6dof-dx-v0","--num_envs","2", "--cpu"],  // 4dof
             // "args" : ["--task","Bong-Lift-Robotiq-6dof-dummy-v0","--num_envs","32", "--cpu", "--checkpoint",
             //          "logs/sb3/Bong-Lift-Robotiq-6dof-dummy-v0/May10_19-51-18_8f3975c50cc7cf1e3eaabca3a429f2e4fa1fbde6/model_163737600_steps.zip"],
             // "args" : ["--task","Bong-Lift-Robotiq-6dof-dx-v0","--num_envs","32", "--cpu", "--checkpoint",

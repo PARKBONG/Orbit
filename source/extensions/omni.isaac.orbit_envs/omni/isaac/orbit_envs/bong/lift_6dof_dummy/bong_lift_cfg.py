@@ -168,11 +168,14 @@ class ObservationsCfg:
         tool_orientations = {"scale": 1.0}
         # -- object state
         object_positions = {"scale": 1}
-        # object_orientations = {"scale": 1}  # pcd
+        object_orientations = {"scale": 1}  # pcd
         object_relative_tool_positions = {"scale": 10}  
-        # object_relative_tool_orientations = {"scale": 10} #pcd
+        object_relative_tool_orientations = {"scale": 10} #pcd
         # -- object desired state
-        # object_desired_positions = {"scale": 1.0}
+        object_desired_positions = {"scale": 1.0}
+        object_desired_orientations = {"scale": 1.0}
+        bong_object_relative_des_positions = {"scale": 10} 
+        bong_object_relative_des_orientations = {"scale": 10} 
         # -- previous action
         # arm_actions = {"scale": 1.0}
         # tool_actions = {"scale": 10}
@@ -180,11 +183,11 @@ class ObservationsCfg:
         bong_is_catch_pcd = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
         # bong_obj_height = {"scale": 10}
-        # bong_object_ang_vel = {"scale": 1.0}  # pcd
-        # bong_object_lin_vel = {"scale": 1.0}  # pcd
+        bong_object_ang_vel = {"scale": 1.0}  # pcd
+        bong_object_lin_vel = {"scale": 1.0}  # pcd
         bong_ee_ang_vel = {"scale": 1.0}
         bong_ee_lin_vel = {"scale": 1.0}
-        bong_cube_pcd = {"scale": 1.0}
+        # bong_cube_pcd = {"scale": 1.0}
 
     # global observation settings
     return_dict_obs_in_group = False
@@ -209,7 +212,8 @@ class RewardsCfg:
     # penalizing_arm_action_rate_l2 = {"weight": 0.5}
     # penalizing_tool_action_l2 = {"weight": 1e-2}
     # -- object-centric
-    # tracking_object_position_l2 = {"weight": 1}
+    tracking_object_position_l2 = {"weight": 100}
+    tracking_object_orientation_l2 = {"weight": 100}
     # tracking_object_position_exp = {"weight": 5.0, "sigma": 0.25, "threshold": 0.08}
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
@@ -217,7 +221,7 @@ class RewardsCfg:
     # bong_catch_object = {"weight": 1000}
     bong_object_falling = {"weight": 50}
     # bong_catch_object = {"weight": 300}
-    bong_catch_object_pcd = {"weight": 5000}
+    bong_catch_object_pcd = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
     # bong_is_success = {"weight": 3000}  #this
     # bong_robot_out_of_box = {"weight": 10}
@@ -225,18 +229,19 @@ class RewardsCfg:
     # bong_is_cheating = {"weight": 100}
     # bong_ee_to_obj_scalar = {"weight": 10}
     bong_ee_to_obj_vel = {"weight": 100}
+    bong_is_success_des = {"weight": 10000}
 
 @configclass
 class TerminationsCfg:
     """Termination terms for the MDP."""
 
-    episode_timeout = True  # reset when episode length ended
+    episode_timeout = False  # reset when episode length ended
     object_falling = True  # reset when object falls off the table
     is_success = False  # reset when object is lifted
-    is_catch = True  # reset when object is lifted
+    is_catch = False  # reset when object is lifted
     fail_to_catch = False  # reset when object is lifted
     is_obj_desired = False
-
+    is_success_des = True
 
 @configclass
 class ControlCfg:

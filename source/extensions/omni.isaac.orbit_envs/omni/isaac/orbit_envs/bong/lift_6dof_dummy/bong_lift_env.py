@@ -269,6 +269,14 @@ class LiftEnv(IsaacEnv):
         # object_position_error_bool = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < self.catch_threshold)  # bong
         # object_position_error_bool_large = (torch.sum(torch.square(self.robot.data.ee_state_w[:, 0:3] - self.object.data.root_pos_w), dim=1) < 1.5 * self.catch_threshold)  # bong
         self.extras["is_success"] = torch.where(self.object.data.root_pos_w[:, 2] > 0.2, 1, 0)  # original
+
+        dist = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, :3], dim=1)
+        quat_ee = quat_mul(quat_inv(self.object_des_pose_w[:, 3:7]), self.object.data.root_quat_w)
+        quat_ee[quat_ee[:, 0] < 0] *= -1
+        ori = torch.norm(quat_ee - torch.tensor([[1, 0, 0, 0]]).expand(self.num_envs, -1), dim=1) / 1.414
+
+        self.extras["is_success_des"] = torch.where((dist < 0.002) & (ori < 0.05), 1, 0)
+        
         # print(self.object.data.root_pos_w[:, 2])
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
@@ -426,6 +434,14 @@ class LiftEnv(IsaacEnv):
 
         if self.cfg.terminations.fail_to_catch:
             self.reset_buf = torch.where(((self.robot_actions[:, -1] != 0) & object_position_error_bool_fail), 1, self.reset_buf)
+
+        if self.cfg.terminations.is_success_des:
+            dist = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, :3], dim=1)
+            quat_ee = quat_mul(quat_inv(self.object_des_pose_w[:, 3:7]), self.object.data.root_quat_w)
+            quat_ee[quat_ee[:, 0] < 0] *= -1
+            ori = torch.norm(quat_ee - torch.tensor([[1, 0, 0, 0]]).expand(self.num_envs, -1), dim=1) / 1.414
+
+            self.reset_buf = torch.where((dist < 0.002) & (ori < 0.05), 1, self.reset_buf)
 
         # if self.cfg.terminations.is_obj_desired:  # original
         #     object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
@@ -602,6 +618,19 @@ class LiftObservationManager(ObservationManager):
         quat_w[quat_w[:, 0] < 0] *= -1
         return quat_w
 
+    def bong_object_relative_des_positions(self, env: LiftEnv):
+        """Current object position w.r.t. end-effector frame."""
+        return env.object.data.root_pos_w - env.object_des_pose_w[:, 0:3]
+
+    def bong_object_relative_des_orientations(self, env: LiftEnv):
+        """Current object orientation w.r.t. end-effector frame."""
+        # compute the relative orientation
+        quat_ee = quat_mul(quat_inv(env.object_des_pose_w[:, 3:7]), env.object.data.root_quat_w)
+        # make the first element positive
+        quat_ee[quat_ee[:, 0] < 0] *= -1
+        # print(quat_ee)
+        return quat_ee
+    
     def arm_actions(self, env: LiftEnv):
         """Last arm actions provided to env."""
         return env.actions[:, :-1]
@@ -718,7 +747,13 @@ class LiftRewardManager(RewardManager):
 
     def tracking_object_position_l2(self, env: LiftEnv):
         """Penalize tracking object position error using exp-kernel."""
-        return torch.sum(torch.square(env.object_des_pose_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
+        return -torch.sum(torch.square(env.object_des_pose_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
+
+    def tracking_object_orientation_l2(self, env: LiftEnv):
+        quat_ee = quat_mul(quat_inv(env.object_des_pose_w[:, 3:7]), env.object.data.root_quat_w)
+        quat_ee[quat_ee[:, 0] < 0] *= -1
+        # print(-torch.norm(quat_ee - torch.tensor([[1, 0, 0, 0]]).expand(env.num_envs, -1), dim=1))
+        return -torch.norm(quat_ee - torch.tensor([[1, 0, 0, 0]]).expand(env.num_envs, -1), dim=1) / 1.414
 
     def tracking_object_position_exp(self, env: LiftEnv, sigma: float, threshold: float):
         """Penalize tracking object position error using exp-kernel."""
@@ -824,3 +859,11 @@ class LiftRewardManager(RewardManager):
         # return torch.pow(torch.cos(4 * torch.arccos(mat[:, 0, 0])) * torch.abs(mat[:, 2, 2]),9)
         # val = torch.abs(torch.cos(4 * torch.arccos(mat[:, 0, 0]))) * torch.abs(mat[:, 2, 2])
         # return torch.where(val > 0.9, val, 0)
+
+    def bong_is_success_des(self, env: LiftEnv):
+        dist = torch.norm(env.object.data.root_pos_w - env.object_des_pose_w[:, :3], dim=1)
+        quat_ee = quat_mul(quat_inv(env.object_des_pose_w[:, 3:7]), env.object.data.root_quat_w)
+        quat_ee[quat_ee[:, 0] < 0] *= -1
+        ori = torch.norm(quat_ee - torch.tensor([[1, 0, 0, 0]]).expand(env.num_envs, -1), dim=1) / 1.414
+
+        return torch.where((dist < 0.002) & (ori < 0.05), 1, 0)
