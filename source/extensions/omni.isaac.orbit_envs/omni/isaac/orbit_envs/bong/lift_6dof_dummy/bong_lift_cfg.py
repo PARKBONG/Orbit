@@ -164,7 +164,7 @@ class ObservationsCfg:
         # tool_vel = {"scale": 1.0}
         # tool_dof_pos_scaled = {"scale": 1.0}
         # -- end effector state
-        # tool_positions = {"scale": 1.0}
+        tool_positions = {"scale": 1.0}
         tool_orientations = {"scale": 1.0}
         # -- object state
         object_positions = {"scale": 1}
@@ -177,7 +177,7 @@ class ObservationsCfg:
         # arm_actions = {"scale": 1.0}
         # tool_actions = {"scale": 10}
         # bong_is_catch = {"scale": 10}
-        # bong_is_catch_pcd = {"scale": 10}
+        bong_is_catch_pcd = {"scale": 10}
         # bong_obj_to_desire = {"scale": 1.0}
         # bong_obj_height = {"scale": 10}
         # bong_object_ang_vel = {"scale": 1.0}
