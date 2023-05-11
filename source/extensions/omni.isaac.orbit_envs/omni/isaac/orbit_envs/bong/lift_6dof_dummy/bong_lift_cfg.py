@@ -215,7 +215,7 @@ class RewardsCfg:
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
     # lifting_object_desired_success = {"weight" : 2}
     # bong_catch_object = {"weight": 1000}
-    bong_object_falling = {"weight": 50}
+    bong_object_falling = {"weight": 150}
     # bong_catch_object = {"weight": 300}
     bong_catch_object_pcd = {"weight": 5000}
     # bong_catch_failure = {"weight": 50}
@@ -224,7 +224,7 @@ class RewardsCfg:
     # bong_object_height = {"weight": 1000}  #this/
     # bong_is_cheating = {"weight": 100}
     # bong_ee_to_obj_scalar = {"weight": 10}
-    bong_ee_to_obj_vel = {"weight": 50}
+    bong_ee_to_obj_vel = {"weight": 30}
 
 @configclass
 class TerminationsCfg:
