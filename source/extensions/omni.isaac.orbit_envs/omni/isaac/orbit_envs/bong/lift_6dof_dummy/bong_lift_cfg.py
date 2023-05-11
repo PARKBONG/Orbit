@@ -221,7 +221,7 @@ class RewardsCfg:
     # bong_catch_object = {"weight": 1000}
     bong_object_falling = {"weight": 50}
     # bong_catch_object = {"weight": 300}
-    bong_catch_object_pcd = {"weight": 100}
+    bong_catch_object_pcd = {"weight": 300}
     # bong_catch_failure = {"weight": 50}
     # bong_is_success = {"weight": 3000}  #this
     # bong_robot_out_of_box = {"weight": 10}
