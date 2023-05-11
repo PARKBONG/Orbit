@@ -212,8 +212,8 @@ class RewardsCfg:
     # penalizing_arm_action_rate_l2 = {"weight": 0.5}
     # penalizing_tool_action_l2 = {"weight": 1e-2}
     # -- object-centric
-    tracking_object_position_l2 = {"weight": 35}
-    tracking_object_orientation_l2 = {"weight": 35}
+    tracking_object_position_l2 = {"weight": 27.5}
+    tracking_object_orientation_l2 = {"weight": 27.5}
     # tracking_object_position_exp = {"weight": 5.0, "sigma": 0.25, "threshold": 0.08}
     # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
     # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
