@@ -184,7 +184,7 @@ class ObservationsCfg:
         # bong_object_lin_vel = {"scale": 1.0}  # pcd
         bong_ee_ang_vel = {"scale": 1.0}
         bong_ee_lin_vel = {"scale": 1.0}
-        bong_cube_pcd = {"scale": 1.0}
+        bong_cube_pcd = {"scale": 10}
 
     # global observation settings
     return_dict_obs_in_group = False
