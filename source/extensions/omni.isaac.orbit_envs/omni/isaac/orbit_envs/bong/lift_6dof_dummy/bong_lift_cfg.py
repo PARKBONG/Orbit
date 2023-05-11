@@ -224,7 +224,7 @@ class RewardsCfg:
     # bong_object_height = {"weight": 1000}  #this/
     # bong_is_cheating = {"weight": 100}
     # bong_ee_to_obj_scalar = {"weight": 10}
-    bong_ee_to_obj_vel = {"weight": 100}
+    bong_ee_to_obj_vel = {"weight": 50}
 
 @configclass
 class TerminationsCfg:
