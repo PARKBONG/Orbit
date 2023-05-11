@@ -26,7 +26,7 @@ from shutil import copyfile
 
 def save_files(log_dir, task_name, env_name, file_target = "bong_lift"):
     isaac_loc = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/"
-    loc1 = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/bong/"
+    loc1 = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/"
     loc2 = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/data/sb3/"
     copyfile(loc1 + task_name + "/" + file_target + "_cfg.py", isaac_loc + log_dir + "/" + file_target + "_cfg.py")
     copyfile(loc1 + task_name + "/" + file_target + "_env.py", isaac_loc + log_dir + "/" + file_target + "_env.py")

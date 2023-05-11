@@ -125,3 +125,10 @@ gym.register(
     entry_point="omni.isaac.orbit_envs.bong.lift_6dof_dummy:LiftEnv",
     kwargs={"cfg_entry_point": "omni.isaac.orbit_envs.bong.lift_6dof_dummy:LiftEnvCfg"},
 )
+
+# JH
+gym.register(
+    id="Soft-Oring-v0",
+    entry_point="omni.isaac.orbit_envs.soft.Oring:OringEnv",
+    kwargs={"cfg_entry_point": "omni.isaac.orbit_envs.soft.Oring:OringEnvCfg"},
+)
