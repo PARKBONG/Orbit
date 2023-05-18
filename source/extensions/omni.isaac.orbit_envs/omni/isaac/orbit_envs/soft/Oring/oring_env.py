@@ -22,7 +22,14 @@ from omni.isaac.orbit.utils.mdp import ObservationManager, RewardManager
 from omni.isaac.orbit_envs.isaac_env import IsaacEnv, VecEnvIndices, VecEnvObs
 
 from .oring_cfg import OringEnvCfg, RandomizationCfg
-
+from omni.isaac.core.utils.stage import add_reference_to_stage
+from omni.isaac.core.utils.prims import delete_prim
+import numpy as np
+# from omni.isaac.manipulators import SingleManipulator
+# from omni.isaac.core.prims import XFormPrim
+# import omni.usd
+from omni.isaac.dynamic_control import _dynamic_control
+from .oring_util import PointCloudHandle
 
 class OringEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator."""
@@ -34,6 +41,7 @@ class OringEnv(IsaacEnv):
         # note: controller decides the robot control mode
         self._pre_process_cfg()
         # create classes (these are called by the function :meth:`_design_scene`)
+        # self.robot_support = SingleArmManipulator(cfg=self.cfg.robot)
         self.robot = SingleArmManipulator(cfg=self.cfg.robot)
         self.object = RigidObject(cfg=self.cfg.object)
 
@@ -45,9 +53,9 @@ class OringEnv(IsaacEnv):
         self._initialize_views()
 
         # prepare the observation manager
-        self._observation_manager = LiftObservationManager(class_to_dict(self.cfg.observations), self, self.device)
+        self._observation_manager = ObservationManager(class_to_dict(self.cfg.observations), self, self.device)
         # prepare the reward manager
-        self._reward_manager = LiftRewardManager(
+        self._reward_manager = RewardManager(
             class_to_dict(self.cfg.rewards), self, self.num_envs, self.dt, self.device
         )
         # print information about MDP
@@ -58,7 +66,9 @@ class OringEnv(IsaacEnv):
         num_obs = self._observation_manager.group_obs_dim["policy"][0]
         self.observation_space = gym.spaces.Box(low=-math.inf, high=math.inf, shape=(num_obs,))
         # compute the action space
-        self.action_space = gym.spaces.Box(low=-1.0, high=1.0, shape=(self.num_actions,))
+        self.action_space = gym.spaces.Box(low=-np.array([0.01, 0.01, 0.01, 0.1]),  # r, p, y, d
+                                           high=np.array([0.01, 0.01, 0.01, 0.1]),
+                                           shape=(self.num_actions,))
         print("[INFO]: Completed setting up the environment...")
 
         # Take an initial step to initialize the scene.
@@ -68,15 +78,43 @@ class OringEnv(IsaacEnv):
         self.object.update_buffers(self.dt)
         self.robot.update_buffers(self.dt)
 
+        self.action_clip = torch.tensor([[-torch.pi, -torch.pi, -torch.pi, -20],  # r, p, y, d
+                                         [torch.pi, torch.pi, torch.pi, 0]])
+
+        self.dc = _dynamic_control.acquire_dynamic_control_interface()
+        # self.robot_support.update_buffers(self.dt)
     """
     Implementation specifics.
     """
 
     def _design_scene(self) -> List[str]:
         # ground plane
-        kit_utils.create_ground_plane("/World/defaultGroundPlane", z_position=-1.05)
+        # kit_utils.create_ground_plane("/World/defaultGroundPlane", z_position=-1.05)
         # table
-        prim_utils.create_prim(self.template_env_ns + "/Table", usd_path=self.cfg.table.usd_path)
+        # prim_utils.create_prim(self.template_env_ns + "/Table", usd_path=self.cfg.table.usd_path)
+        
+        # self.oring_usd_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/ORING11.usd"
+        # self.oring_usd_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/Oring_good_1.usd"
+        # self.oring = add_reference_to_stage(usd_path=self.oring_usd_path,
+        #                                     prim_path="/World/envs/env_0/Oring")
+        
+        # self.robot_support_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/1DOF_HOOK_Oring_f.usd"  # small
+        self.robot_support_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/Oring_1DOF_large.usd"  # large
+        # add_reference_to_stage(self.robot_support, "/World/envs/env_0/RobotSupport")
+        prim_utils.create_prim(prim_path="/World/envs/env_0/RobotSupport",
+                               usd_path=self.robot_support_path,
+                               translation=[0, 0, 0],
+                               orientation=[1, 0, 0, 0],
+                               scale=[1, 1, 1])
+
+        self.cylinder = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/cylinder.usd"  # large
+        # add_reference_to_stage(self.robot_support, "/World/envs/env_0/RobotSupport")
+        prim_utils.create_prim(prim_path="/World/envs/env_0/Cylinder",
+                               usd_path=self.robot_support_path,
+                               translation=[1, 0, 0],
+                               orientation=[1, 0, 0, 0],
+                               scale=[1, 1, 1])
+        
         # robot
         self.robot.spawn(self.template_env_ns + "/Robot")
         # object
@@ -133,6 +171,25 @@ class OringEnv(IsaacEnv):
         self.reset_buf[env_ids] = 0
         self.episode_length_buf[env_ids] = 0
         # controller reset
+        self.robot_actions[env_ids] = 0
+        # delete_prim(prim_path="/World/envs/env_0/Oring")  # https://forums.developer.nvidia.com/t/delete-prim-in-isaac-sim/246025
+
+        delete_prim(prim_path="/World/envs/env_0/RobotSupport")  # https://forums.developer.nvidia.com/t/delete-prim-in-isaac-sim/246025
+        prim_utils.create_prim(prim_path="/World/envs/env_0/RobotSupport",
+                               usd_path=self.robot_support_path,
+                               translation=[0, 0, 0.0],
+                               orientation=[1, 0, 0, 0],
+                               scale=[1, 1, 1])
+        self.pcd = PointCloudHandle(deformable_path="/World/envs/env_0/RobotSupport/ORING/orin")
+        self.pcd.visualizer_setup()
+
+        delete_prim(prim_path="/World/envs/env_0/Cylinder")  # https://forums.developer.nvidia.com/t/delete-prim-in-isaac-sim/246025
+        prim_utils.create_prim(prim_path="/World/envs/env_0/Cylinder",
+                               usd_path=self.cylinder,
+                               translation=[8 * np.cos(np.pi / 3), 8 * np.sin(np.pi / 3), -5],
+                               orientation=[1, 0, 0, 0],
+                               scale=[1, 1, 3])
+        
         if self.cfg.control.control_type == "inverse_kinematics":
             self._ik_controller.reset_idx(env_ids)
 
@@ -156,10 +213,18 @@ class OringEnv(IsaacEnv):
             # we assume last command is tool action so don't change that
             self.robot_actions[:, -1] = self.actions[:, -1]
         elif self.cfg.control.control_type == "default":
-            self.robot_actions[:] = self.actions
+            self.robot_actions[:] += self.actions
+            self.robot_actions = torch.clamp(self.robot_actions, min=self.action_clip[0, :], max=self.action_clip[1, :])
+            # print(self.robot_actions)
+
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
             # set actions into buffers
+            # self.robot_actions = torch.tensor([[0, 0, 0, -10]])
+            # self.dc.wake_up_articulation(self.articulation)
+            # self.dc.set_articulation_dof_position_targets(self.articulation, np.random.rand(1).astype(np.float32))
+            # print(self.pcd.get())
+            self.pcd.visualizer_update()
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)
@@ -353,7 +418,7 @@ class OringEnv(IsaacEnv):
         self.object_des_pose_w[env_ids, 0:3] += self.envs_positions[env_ids]
 
 
-class LiftObservationManager(ObservationManager):
+class ObservationManager(ObservationManager):
     """Reward manager for single-arm reaching environment."""
 
     def arm_dof_pos(self, env: OringEnv):
@@ -438,7 +503,7 @@ class LiftObservationManager(ObservationManager):
         return torch.sign(env.actions[:, -1]).unsqueeze(1)
 
 
-class LiftRewardManager(RewardManager):
+class RewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""
 
     def reaching_object_position_l2(self, env: OringEnv):
@@ -496,4 +561,5 @@ class LiftRewardManager(RewardManager):
 
     def lifting_object_success(self, env: OringEnv, threshold: float):
         """Sparse reward if object is lifted successfully."""
+        # print(env.pcd.get())
         return torch.where(env.object.data.root_pos_w[:, 2] > threshold, 1.0, 0.0)

@@ -98,7 +98,7 @@ class RandomizationCfg:
         position_cat: str = "default"  # randomize position: "default", "uniform"
         orientation_cat: str = "default"  # randomize position: "default", "uniform"
         # randomize position
-        position_default = [0.5, 0.0, 0.5]  # position default (x,y,z)
+        position_default = [100.0, 100.0, 100.0]  # position default (x,y,z)
         position_uniform_min = [0.4, -0.25, 0.25]  # position (x,y,z)
         position_uniform_max = [0.6, 0.25, 0.5]  # position (x,y,z)
         # randomize orientation
@@ -153,7 +153,7 @@ class RewardsCfg:
     # -- robot-centric
     # reaching_object_position_l2 = {"weight": 0.0}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
-    reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
+    # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
     # penalizing_arm_dof_velocity_l2 = {"weight": 1e-5}
     # penalizing_tool_dof_velocity_l2 = {"weight": 1e-5}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
@@ -171,7 +171,7 @@ class TerminationsCfg:
     """Termination terms for the MDP."""
 
     episode_timeout = True  # reset when episode length ended
-    object_falling = True  # reset when object falls off the table
+    object_falling = False  # reset when object falls off the table
     is_success = False  # reset when object is lifted
 
 
@@ -182,7 +182,7 @@ class ControlCfg:
     # action space
     control_type = "default"  # "default", "inverse_kinematics"
     # decimation: Number of control action updates @ sim dt per policy dt
-    decimation = 2
+    decimation = 1
 
     # configuration loaded when control_type == "inverse_kinematics"
     inverse_kinematics: DifferentialInverseKinematicsCfg = DifferentialInverseKinematicsCfg(
@@ -219,6 +219,8 @@ class OringEnvCfg(IsaacEnvCfg):
     )
 
     # Scene Settings
+    robot_support: SingleArmManipulatorCfg = HOOK_CFG
+
     # -- robot
     robot: SingleArmManipulatorCfg = HOOK_CFG
     # -- object

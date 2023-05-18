@@ -10,13 +10,13 @@ from omni.isaac.orbit.actuators.model import ImplicitActuatorCfg
 # from omni.isaac.orbit.utils.assets import ISAAC_ORBIT_NUCLEUS_DIR
 from omni.isaac.orbit.robots.single_arm import SingleArmManipulatorCfg
 
-# _HOOK_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/bong/robotiq_wrist_resized_direction.usd"
-_HOOK_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/4DOF_HOOK.usd"
+# _HOOK_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/4DOF_HOOK_size_2.usd"  # small
+_HOOK_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/4DOF_HOOK_large.usd"  # large
 
-VELOCITY_LIMIT = 100
-TORQUE_LIMIT = 50
-STIFFNESS = 50
-DAMPING = 7
+VELOCITY_LIMIT = 1000000
+TORQUE_LIMIT = 1000000
+STIFFNESS = 20000
+DAMPING = 1000
 
 HOOK_CFG = SingleArmManipulatorCfg(
     meta_info=SingleArmManipulatorCfg.MetaInfoCfg(
@@ -26,10 +26,10 @@ HOOK_CFG = SingleArmManipulatorCfg(
         # tool_sites_names=[],  # xform
     ),
     init_state=SingleArmManipulatorCfg.InitialStateCfg(   # revjoint
-        pos=[0.2, 0, 0.3],
+        pos=[0.0, 0.0, -3],
         # pos=[0, 0, 0],
         # rot=[0.707, 0, 0.707, 0],
-        rot=[0.5, 0.5, 0.5, 0.5],  # {action:global} = {x, z}, {y, x}, {z, y}
+        rot=[1, 0, 0, 0],  # {action:global} = {x, z}, {y, x}, {z, y}
         dof_pos={
             "RevoluteJoint_x": 0.0,
             "RevoluteJoint_y": 0.0,
@@ -40,7 +40,7 @@ HOOK_CFG = SingleArmManipulatorCfg(
 
     ),
     ee_info=SingleArmManipulatorCfg.EndEffectorFrameCfg(
-        body_name="Xform_d", pos_offset=(0.0, 0.0, 0.15), rot_offset=(1.0, 0.0, 0.0, 0.0)  # xform / head
+        body_name="Xform_d", pos_offset=(0.0, 0.0, 0.0), rot_offset=(1.0, 0.0, 0.0, 0.0)  # xform / head
     ),
     rigid_props=SingleArmManipulatorCfg.RigidBodyPropertiesCfg(
         # solver_position_iteration_count=16,  # bong
