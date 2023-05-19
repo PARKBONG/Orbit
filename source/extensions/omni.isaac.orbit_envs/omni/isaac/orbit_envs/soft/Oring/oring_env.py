@@ -30,6 +30,7 @@ import numpy as np
 # import omni.usd
 from omni.isaac.dynamic_control import _dynamic_control
 from .oring_util import PointCloudHandle
+from pxr import Gf, PhysxSchema
 
 class OringEnv(IsaacEnv):
     """Environment for lifting an object off a table with a single-arm manipulator."""
@@ -43,7 +44,7 @@ class OringEnv(IsaacEnv):
         # create classes (these are called by the function :meth:`_design_scene`)
         # self.robot_support = SingleArmManipulator(cfg=self.cfg.robot)
         self.robot = SingleArmManipulator(cfg=self.cfg.robot)
-        self.object = RigidObject(cfg=self.cfg.object)
+        # self.object = RigidObject(cfg=self.cfg.object)
 
         # initialize the base class to setup the scene.
         super().__init__(self.cfg, headless=headless)
@@ -75,13 +76,13 @@ class OringEnv(IsaacEnv):
         # This is required to compute quantities like Jacobians used in step().
         self.sim.step()
         # -- fill up buffers
-        self.object.update_buffers(self.dt)
+        # self.object.update_buffers(self.dt)
         self.robot.update_buffers(self.dt)
 
         self.action_clip = torch.tensor([[-torch.pi, -torch.pi, -torch.pi, -20],  # r, p, y, d
                                          [torch.pi, torch.pi, torch.pi, 0]])
 
-        self.dc = _dynamic_control.acquire_dynamic_control_interface()
+        # self.dc = _dynamic_control.acquire_dynamic_control_interface()
         # self.robot_support.update_buffers(self.dt)
     """
     Implementation specifics.
@@ -89,36 +90,26 @@ class OringEnv(IsaacEnv):
 
     def _design_scene(self) -> List[str]:
         # ground plane
-        # kit_utils.create_ground_plane("/World/defaultGroundPlane", z_position=-1.05)
-        # table
-        # prim_utils.create_prim(self.template_env_ns + "/Table", usd_path=self.cfg.table.usd_path)
-        
-        # self.oring_usd_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/ORING11.usd"
-        # self.oring_usd_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/Oring_good_1.usd"
-        # self.oring = add_reference_to_stage(usd_path=self.oring_usd_path,
-        #                                     prim_path="/World/envs/env_0/Oring")
-        
+        # kit_utils.create_ground_plane("/World/defaultGroundPlane", z_position=-1.05)        
         # self.robot_support_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/1DOF_HOOK_Oring_f.usd"  # small
         self.robot_support_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/Oring_1DOF_large.usd"  # large
-        # add_reference_to_stage(self.robot_support, "/World/envs/env_0/RobotSupport")
-        prim_utils.create_prim(prim_path="/World/envs/env_0/RobotSupport",
-                               usd_path=self.robot_support_path,
-                               translation=[0, 0, 0],
-                               orientation=[1, 0, 0, 0],
-                               scale=[1, 1, 1])
+        # prim_utils.create_prim(prim_path="/World/envs/env_0/RobotSupport",
+        #                        usd_path=self.robot_support_path,
+        #                        translation=[0, 0, 0],
+        #                        orientation=[1, 0, 0, 0],
+        #                        scale=[1, 1, 1])
 
         self.cylinder = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/cylinder.usd"  # large
-        # add_reference_to_stage(self.robot_support, "/World/envs/env_0/RobotSupport")
-        prim_utils.create_prim(prim_path="/World/envs/env_0/Cylinder",
-                               usd_path=self.robot_support_path,
-                               translation=[1, 0, 0],
-                               orientation=[1, 0, 0, 0],
-                               scale=[1, 1, 1])
+        # prim_utils.create_prim(prim_path="/World/envs/env_0/Cylinder",
+        #                        usd_path=self.robot_support_path,
+        #                        translation=[1, 0, 0],
+        #                        orientation=[1, 0, 0, 0],
+        #                        scale=[1, 1, 1])
         
         # robot
         self.robot.spawn(self.template_env_ns + "/Robot")
         # object
-        self.object.spawn(self.template_env_ns + "/Object")
+        # self.object.spawn(self.template_env_ns + "/Object")
 
         # setup debug visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
@@ -153,9 +144,9 @@ class OringEnv(IsaacEnv):
         dof_pos, dof_vel = self.robot.get_default_dof_state(env_ids=env_ids)
         self.robot.set_dof_state(dof_pos, dof_vel, env_ids=env_ids)
         # -- object pose
-        self._randomize_object_initial_pose(env_ids=env_ids, cfg=self.cfg.randomization.object_initial_pose)
+        # self._randomize_object_initial_pose(env_ids=env_ids, cfg=self.cfg.randomization.object_initial_pose)
         # -- goal pose
-        self._randomize_object_desired_pose(env_ids=env_ids, cfg=self.cfg.randomization.object_desired_pose)
+        # self._randomize_object_desired_pose(env_ids=env_ids, cfg=self.cfg.randomization.object_desired_pose)
 
         # -- Reward logging
         # fill extras with episode information
@@ -213,17 +204,16 @@ class OringEnv(IsaacEnv):
             # we assume last command is tool action so don't change that
             self.robot_actions[:, -1] = self.actions[:, -1]
         elif self.cfg.control.control_type == "default":
-            self.robot_actions[:] += self.actions
-            self.robot_actions = torch.clamp(self.robot_actions, min=self.action_clip[0, :], max=self.action_clip[1, :])
+            self.robot_actions[:, :-1] += self.actions
+            self.robot_actions[:, :-1] = torch.clamp(self.robot_actions[:, :-1], min=self.action_clip[0, :], max=self.action_clip[1, :])
             # print(self.robot_actions)
 
+        if self.episode_length_buf == 250:
+            self.robot_actions[:, -1] = -1
+            print(self.robot_actions[:, -1])
+            
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
-            # set actions into buffers
-            # self.robot_actions = torch.tensor([[0, 0, 0, -10]])
-            # self.dc.wake_up_articulation(self.articulation)
-            # self.dc.set_articulation_dof_position_targets(self.articulation, np.random.rand(1).astype(np.float32))
-            # print(self.pcd.get())
             self.pcd.visualizer_update()
             self.robot.apply_action(self.robot_actions)
             # simulate
@@ -234,7 +224,7 @@ class OringEnv(IsaacEnv):
         # post-step:
         # -- compute common buffers
         self.robot.update_buffers(self.dt)
-        self.object.update_buffers(self.dt)
+        # self.object.update_buffers(self.dt)
         # -- compute MDP signals
         # reward
         self.reward_buf = self._reward_manager.compute()
@@ -247,8 +237,8 @@ class OringEnv(IsaacEnv):
         # Note: this is used by algorithms like PPO where time-outs are handled differently
         self.extras["time_outs"] = self.episode_length_buf >= self.max_episode_length
         # -- add information to extra if task completed
-        object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
-        self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)
+        # object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
+        # self.extras["is_success"] = torch.where(object_position_error < 0.002, 1, self.reset_buf)
         # -- update USD visualization
         if self.cfg.viewer.debug_vis and self.enable_render:
             self._debug_vis()
@@ -301,7 +291,7 @@ class OringEnv(IsaacEnv):
 
         # define views over instances
         self.robot.initialize(self.env_ns + "/.*/Robot")
-        self.object.initialize(self.env_ns + "/.*/Object")
+        # self.object.initialize(self.env_ns + "/.*/Object")
 
         # create controller
         if self.cfg.control.control_type == "inverse_kinematics":
@@ -310,7 +300,7 @@ class OringEnv(IsaacEnv):
             )
             self.num_actions = self._ik_controller.num_actions + 1
         elif self.cfg.control.control_type == "default":
-            self.num_actions = self.robot.num_actions
+            self.num_actions = self.robot.num_actions - 1
 
         # history
         self.actions = torch.zeros((self.num_envs, self.num_actions), device=self.device)
@@ -318,17 +308,17 @@ class OringEnv(IsaacEnv):
         # robot joint actions
         self.robot_actions = torch.zeros((self.num_envs, self.robot.num_actions), device=self.device)
         # commands
-        self.object_des_pose_w = torch.zeros((self.num_envs, 7), device=self.device)
+        # self.object_des_pose_w = torch.zeros((self.num_envs, 7), device=self.device)
         # buffers
-        self.object_root_pose_ee = torch.zeros((self.num_envs, 7), device=self.device)
+        # self.object_root_pose_ee = torch.zeros((self.num_envs, 7), device=self.device)
         # time-step = 0
-        self.object_init_pose_w = torch.zeros((self.num_envs, 7), device=self.device)
+        # self.object_init_pose_w = torch.zeros((self.num_envs, 7), device=self.device)
 
     def _debug_vis(self):
         """Visualize the environment in debug mode."""
         # apply to instance manager
         # -- goal
-        self._goal_markers.set_world_poses(self.object_des_pose_w[:, 0:3], self.object_des_pose_w[:, 3:7])
+        # self._goal_markers.set_world_poses(self.object_des_pose_w[:, 0:3], self.object_des_pose_w[:, 3:7])
         # -- end-effector
         self._ee_markers.set_world_poses(self.robot.data.ee_state_w[:, 0:3], self.robot.data.ee_state_w[:, 3:7])
         # -- task-space commands
@@ -345,77 +335,79 @@ class OringEnv(IsaacEnv):
 
     def _check_termination(self) -> None:
         # access buffers from simulator
-        object_pos = self.object.data.root_pos_w - self.envs_positions
+        # object_pos = self.object.data.root_pos_w - self.envs_positions
         # extract values from buffer
         self.reset_buf[:] = 0
         # compute resets
         # -- when task is successful
-        if self.cfg.terminations.is_success:
-            object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
-            self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
+        # if self.cfg.terminations.is_success:
+        #   object_position_error = torch.norm(self.object.data.root_pos_w - self.object_des_pose_w[:, 0:3], dim=1)
+        #   self.reset_buf = torch.where(object_position_error < 0.002, 1, self.reset_buf)
         # -- object fell off the table (table at height: 0.0 m)
-        if self.cfg.terminations.object_falling:
-            self.reset_buf = torch.where(object_pos[:, 2] < -0.05, 1, self.reset_buf)
+        # if self.cfg.terminations.object_falling:
+        #     self.reset_buf = torch.where(object_pos[:, 2] < -0.05, 1, self.reset_buf)
         # -- episode length
         if self.cfg.terminations.episode_timeout:
             self.reset_buf = torch.where(self.episode_length_buf >= self.max_episode_length, 1, self.reset_buf)
 
-    def _randomize_object_initial_pose(self, env_ids: torch.Tensor, cfg: RandomizationCfg.ObjectInitialPoseCfg):
-        """Randomize the initial pose of the object."""
+    # def _randomize_object_initial_pose(self, env_ids: torch.Tensor, cfg: RandomizationCfg.ObjectInitialPoseCfg):
+    #     """Randomize the initial pose of the object."""
         # get the default root state
-        root_state = self.object.get_default_root_state(env_ids)
+        # root_state = self.object.get_default_root_state(env_ids)
         # -- object root position
-        if cfg.position_cat == "default":
-            pass
-        elif cfg.position_cat == "uniform":
-            # sample uniformly from box
-            # note: this should be within in the workspace of the robot
-            root_state[:, 0:3] = sample_uniform(
-                cfg.position_uniform_min, cfg.position_uniform_max, (len(env_ids), 3), device=self.device
-            )
-        else:
-            raise ValueError(f"Invalid category for randomizing the object positions '{cfg.position_cat}'.")
-        # -- object root orientation
-        if cfg.orientation_cat == "default":
-            pass
-        elif cfg.orientation_cat == "uniform":
-            # sample uniformly in SO(3)
-            root_state[:, 3:7] = random_orientation(len(env_ids), self.device)
-        else:
-            raise ValueError(f"Invalid category for randomizing the object orientation '{cfg.orientation_cat}'.")
-        # transform command from local env to world
-        root_state[:, 0:3] += self.envs_positions[env_ids]
+        # if cfg.position_cat == "default":
+        #     pass
+        # elif cfg.position_cat == "uniform":
+        #     # sample uniformly from box
+        #     # note: this should be within in the workspace of the robot
+        #     root_state[:, 0:3] = sample_uniform(
+        #         cfg.position_uniform_min, cfg.position_uniform_max, (len(env_ids), 3), device=self.device
+        #     )
+        # else:
+        #     raise ValueError(f"Invalid category for randomizing the object positions '{cfg.position_cat}'.")
+        # # -- object root orientation
+        # if cfg.orientation_cat == "default":
+        #     pass
+        # elif cfg.orientation_cat == "uniform":
+        #     # sample uniformly in SO(3)
+        #     root_state[:, 3:7] = random_orientation(len(env_ids), self.device)
+        # else:
+        #     raise ValueError(f"Invalid category for randomizing the object orientation '{cfg.orientation_cat}'.")
+        # # transform command from local env to world
+        # root_state[:, 0:3] += self.envs_positions[env_ids]
         # update object init pose
-        self.object_init_pose_w[env_ids] = root_state[:, 0:7]
+        # self.object_init_pose_w[env_ids] = root_state[:, 0:7]
         # set the root state
-        self.object.set_root_state(root_state, env_ids=env_ids)
+        # self.object.set_root_state(root_state, env_ids=env_ids)
+        # pass
 
-    def _randomize_object_desired_pose(self, env_ids: torch.Tensor, cfg: RandomizationCfg.ObjectDesiredPoseCfg):
-        """Randomize the desired pose of the object."""
+    # def _randomize_object_desired_pose(self, env_ids: torch.Tensor, cfg: RandomizationCfg.ObjectDesiredPoseCfg):
+    #     """Randomize the desired pose of the object."""
         # -- desired object root position
-        if cfg.position_cat == "default":
-            # constant command for position
-            self.object_des_pose_w[env_ids, 0:3] = cfg.position_default
-        elif cfg.position_cat == "uniform":
-            # sample uniformly from box
-            # note: this should be within in the workspace of the robot
-            self.object_des_pose_w[env_ids, 0:3] = sample_uniform(
-                cfg.position_uniform_min, cfg.position_uniform_max, (len(env_ids), 3), device=self.device
-            )
-        else:
-            raise ValueError(f"Invalid category for randomizing the desired object positions '{cfg.position_cat}'.")
+        # if cfg.position_cat == "default":
+        #   constant command for position
+        #   self.object_des_pose_w[env_ids, 0:3] = cfg.position_default
+        # elif cfg.position_cat == "uniform":
+        #   sample uniformly from box
+        #   note: this should be within in the workspace of the robot
+        #   self.object_des_pose_w[env_ids, 0:3] = sample_uniform(
+        #       cfg.position_uniform_min, cfg.position_uniform_max, (len(env_ids), 3), device=self.device
+        # )
+        # else:
+        #     raise ValueError(f"Invalid category for randomizing the desired object positions '{cfg.position_cat}'.")
         # -- desired object root orientation
-        if cfg.orientation_cat == "default":
-            # constant position of the object
-            self.object_des_pose_w[env_ids, 3:7] = cfg.orientation_default
-        elif cfg.orientation_cat == "uniform":
-            self.object_des_pose_w[env_ids, 3:7] = random_orientation(len(env_ids), self.device)
-        else:
-            raise ValueError(
-                f"Invalid category for randomizing the desired object orientation '{cfg.orientation_cat}'."
-            )
+        # if cfg.orientation_cat == "default":
+        #   constant position of the object
+        #   self.object_des_pose_w[env_ids, 3:7] = cfg.orientation_default
+        # elif cfg.orientation_cat == "uniform":
+        #   self.object_des_pose_w[env_ids, 3:7] = random_orientation(len(env_ids), self.device)
+        # else:
+        #     raise ValueError(
+        #         f"Invalid category for randomizing the desired object orientation '{cfg.orientation_cat}'."
+        #     )
         # transform command from local env to world
-        self.object_des_pose_w[env_ids, 0:3] += self.envs_positions[env_ids]
+        # self.object_des_pose_w[env_ids, 0:3] += self.envs_positions[env_ids]
+        # pass
 
 
 class ObservationManager(ObservationManager):
@@ -456,39 +448,39 @@ class ObservationManager(ObservationManager):
         quat_w[quat_w[:, 0] < 0] *= -1
         return quat_w
 
-    def object_positions(self, env: OringEnv):
-        """Current object position."""
-        return env.object.data.root_pos_w - env.envs_positions
+    # def object_positions(self, env: OringEnv):
+    #     """Current object position."""
+        # return # env.object.data.root_pos_w - env.envs_positions
 
-    def object_orientations(self, env: OringEnv):
-        """Current object orientation."""
-        # make the first element positive
-        quat_w = env.object.data.root_quat_w
-        quat_w[quat_w[:, 0] < 0] *= -1
-        return quat_w
+    # def object_orientations(self, env: OringEnv):
+    #     """Current object orientation."""
+    #     # make the first element positive
+    #     quat_w = # env.object.data.root_quat_w
+    #     quat_w[quat_w[:, 0] < 0] *= -1
+    #     return quat_w
 
-    def object_relative_tool_positions(self, env: OringEnv):
-        """Current object position w.r.t. end-effector frame."""
-        return env.object.data.root_pos_w - env.robot.data.ee_state_w[:, :3]
+    # def object_relative_tool_positions(self, env: OringEnv):
+    #     """Current object position w.r.t. end-effector frame."""
+    #     return # env.object.data.root_pos_w - env.robot.data.ee_state_w[:, :3]
 
-    def object_relative_tool_orientations(self, env: OringEnv):
-        """Current object orientation w.r.t. end-effector frame."""
-        # compute the relative orientation
-        quat_ee = quat_mul(quat_inv(env.robot.data.ee_state_w[:, 3:7]), env.object.data.root_quat_w)
-        # make the first element positive
-        quat_ee[quat_ee[:, 0] < 0] *= -1
-        return quat_ee
+    # def object_relative_tool_orientations(self, env: OringEnv):
+    #     """Current object orientation w.r.t. end-effector frame."""
+    #     # compute the relative orientation
+    #     quat_ee = quat_mul(quat_inv(env.robot.data.ee_state_w[:, 3:7]), # env.object.data.root_quat_w)
+    #     # make the first element positive
+    #     quat_ee[quat_ee[:, 0] < 0] *= -1
+    #     return quat_ee
 
-    def object_desired_positions(self, env: OringEnv):
-        """Desired object position."""
-        return env.object_des_pose_w[:, 0:3] - env.envs_positions
+    # def object_desired_positions(self, env: OringEnv):
+    #     """Desired object position."""
+    #     return # env.object_des_pose_w[:, 0:3] - env.envs_positions
 
-    def object_desired_orientations(self, env: OringEnv):
-        """Desired object orientation."""
-        # make the first element positive
-        quat_w = env.object_des_pose_w[:, 3:7]
-        quat_w[quat_w[:, 0] < 0] *= -1
-        return quat_w
+    # def object_desired_orientations(self, env: OringEnv):
+    #     """Desired object orientation."""
+    #     # make the first element positive
+    #     quat_w = # env.object_des_pose_w[:, 3:7]
+    #     quat_w[quat_w[:, 0] < 0] *= -1
+    #     return quat_w
 
     def arm_actions(self, env: OringEnv):
         """Last arm actions provided to env."""
@@ -506,28 +498,28 @@ class ObservationManager(ObservationManager):
 class RewardManager(RewardManager):
     """Reward manager for single-arm object lifting environment."""
 
-    def reaching_object_position_l2(self, env: OringEnv):
-        """Penalize end-effector tracking position error using L2-kernel."""
-        return torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
+    # def reaching_object_position_l2(self, env: OringEnv):
+    #     """Penalize end-effector tracking position error using L2-kernel."""
+    #     return torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - # env.object.data.root_pos_w), dim=1)
 
-    def reaching_object_position_exp(self, env: OringEnv, sigma: float):
-        """Penalize end-effector tracking position error using exp-kernel."""
-        error = torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
-        return torch.exp(-error / sigma)
+    # def reaching_object_position_exp(self, env: OringEnv, sigma: float):
+    #     """Penalize end-effector tracking position error using exp-kernel."""
+    #     error = torch.sum(torch.square(env.robot.data.ee_state_w[:, 0:3] - # env.object.data.root_pos_w), dim=1)
+    #     return torch.exp(-error / sigma)
 
-    def reaching_object_position_tanh(self, env: OringEnv, sigma: float):
-        """Penalize tool sites tracking position error using tanh-kernel."""
-        # distance of end-effector to the object: (num_envs,)
-        ee_distance = torch.norm(env.robot.data.ee_state_w[:, 0:3] - env.object.data.root_pos_w, dim=1)
-        # distance of the tool sites to the object: (num_envs, num_tool_sites)
-        object_root_pos = env.object.data.root_pos_w.unsqueeze(1)  # (num_envs, 1, 3)
-        tool_sites_distance = torch.norm(env.robot.data.tool_sites_state_w[:, :, :3] - object_root_pos, dim=-1)
-        # average distance of the tool sites to the object: (num_envs,)
-        # note: we add the ee distance to the average to make sure that the ee is always closer to the object
-        num_tool_sites = tool_sites_distance.shape[1]
-        average_distance = (ee_distance + torch.sum(tool_sites_distance, dim=1)) / (num_tool_sites + 1)
+    # def reaching_object_position_tanh(self, env: OringEnv, sigma: float):
+    #     """Penalize tool sites tracking position error using tanh-kernel."""
+    #     # distance of end-effector to the object: (num_envs,)
+    #     ee_distance = torch.norm(env.robot.data.ee_state_w[:, 0:3] - # env.object.data.root_pos_w, dim=1)
+    #     # distance of the tool sites to the object: (num_envs, num_tool_sites)
+    #     object_root_pos = # env.object.data.root_pos_w.unsqueeze(1)  # (num_envs, 1, 3)
+    #     tool_sites_distance = torch.norm(env.robot.data.tool_sites_state_w[:, :, :3] - object_root_pos, dim=-1)
+    #     # average distance of the tool sites to the object: (num_envs,)
+    #     # note: we add the ee distance to the average to make sure that the ee is always closer to the object
+    #     num_tool_sites = tool_sites_distance.shape[1]
+    #     average_distance = (ee_distance + torch.sum(tool_sites_distance, dim=1)) / (num_tool_sites + 1)
 
-        return 1 - torch.tanh(average_distance / sigma)
+    #     return 1 - torch.tanh(average_distance / sigma)
 
     def penalizing_arm_dof_velocity_l2(self, env: OringEnv):
         """Penalize large movements of the robot arm."""
@@ -545,21 +537,21 @@ class RewardManager(RewardManager):
         """Penalize large values in action commands for the tool."""
         return -torch.square(env.actions[:, -1])
 
-    def tracking_object_position_exp(self, env: OringEnv, sigma: float, threshold: float):
-        """Penalize tracking object position error using exp-kernel."""
-        # distance of the end-effector to the object: (num_envs,)
-        error = torch.sum(torch.square(env.object_des_pose_w[:, 0:3] - env.object.data.root_pos_w), dim=1)
-        # rewarded if the object is lifted above the threshold
-        return (env.object.data.root_pos_w[:, 2] > threshold) * torch.exp(-error / sigma)
+    # def tracking_object_position_exp(self, env: OringEnv, sigma: float, threshold: float):
+    #     """Penalize tracking object position error using exp-kernel."""
+    #     # distance of the end-effector to the object: (num_envs,)
+    #     error = torch.sum(torch.square(# env.object_des_pose_w[:, 0:3] - # env.object.data.root_pos_w), dim=1)
+    #     # rewarded if the object is lifted above the threshold
+    #     return (# env.object.data.root_pos_w[:, 2] > threshold) * torch.exp(-error / sigma)
 
-    def tracking_object_position_tanh(self, env: OringEnv, sigma: float, threshold: float):
-        """Penalize tracking object position error using tanh-kernel."""
-        # distance of the end-effector to the object: (num_envs,)
-        distance = torch.norm(env.object_des_pose_w[:, 0:3] - env.object.data.root_pos_w, dim=1)
-        # rewarded if the object is lifted above the threshold
-        return (env.object.data.root_pos_w[:, 2] > threshold) * (1 - torch.tanh(distance / sigma))
+    # def tracking_object_position_tanh(self, env: OringEnv, sigma: float, threshold: float):
+    #     """Penalize tracking object position error using tanh-kernel."""
+    #     # distance of the end-effector to the object: (num_envs,)
+    #     distance = torch.norm(# env.object_des_pose_w[:, 0:3] - # env.object.data.root_pos_w, dim=1)
+    #     # rewarded if the object is lifted above the threshold
+    #     return (# env.object.data.root_pos_w[:, 2] > threshold) * (1 - torch.tanh(distance / sigma))
 
-    def lifting_object_success(self, env: OringEnv, threshold: float):
-        """Sparse reward if object is lifted successfully."""
-        # print(env.pcd.get())
-        return torch.where(env.object.data.root_pos_w[:, 2] > threshold, 1.0, 0.0)
+    # def lifting_object_success(self, env: OringEnv, threshold: float):
+    #     """Sparse reward if object is lifted successfully."""
+    #     # print(env.pcd.get())
+    #     return torch.where(# env.object.data.root_pos_w[:, 2] > threshold, 1.0, 0.0)

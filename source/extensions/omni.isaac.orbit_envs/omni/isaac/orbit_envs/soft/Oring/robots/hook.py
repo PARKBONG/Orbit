@@ -11,7 +11,8 @@ from omni.isaac.orbit.actuators.model import ImplicitActuatorCfg
 from omni.isaac.orbit.robots.single_arm import SingleArmManipulatorCfg
 
 # _HOOK_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/4DOF_HOOK_size_2.usd"  # small
-_HOOK_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/4DOF_HOOK_large.usd"  # large
+# _HOOK_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/4DOF_HOOK_large.usd"  # large
+_HOOK_INSTANCEABLE_USD = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/4DOF_HOOK_large_open_final3.usd"  # open
 
 VELOCITY_LIMIT = 1000000
 TORQUE_LIMIT = 1000000
@@ -22,7 +23,7 @@ HOOK_CFG = SingleArmManipulatorCfg(
     meta_info=SingleArmManipulatorCfg.MetaInfoCfg(
         usd_path=_HOOK_INSTANCEABLE_USD,
         arm_num_dof=4,
-        tool_num_dof=0,
+        tool_num_dof=2,
         # tool_sites_names=[],  # xform
     ),
     init_state=SingleArmManipulatorCfg.InitialStateCfg(   # revjoint
@@ -35,6 +36,8 @@ HOOK_CFG = SingleArmManipulatorCfg(
             "RevoluteJoint_y": 0.0,
             "RevoluteJoint_z": 0.0,
             "PrismaticJoint": 0.0,
+            "RevoluteJoint_right" : 0.0,
+            "RevoluteJoint_left" : 0.0,
         },
         dof_vel={".*": 0.0},
 
@@ -49,6 +52,7 @@ HOOK_CFG = SingleArmManipulatorCfg(
         max_depenetration_velocity=5.0,
     ),
     collision_props=SingleArmManipulatorCfg.CollisionPropertiesCfg(
+        # collision_enabled=True,
         contact_offset=0.005,
         rest_offset=0.0,
     ),
@@ -83,13 +87,13 @@ HOOK_CFG = SingleArmManipulatorCfg(
                 dof_pos_offset={"PrismaticJoint": 0.0},
             ),
         ),
-        # "robotiq_hand": GripperActuatorGroupCfg(
-        #     dof_names=["bot_joint_0_p", "top_joint_0_p", "bot_joint_1_p", "top_joint_1_p", "bot_joint_2_p", "top_joint_2_p"],
-        #     model_cfg=ImplicitActuatorCfg(velocity_limit=VELOCITY_LIMIT, torque_limit=1000),
-        #     control_cfg=ActuatorControlCfg(command_types=["p_abs"], stiffness={".*": 400}, damping={".*": 20}),
-        #     mimic_multiplier={"bot_joint_0_p": 1, "top_joint_0_p": -1, "bot_joint_1_p": 1, "top_joint_1_p": -1, "bot_joint_2_p": -1, "top_joint_2_p": 1},
-        #     open_dof_pos=0,
-        #     close_dof_pos=0.35,
-        # )
+        "opener": GripperActuatorGroupCfg(
+            dof_names=["RevoluteJoint_right", "RevoluteJoint_left"],
+            model_cfg=ImplicitActuatorCfg(velocity_limit=VELOCITY_LIMIT, torque_limit=TORQUE_LIMIT),
+            control_cfg=ActuatorControlCfg(command_types=["p_abs"], stiffness={".*": 2 * STIFFNESS}, damping={".*": 2 * DAMPING}),
+            mimic_multiplier={"RevoluteJoint_right": -1, "RevoluteJoint_left": 1},
+            open_dof_pos=0,
+            close_dof_pos=3.141592 * (120 / 180),
+        )
     },
 )

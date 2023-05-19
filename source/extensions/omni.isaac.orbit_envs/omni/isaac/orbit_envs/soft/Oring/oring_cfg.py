@@ -18,36 +18,36 @@ from omni.isaac.orbit_envs.isaac_env_cfg import EnvCfg, IsaacEnvCfg, PhysxCfg, S
 ##
 
 
-@configclass
-class TableCfg:
-    """Properties for the table."""
+# @configclass
+# class TableCfg:
+#     """Properties for the table."""
 
-    # note: we use instanceable asset since it consumes less memory
-    usd_path = f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
+#     # note: we use instanceable asset since it consumes less memory
+#     usd_path = f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd"
 
 
-@configclass
-class ManipulationObjectCfg(RigidObjectCfg):
-    """Properties for the object to manipulate in the scene."""
+# @configclass
+# class ManipulationObjectCfg(RigidObjectCfg):
+#     """Properties for the object to manipulate in the scene."""
 
-    meta_info = RigidObjectCfg.MetaInfoCfg(
-        usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
-        scale=(0.8, 0.8, 0.8),
-    )
-    init_state = RigidObjectCfg.InitialStateCfg(
-        pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
-    )
-    rigid_props = RigidObjectCfg.RigidBodyPropertiesCfg(
-        solver_position_iteration_count=16,
-        solver_velocity_iteration_count=1,
-        max_angular_velocity=1000.0,
-        max_linear_velocity=1000.0,
-        max_depenetration_velocity=5.0,
-        disable_gravity=False,
-    )
-    physics_material = RigidObjectCfg.PhysicsMaterialCfg(
-        static_friction=0.5, dynamic_friction=0.5, restitution=0.0, prim_path="/World/Materials/cubeMaterial"
-    )
+#     meta_info = RigidObjectCfg.MetaInfoCfg(
+#         usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Blocks/DexCube/dex_cube_instanceable.usd",
+#         scale=(0.8, 0.8, 0.8),
+#     )
+#     init_state = RigidObjectCfg.InitialStateCfg(
+#         pos=(0.4, 0.0, 0.075), rot=(1.0, 0.0, 0.0, 0.0), lin_vel=(0.0, 0.0, 0.0), ang_vel=(0.0, 0.0, 0.0)
+#     )
+#     rigid_props = RigidObjectCfg.RigidBodyPropertiesCfg(
+#         solver_position_iteration_count=16,
+#         solver_velocity_iteration_count=1,
+#         max_angular_velocity=1000.0,
+#         max_linear_velocity=1000.0,
+#         max_depenetration_velocity=5.0,
+#         disable_gravity=False,
+#     )
+#     physics_material = RigidObjectCfg.PhysicsMaterialCfg(
+#         static_friction=0.5, dynamic_friction=0.5, restitution=0.0, prim_path="/World/Materials/cubeMaterial"
+#     )
 
 
 @configclass
@@ -131,10 +131,10 @@ class ObservationsCfg:
         # -- object state
         # object_positions = {"scale": 1.0}
         # object_orientations = {"scale": 1.0}
-        object_relative_tool_positions = {"scale": 1.0}
+        # object_relative_tool_positions = {"scale": 1.0}
         # object_relative_tool_orientations = {"scale": 1.0}
         # -- object desired state
-        object_desired_positions = {"scale": 1.0}
+        # object_desired_positions = {"scale": 1.0}
         # -- previous action
         arm_actions = {"scale": 1.0}
         tool_actions = {"scale": 1.0}
@@ -154,16 +154,16 @@ class RewardsCfg:
     # reaching_object_position_l2 = {"weight": 0.0}
     # reaching_object_position_exp = {"weight": 2.5, "sigma": 0.25}
     # reaching_object_position_tanh = {"weight": 2.5, "sigma": 0.1}
-    # penalizing_arm_dof_velocity_l2 = {"weight": 1e-5}
+    penalizing_arm_dof_velocity_l2 = {"weight": -1e-9}
     # penalizing_tool_dof_velocity_l2 = {"weight": 1e-5}
     # penalizing_robot_dof_acceleration_l2 = {"weight": 1e-7}
     # -- action-centric
-    penalizing_arm_action_rate_l2 = {"weight": 1e-2}
+    # penalizing_arm_action_rate_l2 = {"weight": 1e-2}
     # penalizing_tool_action_l2 = {"weight": 1e-2}
     # -- object-centric
     # tracking_object_position_exp = {"weight": 5.0, "sigma": 0.25, "threshold": 0.08}
-    tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
-    lifting_object_success = {"weight": 3.5, "threshold": 0.08}
+    # tracking_object_position_tanh = {"weight": 5.0, "sigma": 0.2, "threshold": 0.08}
+    # lifting_object_success = {"weight": 3.5, "threshold": 0.08}
 
 
 @configclass
@@ -171,8 +171,8 @@ class TerminationsCfg:
     """Termination terms for the MDP."""
 
     episode_timeout = True  # reset when episode length ended
-    object_falling = False  # reset when object falls off the table
-    is_success = False  # reset when object is lifted
+    # object_falling = False  # reset when object falls off the table
+    # is_success = False  # reset when object is lifted
 
 
 @configclass
@@ -224,9 +224,9 @@ class OringEnvCfg(IsaacEnvCfg):
     # -- robot
     robot: SingleArmManipulatorCfg = HOOK_CFG
     # -- object
-    object: ManipulationObjectCfg = ManipulationObjectCfg()
+    # object: ManipulationObjectCfg = ManipulationObjectCfg()
     # -- table
-    table: TableCfg = TableCfg()
+    # table: TableCfg = TableCfg()
     # -- visualization marker
     goal_marker: GoalMarkerCfg = GoalMarkerCfg()
     frame_marker: FrameMarkerCfg = FrameMarkerCfg()
