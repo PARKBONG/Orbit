@@ -147,8 +147,7 @@ class OringEnv(IsaacEnv):
         # self._randomize_object_initial_pose(env_ids=env_ids, cfg=self.cfg.randomization.object_initial_pose)
         # -- goal pose
         # self._randomize_object_desired_pose(env_ids=env_ids, cfg=self.cfg.randomization.object_desired_pose)
-        # for _ in range(50):
-        #     step()
+
         # -- Reward logging
         # fill extras with episode information
         self.extras["episode"] = dict()
@@ -211,7 +210,7 @@ class OringEnv(IsaacEnv):
 
         if self.episode_length_buf == 250:
             self.robot_actions[:, -1] = -1
-            # print(self.robot_actions[:, -1])
+            print(self.robot_actions[:, -1])
             
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):

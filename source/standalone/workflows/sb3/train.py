@@ -75,16 +75,16 @@ def main():
     dump_pickle(os.path.join(log_dir, "params", "env.pkl"), env_cfg)
     dump_pickle(os.path.join(log_dir, "params", "agent.pkl"), agent_cfg)
 
-    if args_cli.task == "Bong-Lift-Robotiq-6dof-v0":
-        save_files(log_dir=log_dir, task_name="bong/lift_6dof", env_name="bong_lift_robotiq_6dof_ppo", file_target="bong_lift")
-    elif args_cli.task == "Bong-Lift-Robotiq-6dof-dummy-v0":
-        save_files(log_dir=log_dir, task_name="bong/lift_6dof_dummy", env_name="bong_lift_robotiq_6dof_dummy_ppo", file_target="bong_lift")
-    elif args_cli.task == "Bong-Lift-Robotiq-6dof-dx-v0":
-        save_files(log_dir=log_dir, task_name="bong/lift_6dof_dx", env_name="bong_lift_robotiq_6dof_dx_ppo", file_target="bong_lift")
-    elif args_cli.task == "Soft-Oring-v0":
-        save_files(log_dir=log_dir, task_name="soft/Oring", env_name="soft_oring_ppo", file_target="oring")
-    else:
-        raise Exception('Bong~!') 
+    # if args_cli.task == "Bong-Lift-Robotiq-6dof-v0":
+    #     save_files(log_dir=log_dir, task_name="bong/lift_6dof", env_name="bong_lift_robotiq_6dof_ppo", file_target="bong_lift")
+    # elif args_cli.task == "Bong-Lift-Robotiq-6dof-dummy-v0":
+    #     save_files(log_dir=log_dir, task_name="bong/lift_6dof_dummy", env_name="bong_lift_robotiq_6dof_dummy_ppo", file_target="bong_lift")
+    # elif args_cli.task == "Bong-Lift-Robotiq-6dof-dx-v0":
+    #     save_files(log_dir=log_dir, task_name="bong/lift_6dof_dx", env_name="bong_lift_robotiq_6dof_dx_ppo", file_target="bong_lift")
+    # elif args_cli.task == "Soft-Oring-v0":
+    #     save_files(log_dir=log_dir, task_name="soft/Oring", env_name="soft_oring_ppo", file_target="oring")
+    # else:
+    #     raise Exception('Bong~!') 
     # read configurations about the agent-training
     policy_arch = agent_cfg.pop("policy")  # 'MlpPolicy'
     n_timesteps = agent_cfg.pop("n_timesteps")

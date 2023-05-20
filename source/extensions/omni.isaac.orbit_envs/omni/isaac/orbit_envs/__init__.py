@@ -132,3 +132,9 @@ gym.register(
     entry_point="omni.isaac.orbit_envs.soft.Oring:OringEnv",
     kwargs={"cfg_entry_point": "omni.isaac.orbit_envs.soft.Oring:OringEnvCfg"},
 )
+
+gym.register(
+    id="Soft-Oring-Entangled-v0",
+    entry_point="omni.isaac.orbit_envs.soft.Oring_entangled:OringEnv",
+    kwargs={"cfg_entry_point": "omni.isaac.orbit_envs.soft.Oring_entangled:OringEnvCfg"},
+)

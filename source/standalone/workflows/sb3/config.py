@@ -30,6 +30,7 @@ SB3_PPO_CONFIG_FILE = {
 
     # Soft
     "Soft-Oring-v0": os.path.join(ORBIT_ENVS_DATA_DIR, "sb3/soft_oring_ppo.yaml"),
+    "Soft-Oring-Entangled-v0": os.path.join(ORBIT_ENVS_DATA_DIR, "sb3/soft_oring_entangled_ppo.yaml"),
 }
 """Mapping from environment names to PPO agent files."""
 
