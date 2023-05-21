@@ -67,8 +67,8 @@ class OringEnv(IsaacEnv):
         num_obs = self._observation_manager.group_obs_dim["policy"][0]
         self.observation_space = gym.spaces.Box(low=-math.inf, high=math.inf, shape=(num_obs,))
         # compute the action space
-        self.action_space = gym.spaces.Box(low=-np.array([0.01, 0.01, 0.01, 0.1]),  # r, p, y, d
-                                           high=np.array([0.01, 0.01, 0.01, 0.1]),
+        self.action_space = gym.spaces.Box(low=-np.array([0.1, 0.1, 0.1, 0.1, 0.1, 0.1]),  # r, p, y, d
+                                           high=np.array([0.1, 0.1, 0.1, 0.1, 0.1, 0.1]),
                                            shape=(self.num_actions,))
         print("[INFO]: Completed setting up the environment...")
 
@@ -79,8 +79,8 @@ class OringEnv(IsaacEnv):
         # self.object.update_buffers(self.dt)
         self.robot.update_buffers(self.dt)
 
-        self.action_clip = torch.tensor([[-torch.pi, -torch.pi, -torch.pi, -20],  # r, p, y, d
-                                         [torch.pi, torch.pi, torch.pi, 0]])
+        self.action_clip = torch.tensor([[1, 1, 1, -torch.pi, -torch.pi, -torch.pi],  # r, p, y, d
+                                         [2, 2, 2, torch.pi, torch.pi, torch.pi]])
 
         # self.dc = _dynamic_control.acquire_dynamic_control_interface()
         # self.robot_support.update_buffers(self.dt)
@@ -92,7 +92,8 @@ class OringEnv(IsaacEnv):
         # ground plane
         # kit_utils.create_ground_plane("/World/defaultGroundPlane", z_position=-1.05)        
         # self.robot_support_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/1DOF_HOOK_Oring_f.usd"  # small
-        self.robot_support_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring/usd/Oring_1DOF_large.usd"  # large
+        # self.robot_support_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring_entangled/usd/test_scene_2.usd"  # large
+        self.robot_support_path = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring_entangled/usd/test_scene_2_bong_01_05.usd"  # large
         # prim_utils.create_prim(prim_path="/World/envs/env_0/RobotSupport",
         #                        usd_path=self.robot_support_path,
         #                        translation=[0, 0, 0],
@@ -171,15 +172,9 @@ class OringEnv(IsaacEnv):
                                translation=[0, 0, 0.0],
                                orientation=[1, 0, 0, 0],
                                scale=[1, 1, 1])
-        self.pcd = PointCloudHandle(deformable_path="/World/envs/env_0/RobotSupport/ORING/orin")
-        self.pcd.visualizer_setup()
-
-        delete_prim(prim_path="/World/envs/env_0/Cylinder")  # https://forums.developer.nvidia.com/t/delete-prim-in-isaac-sim/246025
-        prim_utils.create_prim(prim_path="/World/envs/env_0/Cylinder",
-                               usd_path=self.cylinder,
-                               translation=[8 * np.cos(np.pi / 3), 8 * np.sin(np.pi / 3), -5],
-                               orientation=[1, 0, 0, 0],
-                               scale=[1, 1, 3])
+        self.pcd = PointCloudHandle(deformable_path="/World/envs/env_0/RobotSupport/oring_01_05/oring")
+        # self.pcd.visualizer_setup()
+        self.pcd.partial_visualizer_setup(sample_size=10)
         
         if self.cfg.control.control_type == "inverse_kinematics":
             self._ik_controller.reset_idx(env_ids)
@@ -214,7 +209,8 @@ class OringEnv(IsaacEnv):
             
         # perform physics stepping
         for _ in range(self.cfg.control.decimation):
-            self.pcd.visualizer_update()
+            # self.pcd.visualizer_update()
+            self.pcd.partial_visualizer_update()
             self.robot.apply_action(self.robot_actions)
             # simulate
             self.sim.step(render=self.enable_render)

@@ -6,7 +6,8 @@
 from omni.isaac.orbit.controllers.differential_inverse_kinematics import DifferentialInverseKinematicsCfg
 from omni.isaac.orbit.objects import RigidObjectCfg
 # from omni.isaac.orbit.robots.config.franka import FRANKA_PANDA_ARM_WITH_PANDA_HAND_CFG
-from .robots.hook import HOOK_CFG
+# from .robots.hook import HOOK_CFG
+from .robots.franka_tip import FRANKA_TIP_CFG
 from omni.isaac.orbit.robots.single_arm import SingleArmManipulatorCfg
 from omni.isaac.orbit.utils import configclass
 from omni.isaac.orbit.utils.assets import ISAAC_NUCLEUS_DIR
@@ -219,10 +220,10 @@ class OringEnvCfg(IsaacEnvCfg):
     )
 
     # Scene Settings
-    robot_support: SingleArmManipulatorCfg = HOOK_CFG
+    robot_support: SingleArmManipulatorCfg = FRANKA_TIP_CFG
 
     # -- robot
-    robot: SingleArmManipulatorCfg = HOOK_CFG
+    robot: SingleArmManipulatorCfg = FRANKA_TIP_CFG
     # -- object
     # object: ManipulationObjectCfg = ManipulationObjectCfg()
     # -- table
