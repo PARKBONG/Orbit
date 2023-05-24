@@ -9,7 +9,7 @@
             "type": "python",
             "request": "launch",
             // "args" : ["--task","Soft-Oring-v0","--num_envs","1", "--cpu"],
-            "args" : ["--task","Soft-Oring-Entangled-v0","--num_envs","1", "--cpu"],
+            "args" : ["--task","Soft-Oring-Entangled-v0","--num_envs","1"],
             // "args" : ["--task","Soft-Oring-v0","--num_envs","32", "--cpu", "--checkpoint",
             //          "logs/sb3/Bong-Lift-Robotiq-6dof-dummy-v0/May11_09-08-38_508069445d556ead031cecb8ae8e46cf2b39839a/model_20275200_steps.zip"],
             "program": "${file}",

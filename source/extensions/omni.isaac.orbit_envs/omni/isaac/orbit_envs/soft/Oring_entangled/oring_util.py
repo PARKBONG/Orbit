@@ -8,16 +8,27 @@ import torch
 class PointCloudHandle():
     '''This is collision based pcd handle'''
 
-    def __init__(self, deformable_path):
-        self.ORIENT = np.array([[1, 0, 0], [0, 0, -1], [0, 1, 0]])
+    def __init__(self):
+        self.ORIENT = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
         # self.SCALE = np.array([[0.02, 0.02, 0.02]])
 
         # deformable_path = "/Root/ORG60_5x/orin/orin"
+        # deformable_prim = get_current_stage().GetPrimAtPath(deformable_path)
+        # self.deformable_body = PhysxSchema.PhysxDeformableBodyAPI(deformable_prim)
+        # self.deformable_body_xform = XFormPrimView(prim_paths_expr=deformable_path, name="Deformable_pcd")
+        self.position = np.zeros((500, 3), dtype = np.float32)
+        # mesh_indices = deformable_body.GetCollisionIndicesAttr().Get()
+
+    def setup(self, deformable_path):
         deformable_prim = get_current_stage().GetPrimAtPath(deformable_path)
         self.deformable_body = PhysxSchema.PhysxDeformableBodyAPI(deformable_prim)
         self.deformable_body_xform = XFormPrimView(prim_paths_expr=deformable_path, name="Deformable_pcd")
-        # mesh_indices = deformable_body.GetCollisionIndicesAttr().Get()
-
+        
+    def update(self):
+        local_collision_point = (np.array(self.deformable_body.GetCollisionPointsAttr().Get())) @ self.ORIENT.T
+        global_collision_point = self.deformable_body_xform.get_world_poses()[0]
+        self.position = local_collision_point + global_collision_point.numpy()  # This is what you want!
+    
     def get(self):
         local_collision_point = (np.array(self.deformable_body.GetCollisionPointsAttr().Get())) @ self.ORIENT.T
         global_collision_point = self.deformable_body_xform.get_world_poses()[0]

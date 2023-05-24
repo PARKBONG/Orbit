@@ -140,6 +140,8 @@ class ObservationsCfg:
         arm_actions = {"scale": 1.0}
         tool_actions = {"scale": 1.0}
 
+        pcn_latent = {"scale": 1.0}  # PCN
+        
     # global observation settings
     return_dict_obs_in_group = False
     """Whether to return observations as dictionary or flattened vector within groups."""
