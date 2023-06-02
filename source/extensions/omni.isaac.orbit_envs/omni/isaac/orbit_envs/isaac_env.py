@@ -4,7 +4,7 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 """The superclass for Isaac Sim based environments."""
-
+# modify for deformable object 
 
 import abc
 import gym
@@ -25,22 +25,7 @@ from .isaac_env_cfg import IsaacEnvCfg
 
 # Define type aliases here to avoid circular import
 VecEnvIndices = Union[int, Iterable[int]]
-"""Indices of the sub-environments. Used when we want to access one or more environments."""
-
 VecEnvObs = Dict[str, Union[torch.Tensor, Dict[str, torch.Tensor]]]
-"""Observation returned by the environment. It contains the observation for each sub-environment.
-
-The observations are stored in a dictionary. The keys are the group to which the observations belong.
-This is useful for various learning setups beyond vanilla reinforcement learning, such as asymmetric
-actor-critic, multi-agent, or hierarchical reinforcement learning.
-
-For example, for asymmetric actor-critic, the observation for the actor and the critic can be accessed
-using the keys ``"policy"`` and ``"critic"`` respectively.
-
-Within each group, the observations can be stored either as a dictionary with keys as the names of each
-observation term in the group, or a single tensor obtained from concatenating all the observation terms.
-"""
-
 VecEnvStepReturn = Tuple[VecEnvObs, torch.Tensor, torch.Tensor, Dict]
 """The environment signals processed at the end of each step. It contains the observation, reward, termination
 signal and additional information for each sub-environment."""
@@ -81,7 +66,6 @@ class IsaacEnv(gym.Env):
         # store inputs to class
         self.cfg = cfg
         self.enable_render = not headless
-        # extract commonly used parameters
         self.num_envs = self.cfg.env.num_envs
         self.device = self.cfg.sim.device
         self.physics_dt = self.cfg.sim.dt
@@ -136,23 +120,18 @@ class IsaacEnv(gym.Env):
         cloner = GridCloner(spacing=self.cfg.env.env_spacing)
         cloner.define_base_env(self.env_ns)
         # create the xform prim to hold the template environment
-        if not prim_utils.is_prim_path_valid(self.template_env_ns):
-            prim_utils.define_prim(self.template_env_ns)
-        # setup single scene
+        self.envs_prim_paths = cloner.generate_paths(self.env_ns + "/env", self.num_envs)
+        for i in self.envs_prim_paths:
+            prim_utils.define_prim(i)
         global_prim_paths = self._design_scene()
         # check if any global prim paths are defined
         if global_prim_paths is None:
             global_prim_paths = list()
-        # clone the scenes into the namespace "/World/envs" based on template namespace
-        self.envs_prim_paths = cloner.generate_paths(self.env_ns + "/env", self.num_envs)
-        self.envs_positions = cloner.clone(
-            source_prim_path=self.template_env_ns,
-            prim_paths=self.envs_prim_paths,
-            replicate_physics=self.cfg.sim.replicate_physics,
-        )
-        # convert environment positions to torch tensor
+
+        # env_prim env_0/env_1
+        self.envs_positions = cloner.clone_path(prim_paths=self.envs_prim_paths) #chan
+        # env_position : local position origin point
         self.envs_positions = torch.tensor(self.envs_positions, dtype=torch.float, device=self.device)
-        # filter collisions within each environment instance
         physics_scene_path = self.sim.get_physics_context().prim_path
         cloner.filter_collisions(
             physics_scene_path, "/World/collisions", prim_paths=self.envs_prim_paths, global_paths=global_prim_paths

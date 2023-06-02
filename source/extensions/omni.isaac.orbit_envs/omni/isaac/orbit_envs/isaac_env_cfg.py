@@ -166,7 +166,7 @@ class SimCfg:
         with the GUI enabled. This is to allow certain GUI features to work properly.
     """
 
-    replicate_physics: bool = True
+    replicate_physics: bool = False  # chan True
     """Enable/disable replication of physics schemas when using the Cloner APIs. Default is False.
 
     Note:
