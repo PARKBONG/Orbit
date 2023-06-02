@@ -32,12 +32,15 @@ class PointCloudHandle():
         for deform_body in self.deform_prim:
             self.deformable_body.append(PhysxSchema.PhysxDeformableBodyAPI(deform_body))
         
+        self.root = "/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft"
         # visualize
         self.points = []
 
         # latent vector extract
         self.model = PCN().to("cuda:0")
-        self.model.load_state_dict(torch.load("/home/bong/.local/share/ov/pkg/isaac_sim-2022.2.1/Orbit/source/extensions/omni.isaac.orbit_envs/omni/isaac/orbit_envs/soft/Oring_entangled/models/checkpoint/best_l1_cd.pth"))
+        # self.model.load_state_dict(torch.load("/Oring_entangled/models/checkpoint/best_l1_cd.pth"))
+        self.model.load_state_dict(torch.load("/Oring_entangled/models/checkpoint/checkpoint_400.pth"))
+        
 
     def initialize(self):
         self.deform_prim = []
